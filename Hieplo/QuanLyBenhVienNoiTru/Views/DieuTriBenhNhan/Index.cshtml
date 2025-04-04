@@ -1,0 +1,74 @@
+@model IEnumerable<QuanLyBenhVienNoiTru.Models.DieuTriBenhNhan>
+
+@{
+    ViewData["Title"] = "Danh sách điều trị bệnh nhân";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Danh sách điều trị bệnh nhân</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Thêm mới</a>
+</p>
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Mã điều trị</th>
+                        <th>Bệnh nhân</th>
+                        <th>Hình thức điều trị</th>
+                        <th>Bác sĩ thực hiện</th>
+                        <th>Ngày thực hiện</th>
+                        <th>Kết quả</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.MaDieuTriBenhNhan)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.BenhNhan.HoTen)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.HinhThucDieuTri.TenDieuTri)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.BacSi.HoTen)
+                            </td>
+                            <td>
+                                @(item.NgayThucHien.HasValue ? item.NgayThucHien.Value.ToString("dd/MM/yyyy") : "")
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.KetQua)
+                            </td>
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@item.MaDieuTriBenhNhan" class="btn btn-warning btn-sm">Sửa</a>
+                                <a asp-action="Details" asp-route-id="@item.MaDieuTriBenhNhan" class="btn btn-info btn-sm">Chi tiết</a>
+                                <a asp-action="Delete" asp-route-id="@item.MaDieuTriBenhNhan" class="btn btn-danger btn-sm">Xóa</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#dataTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Vietnamese.json"
+                }
+            });
+        });
+    </script>
+}

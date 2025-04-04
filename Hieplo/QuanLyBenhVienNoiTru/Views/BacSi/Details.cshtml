@@ -1,0 +1,107 @@
+@model QuanLyBenhVienNoiTru.Models.BacSi
+@{
+    ViewData["Title"] = "Chi Tiết Bác Sĩ";
+    Layout = "_BacSiLayout";
+}
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Chi Tiết Bác Sĩ</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/BacSi">Danh Sách Bác Sĩ</a></li>
+        <li class="breadcrumb-item active">Chi Tiết</li>
+    </ol>
+    
+    <div class="row">
+        <div class="col-xl-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-user-md me-1"></i>
+                    Thông Tin Cá Nhân
+                </div>
+                <div class="card-body">
+                    <div class="row mb-2">
+                        <div class="col-md-4 fw-bold">Họ và tên:</div>
+                        <div class="col-md-8">@Model.HoTen</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-4 fw-bold">Chuyên khoa:</div>
+                        <div class="col-md-8">@Model.ChuyenKhoa</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-4 fw-bold">Số điện thoại:</div>
+                        <div class="col-md-8">@Model.SoDienThoai</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-4 fw-bold">Mã tài khoản:</div>
+                        <div class="col-md-8">
+                            @(Model.MaTaiKhoan != null ? Model.MaTaiKhoan.ToString() : "Chưa gán tài khoản")
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a asp-action="Edit" asp-route-id="@Model.MaBacSi" class="btn btn-primary">
+                            <i class="fas fa-edit me-1"></i> Chỉnh Sửa
+                        </a>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i> Quay Lại
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-clipboard-list me-1"></i>
+                    Danh Sách Điều Trị Gần Đây
+                </div>
+                <div class="card-body">
+                    @if (Model.DieuTriBenhNhans != null && Model.DieuTriBenhNhans.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Bệnh Nhân</th>
+                                        <th>Ngày Thực Hiện</th>
+                                        <th>Điều Trị</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.DieuTriBenhNhans.OrderByDescending(d => d.NgayThucHien).Take(5))
+                                    {
+                                        <tr>
+                                            <td>
+                                                <a asp-controller="BenhNhan" asp-action="Details" asp-route-id="@item.MaBenhNhan">
+                                                    @(item.BenhNhan?.HoTen ?? "N/A")
+                                                </a>
+                                            </td>
+                                            <td>@String.Format("{0:dd/MM/yyyy}", item.NgayThucHien)</td>
+                                            <td>
+                                                <a asp-controller="DieuTriBenhNhan" asp-action="Details" asp-route-id="@item.MaDieuTriBenhNhan">
+                                                    @(item.HinhThucDieuTri?.TenDieuTri ?? "N/A")
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-end">
+                            <a asp-controller="DieuTriBenhNhan" asp-action="Index" asp-route-bacSiId="@Model.MaBacSi" class="btn btn-sm btn-info">
+                                <i class="fas fa-list me-1"></i> Xem Tất Cả
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            Bác sĩ chưa có lịch sử điều trị nào.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,83 @@
+@model QuanLyBenhVienNoiTru.Models.DieuTriBenhNhan
+
+@{
+    ViewData["Title"] = "Thêm điều trị mới";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Thêm điều trị mới</h2>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Thông tin điều trị</h6>
+    </div>
+    <div class="card-body">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="MaBenhNhan" class="control-label">Bệnh nhân</label>
+                        <select asp-for="MaBenhNhan" class="form-control" asp-items="ViewBag.MaBenhNhan">
+                            <option value="">-- Chọn bệnh nhân --</option>
+                        </select>
+                        <span asp-validation-for="MaBenhNhan" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="MaDieuTri" class="control-label">Hình thức điều trị</label>
+                        <select asp-for="MaDieuTri" class="form-control" asp-items="ViewBag.MaDieuTri">
+                            <option value="">-- Chọn hình thức điều trị --</option>
+                        </select>
+                        <span asp-validation-for="MaDieuTri" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="MaBacSi" class="control-label">Bác sĩ thực hiện</label>
+                        <select asp-for="MaBacSi" class="form-control" asp-items="ViewBag.MaBacSi">
+                            <option value="">-- Chọn bác sĩ --</option>
+                        </select>
+                        <span asp-validation-for="MaBacSi" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="NgayThucHien" class="control-label">Ngày thực hiện</label>
+                        <input asp-for="NgayThucHien" class="form-control" type="date" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                        <span asp-validation-for="NgayThucHien" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label asp-for="KetQua" class="control-label">Kết quả</label>
+                <textarea asp-for="KetQua" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="KetQua" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <input type="submit" value="Lưu" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function() {
+            // Enhance select dropdowns with select2
+            $('select').select2({
+                theme: 'bootstrap4',
+                width: '100%'
+            });
+        });
+    </script>
+}

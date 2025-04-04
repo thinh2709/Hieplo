@@ -1,0 +1,505 @@
+@model IEnumerable<QuanLyBenhVienNoiTru.Models.BenhNhan>
+
+@{
+    ViewData["Title"] = "Danh sách bệnh nhân";
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Quản lý bệnh viện nội trú</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-color: #f5f5f5;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            background-color: var(--secondary-color);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            color: white !important;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            transition: color 0.3s;
+        }
+        
+        .nav-link:hover {
+            color: white !important;
+        }
+        
+        .dashboard-header {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .dashboard-title {
+            color: var(--secondary-color);
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+        
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .search-box input {
+            border-radius: 50px;
+            padding-left: 40px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 10px;
+            color: #999;
+        }
+        
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .table {
+            margin-bottom: 0;
+        }
+        
+        .table thead th {
+            background-color: var(--light-color);
+            color: var(--secondary-color);
+            font-weight: 600;
+            border-bottom: none;
+        }
+        
+        .table tbody tr {
+            transition: background-color 0.3s;
+        }
+        
+        .table tbody tr:hover {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+        
+        .table td {
+            vertical-align: middle;
+        }
+        
+        .badge {
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 30px;
+        }
+        
+        .badge-success {
+            background-color: var(--success-color);
+        }
+        
+        .badge-warning {
+            background-color: var(--warning-color);
+        }
+        
+        .btn {
+            border-radius: 5px;
+            font-weight: 500;
+            padding: 8px 15px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
+            border-color: #27ae60;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+            border-color: #c0392b;
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .btn-icon {
+            margin-right: 5px;
+        }
+        
+        .alert {
+            border-radius: 8px;
+            border-left: 4px solid;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background-color: rgba(46, 204, 113, 0.1);
+            border-left-color: var(--success-color);
+            color: #27ae60;
+        }
+        
+        .alert-warning {
+            background-color: rgba(243, 156, 18, 0.1);
+            border-left-color: var(--warning-color);
+            color: #d35400;
+        }
+        
+        .alert-danger {
+            background-color: rgba(231, 76, 60, 0.1);
+            border-left-color: var(--danger-color);
+            color: #c0392b;
+        }
+        
+        .alert-dismissible .close {
+            padding: 15px;
+        }
+        
+        .pagination {
+            margin-top: 20px;
+            justify-content: center;
+        }
+        
+        .page-item.active .page-link {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .page-link {
+            color: var(--primary-color);
+            border-radius: 5px;
+            margin: 0 3px;
+        }
+        
+        footer {
+            background-color: var(--light-color);
+            padding: 15px 0;
+            margin-top: 50px;
+            text-align: center;
+            color: var(--secondary-color);
+            font-size: 14px;
+        }
+        
+        /* Responsive adjustments */
+        @@media (max-width: 768px) {
+            .card {
+                margin-bottom: 20px;
+            }
+            
+            .dashboard-header {
+                padding: 15px;
+            }
+            
+            .btn {
+                padding: 6px 12px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="fas fa-hospital-alt me-2"></i>Bệnh Viện Nội Trú</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#"><i class="fas fa-home me-1"></i>Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-user-md me-1"></i>Bác sĩ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-procedures me-1"></i>Bệnh nhân</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-heartbeat me-1"></i>Điều trị</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-money-bill-wave me-1"></i>Chi phí</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-1"></i>@User.Identity.Name
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-user-cog me-2"></i>Hồ sơ</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-lock me-2"></i>Đổi mật khẩu</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Alerts -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>@TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <div class="dashboard-header d-flex justify-content-between align-items-center">
+            <div>
+                <h4 class="dashboard-title">Danh sách bệnh nhân</h4>
+                <p class="text-muted mb-0">Quản lý danh sách bệnh nhân nội trú</p>
+            </div>
+            <div>
+                <a href="@Url.Action("Create", "BenhNhan")" class="btn btn-primary">
+                    <i class="fas fa-plus btn-icon"></i>Thêm bệnh nhân mới
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row align-items-center mb-3">
+                    <div class="col-md-6">
+                        <div class="search-box">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm bệnh nhân...">
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-primary active filterBtn" data-filter="all">Tất cả</button>
+                            <button type="button" class="btn btn-outline-primary filterBtn" data-filter="active">Đang điều trị</button>
+                            <button type="button" class="btn btn-outline-primary filterBtn" data-filter="discharged">Đã xuất viện</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Họ tên</th>
+                                <th>Ngày sinh</th>
+                                <th>Giới tính</th>
+                                <th>Khoa</th>
+                                <th>Ngày nhập viện</th>
+                                <th>Tình trạng</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr class="@(item.NgayXuatVien == null ? "patient-active" : "patient-discharged")">
+                                    <td>@item.MaBenhNhan</td>
+                                    <td>
+                                        <div class="fw-bold">@item.HoTen</div>
+                                        <div class="small text-muted">@item.SoDienThoai</div>
+                                    </td>
+                                    <td>@(item.NgaySinh?.ToString("dd/MM/yyyy") ?? "-")</td>
+                                    <td>@item.GioiTinh</td>
+                                    <td>@item.Khoa.TenKhoa</td>
+                                    <td>@item.NgayNhapVien.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        @if (item.NgayXuatVien == null)
+                                        {
+                                            <span class="badge bg-success">Đang điều trị</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Đã xuất viện (@item.NgayXuatVien?.ToString("dd/MM/yyyy"))</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            @if (item.NgayXuatVien == null)
+                                            {
+                                                <a href="@Url.Action("ThemDieuTri", new { id = item.MaBenhNhan })" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-heartbeat me-1"></i>Điều trị
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a href="@Url.Action("Details", "BenhNhan", new { id = item.MaBenhNhan })" class="btn btn-sm btn-outline-info">
+                                                    <i class="fas fa-info-circle me-1"></i>Chi tiết
+                                                </a>
+                                            }
+                                            <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"></button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a class="dropdown-item" href="@Url.Action("Details", "BenhNhan", new { id = item.MaBenhNhan })">
+                                                        <i class="fas fa-info-circle me-2"></i>Chi tiết
+                                                    </a>
+                                                </li>
+                                                @if (item.NgayXuatVien == null)
+                                                {
+                                                    <li>
+                                                        <a class="dropdown-item" href="@Url.Action("XuatVien", new { id = item.MaBenhNhan })">
+                                                            <i class="fas fa-check-circle me-2"></i>Xuất viện
+                                                        </a>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <nav>
+                    <ul class="pagination">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1"><i class="fas fa-chevron-left"></i></a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#"><i class="fas fa-chevron-right"></i></a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; @DateTime.Now.Year - Hệ thống quản lý bệnh viện nội trú</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Tìm kiếm bệnh nhân
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const tableRows = document.querySelectorAll('tbody tr');
+            
+            // Tìm kiếm
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                tableRows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    if (text.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Bộ lọc
+            const filterButtons = document.querySelectorAll('.filterBtn');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Thay đổi trạng thái active
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const filterValue = this.getAttribute('data-filter');
+                    
+                    tableRows.forEach(row => {
+                        if (filterValue === 'all') {
+                            row.style.display = '';
+                        } else if (filterValue === 'active' && row.classList.contains('patient-active')) {
+                            row.style.display = '';
+                        } else if (filterValue === 'discharged' && row.classList.contains('patient-discharged')) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

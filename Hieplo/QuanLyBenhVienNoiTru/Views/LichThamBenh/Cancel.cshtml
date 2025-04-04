@@ -1,0 +1,35 @@
+@model LichThamBenh
+@{
+    ViewData["Title"] = "Hủy lịch thăm";
+    Layout = User.IsInRole("Admin") ? "_AdminLayout" : "_BacSiLayout";
+}
+
+<div class="container">
+    <h2>Hủy lịch thăm</h2>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Bạn có chắc chắn muốn hủy lịch thăm này?</h5>
+            <dl class="row">
+                <dt class="col-sm-3">Khách thăm:</dt>
+                <dd class="col-sm-9">@Model.KhachThamBenh?.HoTen</dd>
+                
+                <dt class="col-sm-3">Bệnh nhân:</dt>
+                <dd class="col-sm-9">@Model.BenhNhan?.HoTen</dd>
+                
+                <dt class="col-sm-3">Thời gian thăm:</dt>
+                <dd class="col-sm-9">@Model.ThoiGianTham?.ToString("dd/MM/yyyy HH:mm")</dd>
+                
+                <dt class="col-sm-3">Trạng thái:</dt>
+                <dd class="col-sm-9">@Model.TrangThai</dd>
+            </dl>
+
+            <form asp-action="CancelConfirmed" method="post">
+                <input type="hidden" name="id" value="@Model.MaLich" />
+                <div class="form-group">
+                    <input type="submit" value="Xác nhận hủy" class="btn btn-danger" />
+                    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

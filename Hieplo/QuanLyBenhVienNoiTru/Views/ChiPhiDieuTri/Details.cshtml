@@ -1,0 +1,167 @@
+@model QuanLyBenhVienNoiTru.Models.ChiPhiDieuTri
+
+@{
+    ViewData["Title"] = "Chi tiết chi phí điều trị";
+    Layout = "_Layout";
+    
+    var dieuTriList = ViewBag.DieuTriList as List<QuanLyBenhVienNoiTru.Models.DieuTriBenhNhan>;
+}
+
+<div class="container-fluid">
+    <h2 class="mt-4 mb-4">Chi tiết chi phí điều trị</h2>
+    
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-info">
+            @TempData["Message"]
+        </div>
+    }
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Thông tin chi phí
+                </div>
+                <div class="card-body">
+                    <div class="row mb-2">
+                        <div class="col-md-4 font-weight-bold">Mã chi phí:</div>
+                        <div class="col-md-8">@Model.MaChiPhi</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-4 font-weight-bold">Bệnh nhân:</div>
+                        <div class="col-md-8">@(Model.BenhNhan?.HoTen ?? "N/A")</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-4 font-weight-bold">Tổng chi phí:</div>
+                        <div class="col-md-8">@Model.TongChiPhi.ToString("N0") VNĐ</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-4 font-weight-bold">Ngày lập:</div>
+                        <div class="col-md-8">@(Model.NgayLap?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-4 font-weight-bold">Trạng thái:</div>
+                        <div class="col-md-8">
+                            @if (Model.DaThanhToan)
+                            {
+                                <span class="badge badge-success">Đã thanh toán</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-warning">Chưa thanh toán</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="btn-group">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Quay lại
+                        </a>
+                        @if (!Model.DaThanhToan)
+                        {
+                            <a asp-action="ThanhToan" asp-route-id="@Model.MaChiPhi" class="btn btn-success ml-1">
+                                <i class="fas fa-money-bill"></i> Thanh toán
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-user mr-1"></i>
+                    Thông tin bệnh nhân
+                </div>
+                <div class="card-body">
+                    @if (Model.BenhNhan != null)
+                    {
+                        <div class="row mb-2">
+                            <div class="col-md-4 font-weight-bold">Mã bệnh nhân:</div>
+                            <div class="col-md-8">@Model.BenhNhan.MaBenhNhan</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-4 font-weight-bold">Họ tên:</div>
+                            <div class="col-md-8">@Model.BenhNhan.HoTen</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-4 font-weight-bold">Số điện thoại:</div>
+                            <div class="col-md-8">@(Model.BenhNhan.SoDienThoai ?? "N/A")</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-4 font-weight-bold">Khoa:</div>
+                            <div class="col-md-8">@(Model.BenhNhan.Khoa?.TenKhoa ?? "N/A")</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-4 font-weight-bold">Ngày nhập viện:</div>
+                            <div class="col-md-8">@(Model.BenhNhan.NgayNhapVien.ToString("dd/MM/yyyy"))</div>
+                        </div>
+                        @if (Model.BenhNhan.NgayXuatVien.HasValue)
+                        {
+                            <div class="row mb-2">
+                                <div class="col-md-4 font-weight-bold">Ngày xuất viện:</div>
+                                <div class="col-md-8">@Model.BenhNhan.NgayXuatVien.Value.ToString("dd/MM/yyyy")</div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p>Không có thông tin bệnh nhân.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-list mr-1"></i>
+            Danh sách các điều trị
+        </div>
+        <div class="card-body">
+            @if (dieuTriList != null && dieuTriList.Any())
+            {
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Mã điều trị</th>
+                            <th>Hình thức điều trị</th>
+                            <th>Bác sĩ phụ trách</th>
+                            <th>Ngày thực hiện</th>
+                            <th>Chi phí</th>
+                            <th>Kết quả</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in dieuTriList)
+                        {
+                            <tr>
+                                <td>@item.MaDieuTriBenhNhan</td>
+                                <td>@(item.HinhThucDieuTri?.TenDieuTri ?? "N/A")</td>
+                                <td>@(item.BacSi?.HoTen ?? "N/A")</td>
+                                <td>@(item.NgayThucHien?.ToString("dd/MM/yyyy") ?? "N/A")</td>
+                                <td>@(item.HinhThucDieuTri?.ChiPhi.ToString("N0") ?? "0") VNĐ</td>
+                                <td>@(string.IsNullOrEmpty(item.KetQua) ? "Không có" : item.KetQua)</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="4" class="text-right">Tổng chi phí:</th>
+                            <th>@Model.TongChiPhi.ToString("N0") VNĐ</th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            }
+            else
+            {
+                <p>Không có thông tin điều trị.</p>
+            }
+        </div>
+    </div>
+</div>

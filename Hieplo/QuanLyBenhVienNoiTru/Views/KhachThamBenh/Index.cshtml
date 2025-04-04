@@ -1,0 +1,37 @@
+@model KhachThamBenh
+@{
+    ViewData["Title"] = "Thông tin khách thăm";
+    Layout = "_KhachLayout";
+}
+
+<div class="container">
+    <h2>Thông tin khách thăm</h2>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">@Model.HoTen</h5>
+            <p class="card-text">Số điện thoại: @Model.SoDienThoai</p>
+            <p class="card-text">Mối quan hệ: @Model.MoiQuanHe</p>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Đăng ký thăm bệnh</h5>
+                    <p class="card-text">Đăng ký thời gian thăm bệnh nhân đang điều trị tại bệnh viện.</p>
+                    <a asp-action="DangKyTham" class="btn btn-primary">Đăng ký thăm</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Lịch sử thăm bệnh</h5>
+                    <p class="card-text">Xem lại lịch sử các lần thăm bệnh của bạn.</p>
+                    <a asp-action="LichSuTham" class="btn btn-info">Xem lịch sử</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

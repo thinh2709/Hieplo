@@ -1,0 +1,155 @@
+@model List<QuanLyBenhVienNoiTru.Models.ChiPhiDieuTri>
+
+@{
+    ViewData["Title"] = "Danh sách chi phí điều trị";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <h2 class="mt-4 mb-4">Quản lý chi phí điều trị</h2>
+    
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fas fa-table mr-1"></i>
+                Danh sách chi phí điều trị
+            </div>
+            <a asp-action="Create" class="btn btn-success">
+                <i class="fas fa-plus"></i> Tạo mới
+            </a>
+        </div>
+        <div class="card-body">
+            <!-- Tìm kiếm và lọc -->
+            <form asp-action="Index" method="get" class="mb-4">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="SearchTerm" placeholder="Tìm kiếm..." />
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <select name="TrangThaiThanhToan" class="form-control">
+                            <option value="">-- Tất cả trạng thái --</option>
+                            <option value="true">Đã thanh toán</option>
+                            <option value="false">Chưa thanh toán</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <input type="date" class="form-control" name="TuNgay" placeholder="Từ ngày" />
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <input type="date" class="form-control" name="DenNgay" placeholder="Đến ngày" />
+                    </div>
+                </div>
+            </form>
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle mr-1"></i> @TempData["Success"]
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            }
+
+            @if (TempData["Message"] != null)
+            {
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    <i class="fas fa-info-circle mr-1"></i> @TempData["Message"]
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            }
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="chiPhiTable" width="100%" cellspacing="0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Mã chi phí</th>
+                            <th>Bệnh nhân</th>
+                            <th>Tổng chi phí</th>
+                            <th>Trạng thái</th>
+                            <th>Ngày lập</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.MaChiPhi</td>
+                                    <td>@(item.BenhNhan?.HoTen ?? "N/A")</td>
+                                    <td>@item.TongChiPhi.ToString("N0") VNĐ</td>
+                                    <td>
+                                        @if (item.DaThanhToan)
+                                        {
+                                            <span class="badge badge-success">Đã thanh toán</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-warning">Chưa thanh toán</span>
+                                        }
+                                    </td>
+                                    <td>@(item.NgayLap?.ToString("dd/MM/yyyy") ?? "N/A")</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a asp-action="Details" asp-route-id="@item.MaChiPhi" class="btn btn-info btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a asp-action="Edit" asp-route-id="@item.MaChiPhi" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            @if (!item.DaThanhToan)
+                                            {
+                                                <a asp-action="ThanhToan" asp-route-id="@item.MaChiPhi" class="btn btn-success btn-sm">
+                                                    <i class="fas fa-money-bill"></i>
+                                                </a>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center">Không có dữ liệu</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#chiPhiTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Vietnamese.json"
+                },
+                "paging": true,
+                "ordering": true,
+                "info": true,
+                "responsive": true,
+                "searching": false, // Tắt tìm kiếm của DataTables vì đã có form tìm kiếm riêng
+                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Tất cả"]],
+                "order": [[0, "desc"]], // Sắp xếp theo mã chi phí giảm dần
+                "columnDefs": [
+                    { "orderable": false, "targets": 5 } // Không cho phép sắp xếp cột thao tác
+                ]
+            });
+        });
+    </script>
+}

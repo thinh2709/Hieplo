@@ -1,0 +1,111 @@
+@model QuanLyBenhVienNoiTru.Models.BenhNhan
+
+@{
+    ViewData["Title"] = "Chỉnh sửa thông tin bệnh nhân";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <h2>Chỉnh sửa thông tin bệnh nhân</h2>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Thông tin bệnh nhân #@Model.MaBenhNhan</h6>
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="MaBenhNhan" />
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="HoTen" class="control-label">Họ tên</label>
+                            <input asp-for="HoTen" class="form-control" required />
+                            <span asp-validation-for="HoTen" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label asp-for="NgaySinh" class="control-label">Ngày sinh</label>
+                            <input asp-for="NgaySinh" class="form-control" type="date" value="@(Model.NgaySinh.HasValue ? Model.NgaySinh.Value.ToString("yyyy-MM-dd") : "")" />
+                            <span asp-validation-for="NgaySinh" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label asp-for="GioiTinh" class="control-label">Giới tính</label>
+                            <select asp-for="GioiTinh" class="form-control" asp-items="ViewBag.GioiTinhList">
+                                <option value="">-- Chọn giới tính --</option>
+                            </select>
+                            <span asp-validation-for="GioiTinh" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label asp-for="SoDienThoai" class="control-label">Số điện thoại</label>
+                            <input asp-for="SoDienThoai" class="form-control" />
+                            <span asp-validation-for="SoDienThoai" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label asp-for="DiaChi" class="control-label">Địa chỉ</label>
+                            <textarea asp-for="DiaChi" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="DiaChi" class="text-danger"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="BaoHiemYTe" class="control-label">Bảo hiểm y tế</label>
+                            <div class="form-check">
+                                <input asp-for="BaoHiemYTe" class="form-check-input" type="checkbox" />
+                                <label class="form-check-label">Có bảo hiểm y tế</label>
+                            </div>
+                            <span asp-validation-for="BaoHiemYTe" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label asp-for="MaKhoa" class="control-label">Khoa điều trị</label>
+                            <select asp-for="MaKhoa" class="form-control" asp-items="ViewBag.MaKhoa" required>
+                                <option value="">-- Chọn khoa --</option>
+                            </select>
+                            <span asp-validation-for="MaKhoa" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label asp-for="NgayNhapVien" class="control-label">Ngày nhập viện</label>
+                            <input asp-for="NgayNhapVien" class="form-control" type="date" value="@Model.NgayNhapVien.ToString("yyyy-MM-dd")" required />
+                            <span asp-validation-for="NgayNhapVien" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label asp-for="NgayXuatVien" class="control-label">Ngày xuất viện</label>
+                            <input asp-for="NgayXuatVien" class="form-control" type="date" value="@(Model.NgayXuatVien.HasValue ? Model.NgayXuatVien.Value.ToString("yyyy-MM-dd") : "")" />
+                            <span asp-validation-for="NgayXuatVien" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i> Lưu ý: Nếu bệnh nhân xuất viện, vui lòng cập nhật ngày xuất viện.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group text-center mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Cập nhật thông tin
+                    </button>
+                    <a asp-action="Details" asp-route-id="@Model.MaBenhNhan" class="btn btn-info">
+                        <i class="fas fa-info-circle"></i> Xem chi tiết
+                    </a>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

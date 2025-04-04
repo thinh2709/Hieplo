@@ -1,0 +1,254 @@
+﻿﻿@{
+    ViewData["Title"] = "Hệ Thống Quản Lý Bệnh Viện Nội Trú";
+}
+
+<div class="container">
+    <!-- Banner/Hero Section -->
+    <div class="row my-4">
+        <div class="col-12 text-center">
+            <h1 class="display-4">Hệ Thống Quản Lý Bệnh Viện Nội Trú</h1>
+            <p class="lead">Giải pháp hiện đại cho quản lý bệnh nhân, điều trị và thăm bệnh</p>
+            <hr class="my-4">
+        </div>
+    </div>
+
+    <!-- Features/Quick Access Cards -->
+    <div class="row">
+        <!-- Admin Section -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0"><i class="fas fa-user-shield"></i> Quản Trị Viên</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Quản lý người dùng hệ thống, phân quyền và giám sát hoạt động.</p>
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item"><i class="fas fa-users"></i> Quản lý tài khoản</li>
+                        <li class="list-group-item"><i class="fas fa-chart-line"></i> Thống kê báo cáo</li>
+                        <li class="list-group-item"><i class="fas fa-cog"></i> Cấu hình hệ thống</li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-white border-top-0">
+                    <a asp-controller="Admin" asp-action="Index" class="btn btn-outline-primary btn-block">Truy cập</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Doctors Section -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0"><i class="fas fa-user-md"></i> Bác Sĩ</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Quản lý bệnh nhân, thực hiện điều trị và cập nhật thông tin y tế.</p>
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item"><i class="fas fa-procedures"></i> Quản lý bệnh nhân</li>
+                        <li class="list-group-item"><i class="fas fa-clipboard-list"></i> Điều trị bệnh nhân</li>
+                        <li class="list-group-item"><i class="fas fa-file-medical"></i> Xuất viện</li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-white border-top-0">
+                    <a asp-controller="BacSi" asp-action="Index" class="btn btn-outline-success btn-block">Truy cập</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visitors Section -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0"><i class="fas fa-user-friends"></i> Khách Thăm Bệnh</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Đăng ký thăm bệnh, xem lịch và quản lý việc thăm bệnh nhân.</p>
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item"><i class="fas fa-calendar-plus"></i> Đăng ký thăm</li>
+                        <li class="list-group-item"><i class="fas fa-calendar-check"></i> Lịch sử thăm</li>
+                        <li class="list-group-item"><i class="fas fa-info-circle"></i> Thông tin quy định</li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-white border-top-0">
+                    <a asp-controller="KhachThamBenh" asp-action="Index" class="btn btn-outline-info btn-block">Truy cập</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Features Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Quản Lý Toàn Diện</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Patients Management -->
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <div class="card h-100 border-0">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-hospital-user fa-3x text-primary mb-3"></i>
+                                    <h5>Quản Lý Bệnh Nhân</h5>
+                                    <p class="small">Hồ sơ bệnh nhân, nhập/xuất viện</p>
+                                    <a asp-controller="BenhNhan" asp-action="Index" class="stretched-link"></a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Departments -->
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <div class="card h-100 border-0">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-hospital fa-3x text-danger mb-3"></i>
+                                    <h5>Khoa Phòng</h5>
+                                    <p class="small">Quản lý khoa và phân công</p>
+                                    <a asp-controller="Khoa" asp-action="Index" class="stretched-link"></a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Treatment Management -->
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <div class="card h-100 border-0">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-stethoscope fa-3x text-success mb-3"></i>
+                                    <h5>Điều Trị</h5>
+                                    <p class="small">Hình thức và dịch vụ điều trị</p>
+                                    <a asp-controller="HinhThucDieuTri" asp-action="Index" class="stretched-link"></a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Financial Management -->
+                        <div class="col-md-3 col-sm-6 mb-3">
+                            <div class="card h-100 border-0">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-file-invoice-dollar fa-3x text-warning mb-3"></i>
+                                    <h5>Chi Phí Điều Trị</h5>
+                                    <p class="small">Quản lý viện phí và thanh toán</p>
+                                    <a asp-controller="ChiPhiDieuTri" asp-action="Index" class="stretched-link"></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats & Info Section -->
+    <div class="row mt-4">
+        <!-- Stats -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Thống Kê Nhanh</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <div class="p-3 bg-light rounded">
+                                <h3 class="text-primary" id="patientCount">--</h3>
+                                <p class="mb-0">Bệnh nhân đang điều trị</p>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="p-3 bg-light rounded">
+                                <h3 class="text-success" id="doctorCount">--</h3>
+                                <p class="mb-0">Bác sĩ</p>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded">
+                                <h3 class="text-info" id="deptCount">--</h3>
+                                <p class="mb-0">Khoa phòng</p>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded">
+                                <h3 class="text-danger" id="visitCount">--</h3>
+                                <p class="mb-0">Lượt thăm khám hôm nay</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- News & Updates -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Thông Báo</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">Cập nhật hệ thống</h5>
+                                <small>3 ngày trước</small>
+                            </div>
+                            <p class="mb-1">Hệ thống đã được nâng cấp với các tính năng mới về quản lý điều trị.</p>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">Quy định thăm bệnh mới</h5>
+                                <small>1 tuần trước</small>
+                            </div>
+                            <p class="mb-1">Cập nhật quy định thăm bệnh trong thời gian cao điểm dịch bệnh.</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login/Register Callout (for non-authenticated users) -->
+    <div class="row mt-2">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <div class="col-md-8">
+                                <h4>Xin chào, @User.Identity.Name!</h4>
+                                <p class="mb-md-0">Chào mừng bạn đến với hệ thống quản lý bệnh viện.</p>
+                            </div>
+                            <div class="col-md-4 text-md-right">
+                                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-outline-primary">Đăng Xuất</button>
+                                </form>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-md-8">
+                                <h4>Chưa có tài khoản?</h4>
+                                <p class="mb-md-0">Đăng ký ngay để truy cập đầy đủ tính năng của hệ thống quản lý bệnh viện.</p>
+                            </div>
+                            <div class="col-md-4 text-md-right">
+                                <a asp-controller="Account" asp-action="Login" class="btn btn-primary mr-2">Đăng Nhập</a>
+                                <a asp-controller="Account" asp-action="Register" class="btn btn-outline-primary">Đăng Ký</a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Giả lập các số liệu thống kê (trong thực tế sẽ lấy từ API hoặc model)
+            $("#patientCount").text("42");
+            $("#doctorCount").text("15");
+            $("#deptCount").text("8");
+            $("#visitCount").text("26");
+        });
+    </script>
+}

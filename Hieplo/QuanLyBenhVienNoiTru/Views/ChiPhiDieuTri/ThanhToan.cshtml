@@ -1,0 +1,56 @@
+@model QuanLyBenhVienNoiTru.Models.ChiPhiDieuTri
+
+@{
+    ViewData["Title"] = "Thanh toán chi phí điều trị";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <h2 class="mt-4 mb-4">Thanh toán chi phí điều trị</h2>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-money-bill mr-1"></i>
+                    Thông tin thanh toán
+                </div>
+                <div class="card-body">
+                    <div class="row mb-2">
+                        <div class="col-md-4 font-weight-bold">Mã chi phí:</div>
+                        <div class="col-md-8">@Model.MaChiPhi</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-4 font-weight-bold">Bệnh nhân:</div>
+                        <div class="col-md-8">@(Model.BenhNhan?.HoTen ?? "N/A")</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-4 font-weight-bold">Tổng chi phí:</div>
+                        <div class="col-md-8">@Model.TongChiPhi.ToString("N0") VNĐ</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-4 font-weight-bold">Ngày lập:</div>
+                        <div class="col-md-8">@(Model.NgayLap?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")</div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <form asp-action="ThanhToanConfirmed" method="post">
+                        <input type="hidden" name="id" value="@Model.MaChiPhi" />
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Bạn có chắc chắn muốn xác nhận thanh toán cho chi phí này?
+                        </div>
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check"></i> Xác nhận thanh toán
+                            </button>
+                            <a asp-action="Details" asp-route-id="@Model.MaChiPhi" class="btn btn-secondary ml-2">
+                                <i class="fas fa-times"></i> Hủy
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

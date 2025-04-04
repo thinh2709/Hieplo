@@ -1,0 +1,39 @@
+@model QuanLyBenhVienNoiTru.Models.Khoa
+@{
+    ViewData["Title"] = "Xóa khoa";
+    Layout = "_AdminLayout";
+}
+
+<div class="container">
+    <h2>Xóa khoa</h2>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title text-danger">Bạn có chắc chắn muốn xóa khoa này?</h5>
+            <dl class="row">
+                <dt class="col-sm-3">Mã khoa:</dt>
+                <dd class="col-sm-9">@Model.MaKhoa</dd>
+                
+                <dt class="col-sm-3">Tên khoa:</dt>
+                <dd class="col-sm-9">@Model.TenKhoa</dd>
+                
+                <dt class="col-sm-3">Mô tả:</dt>
+                <dd class="col-sm-9">@Model.MoTa</dd>
+            </dl>
+            
+            @if (Model.BenhNhans != null && Model.BenhNhans.Any())
+            {
+                <div class="alert alert-warning">
+                    <strong>Cảnh báo!</strong> Khoa này hiện có @Model.BenhNhans.Count bệnh nhân. Việc xóa có thể ảnh hưởng đến dữ liệu liên quan.
+                </div>
+            }
+
+            <form asp-action="Delete" method="post">
+                <input type="hidden" name="id" value="@Model.MaKhoa" />
+                <div class="form-group">
+                    <input type="submit" value="Xác nhận xóa" class="btn btn-danger" />
+                    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

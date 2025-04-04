@@ -1,0 +1,153 @@
+@{
+    ViewData["Title"] = "Trang quản trị";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Bảng điều khiển</h1>
+    </div>
+
+    <div class="row">
+        <!-- Tổng số bệnh nhân -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Tổng bệnh nhân</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.TongBenhNhan</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bệnh nhân đang điều trị -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Bệnh nhân đang điều trị</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.BenhNhanDangDieuTri</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-procedures fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tổng số bác sĩ -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Tổng số bác sĩ
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.TongBacSi</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-md fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tổng khoa -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Tổng số khoa</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.TongKhoa</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clinic-medical fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Liên kết nhanh -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Quản lý hệ thống</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <a href="@Url.Action("ManageUsers", "Admin")" class="btn btn-primary btn-block mb-3">
+                                <i class="fas fa-users mr-2"></i> Quản lý người dùng
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="@Url.Action("Index", "Khoa")" class="btn btn-info btn-block mb-3">
+                                <i class="fas fa-hospital mr-2"></i> Quản lý khoa
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="@Url.Action("Index", "BacSi")" class="btn btn-success btn-block mb-3">
+                                <i class="fas fa-user-md mr-2"></i> Quản lý bác sĩ
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="@Url.Action("Index", "BenhNhan")" class="btn btn-warning btn-block mb-3">
+                                <i class="fas fa-procedures mr-2"></i> Quản lý bệnh nhân
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Báo cáo nhanh -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Báo cáo nhanh</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <a href="@Url.Action("Index", "ChiPhiDieuTri")" class="btn btn-danger btn-block mb-3">
+                                <i class="fas fa-money-bill-wave mr-2"></i> Chi phí điều trị
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="@Url.Action("Index", "HinhThucDieuTri")" class="btn btn-secondary btn-block mb-3">
+                                <i class="fas fa-procedures mr-2"></i> Hình thức điều trị
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="@Url.Action("Index", "DieuTriBenhNhan")" class="btn btn-primary btn-block mb-3">
+                                <i class="fas fa-notes-medical mr-2"></i> Điều trị bệnh nhân
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="@Url.Action("Index", "LichThamBenh")" class="btn btn-info btn-block mb-3">
+                                <i class="fas fa-calendar-check mr-2"></i> Lịch thăm bệnh
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

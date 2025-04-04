@@ -1,0 +1,62 @@
+@model QuanLyBenhVienNoiTru.Models.BacSi
+@{
+    ViewData["Title"] = "Xóa Bác Sĩ";
+    Layout = "_BacSiLayout";
+}
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Xóa Bác Sĩ</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/BacSi">Danh Sách Bác Sĩ</a></li>
+        <li class="breadcrumb-item active">Xóa</li>
+    </ol>
+    
+    <div class="alert alert-danger">
+        <h4><i class="fas fa-exclamation-triangle me-2"></i>Cảnh báo!</h4>
+        <p>Bạn có chắc chắn muốn xóa bác sĩ này? Hành động này không thể hoàn tác.</p>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-user-md me-1"></i>
+            Thông Tin Bác Sĩ
+        </div>
+        <div class="card-body">
+            <div class="row mb-2">
+                <div class="col-md-3 fw-bold">Mã Bác Sĩ:</div>
+                <div class="col-md-9">@Model.MaBacSi</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-3 fw-bold">Họ và tên:</div>
+                <div class="col-md-9">@Model.HoTen</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-3 fw-bold">Chuyên khoa:</div>
+                <div class="col-md-9">@Model.ChuyenKhoa</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-3 fw-bold">Số điện thoại:</div>
+                <div class="col-md-9">@Model.SoDienThoai</div>
+            </div>
+            
+            @if (Model.DieuTriBenhNhans != null && Model.DieuTriBenhNhans.Any())
+            {
+                <div class="alert alert-warning mt-3">
+                    <i class="fas fa-exclamation-circle me-1"></i>
+                    <strong>Lưu ý:</strong> Bác sĩ này đã thực hiện @Model.DieuTriBenhNhans.Count điều trị.
+                    Xóa bác sĩ này có thể ảnh hưởng đến dữ liệu liên quan.
+                </div>
+            }
+            
+            <form asp-action="Delete" method="post" class="mt-4">
+                <input type="hidden" asp-for="MaBacSi" />
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash-alt me-1"></i> Xác Nhận Xóa
+                </button>
+                <a asp-action="Index" class="btn btn-secondary ms-2">
+                    <i class="fas fa-arrow-left me-1"></i> Quay Lại
+                </a>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,73 @@
+@model IEnumerable<QuanLyBenhVienNoiTru.Models.HinhThucDieuTri>
+
+@{
+    ViewData["Title"] = "Danh sách hình thức điều trị";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <h2>Danh sách hình thức điều trị</h2>
+    
+    <p>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Thêm mới
+        </a>
+    </p>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Danh sách các hình thức điều trị</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>@Html.DisplayNameFor(model => model.MaDieuTri)</th>
+                            <th>@Html.DisplayNameFor(model => model.TenDieuTri)</th>
+                            <th>@Html.DisplayNameFor(model => model.ChiPhi)</th>
+                            <th>@Html.DisplayNameFor(model => model.MoTa)</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@Html.DisplayFor(modelItem => item.MaDieuTri)</td>
+                                <td>@Html.DisplayFor(modelItem => item.TenDieuTri)</td>
+                                <td>@Html.DisplayFor(modelItem => item.ChiPhi)</td>
+                                <td>@Html.DisplayFor(modelItem => item.MoTa)</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a asp-action="Edit" asp-route-id="@item.MaDieuTri" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-edit"></i> Sửa
+                                        </a>
+                                        <a asp-action="Details" asp-route-id="@item.MaDieuTri" class="btn btn-info btn-sm">
+                                            <i class="fas fa-info-circle"></i> Chi tiết
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.MaDieuTri" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-trash-alt"></i> Xóa
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#dataTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.22/i18n/Vietnamese.json"
+                }
+            });
+        });
+    </script>
+}

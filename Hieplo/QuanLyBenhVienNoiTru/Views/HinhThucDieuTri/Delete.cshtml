@@ -1,0 +1,47 @@
+@model QuanLyBenhVienNoiTru.Models.HinhThucDieuTri
+
+@{
+    ViewData["Title"] = "Xóa hình thức điều trị";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <h2>Xác nhận xóa hình thức điều trị</h2>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Bạn có chắc chắn muốn xóa hình thức điều trị này?</h6>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-danger">
+                <strong>Cảnh báo:</strong> Việc xóa sẽ không thể hoàn tác. Thông tin liên quan đến hình thức điều trị này có thể bị ảnh hưởng.
+            </div>
+            
+            <dl class="row">
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.MaDieuTri)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.MaDieuTri)</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.TenDieuTri)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.TenDieuTri)</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.ChiPhi)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.ChiPhi) VNĐ</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.MoTa)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.MoTa)</dd>
+            </dl>
+            
+            <form asp-action="Delete">
+                <input type="hidden" asp-for="MaDieuTri" />
+                <div class="form-group">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash-alt"></i> Xóa
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

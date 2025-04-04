@@ -1,0 +1,47 @@
+@model IEnumerable<QuanLyBenhVienNoiTru.Models.Khoa>
+@{
+    ViewData["Title"] = "Danh sách khoa";
+    Layout = User.IsInRole("Admin") ? "_AdminLayout" : "_Layout";
+}
+
+<div class="container">
+    <h2>Danh sách khoa</h2>
+    
+    @if (User.IsInRole("Admin"))
+    {
+        <p>
+            <a asp-action="Create" class="btn btn-primary">Thêm mới</a>
+        </p>
+    }
+    
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Mã khoa</th>
+                    <th>Tên khoa</th>
+                    <th>Mô tả</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.MaKhoa</td>
+                        <td>@item.TenKhoa</td>
+                        <td>@item.MoTa</td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.MaKhoa" class="btn btn-info btn-sm">Chi tiết</a>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <a asp-action="Edit" asp-route-id="@item.MaKhoa" class="btn btn-primary btn-sm">Sửa</a>
+                                <a asp-action="Delete" asp-route-id="@item.MaKhoa" class="btn btn-danger btn-sm">Xóa</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

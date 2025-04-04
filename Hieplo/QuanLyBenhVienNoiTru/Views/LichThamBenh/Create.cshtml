@@ -1,0 +1,43 @@
+@model QuanLyBenhVienNoiTru.Models.ViewModels.LichThamBenhViewModel
+@{
+    ViewData["Title"] = "Đăng ký lịch thăm";
+    Layout = User.IsInRole("Admin") ? "_AdminLayout" : "_BacSiLayout";
+}
+
+<div class="container">
+    <h2>Đăng ký lịch thăm</h2>
+    <div class="card">
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                
+                <div class="form-group">
+                    <label asp-for="MaKhach" class="control-label"></label>
+                    <select asp-for="MaKhach" class="form-control" asp-items="ViewBag.MaKhach"></select>
+                    <span asp-validation-for="MaKhach" class="text-danger"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label asp-for="MaBenhNhan" class="control-label"></label>
+                    <select asp-for="MaBenhNhan" class="form-control" asp-items="ViewBag.MaBenhNhan"></select>
+                    <span asp-validation-for="MaBenhNhan" class="text-danger"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label asp-for="ThoiGianTham" class="control-label"></label>
+                    <input asp-for="ThoiGianTham" type="datetime-local" class="form-control" />
+                    <span asp-validation-for="ThoiGianTham" class="text-danger"></span>
+                </div>
+                
+                <div class="form-group">
+                    <input type="submit" value="Đăng ký" class="btn btn-primary" />
+                    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

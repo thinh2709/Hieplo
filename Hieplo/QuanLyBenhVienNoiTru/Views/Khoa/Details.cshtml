@@ -1,0 +1,59 @@
+@model QuanLyBenhVienNoiTru.Models.Khoa
+@{
+    ViewData["Title"] = "Chi tiết khoa";
+    Layout = User.IsInRole("Admin") ? "_AdminLayout" : "_Layout";
+}
+
+<div class="container">
+    <h2>Chi tiết khoa</h2>
+    <div class="card">
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Mã khoa:</dt>
+                <dd class="col-sm-9">@Model.MaKhoa</dd>
+                
+                <dt class="col-sm-3">Tên khoa:</dt>
+                <dd class="col-sm-9">@Model.TenKhoa</dd>
+                
+                <dt class="col-sm-3">Mô tả:</dt>
+                <dd class="col-sm-9">@Model.MoTa</dd>
+            </dl>
+            
+            <div>
+                <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-action="Edit" asp-route-id="@Model.MaKhoa" class="btn btn-primary">Sửa</a>
+                }
+            </div>
+        </div>
+    </div>
+    
+    @if (Model.BenhNhans != null && Model.BenhNhans.Any())
+    {
+        <div class="mt-4">
+            <h4>Danh sách bệnh nhân trong khoa</h4>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Mã BN</th>
+                        <th>Họ tên</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.BenhNhans)
+                    {
+                        <tr>
+                            <td>@item.MaBenhNhan</td>
+                            <td>@item.HoTen</td>
+                            <td>
+                                <a asp-controller="BenhNhan" asp-action="Details" asp-route-id="@item.MaBenhNhan" class="btn btn-info btn-sm">Chi tiết</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

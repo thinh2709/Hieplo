@@ -1,0 +1,41 @@
+@model QuanLyBenhVienNoiTru.Models.HinhThucDieuTri
+
+@{
+    ViewData["Title"] = "Chi tiết hình thức điều trị";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <h2>Chi tiết hình thức điều trị</h2>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Thông tin chi tiết</h6>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.MaDieuTri)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.MaDieuTri)</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.TenDieuTri)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.TenDieuTri)</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.ChiPhi)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.ChiPhi) VNĐ</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.MoTa)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.MoTa)</dd>
+            </dl>
+        </div>
+        <div class="card-footer">
+            <div class="form-group">
+                <a asp-action="Edit" asp-route-id="@Model.MaDieuTri" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> Sửa
+                </a>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

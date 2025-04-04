@@ -1,0 +1,58 @@
+@model LichThamBenh
+@{
+    ViewData["Title"] = "Chi tiết lịch thăm";
+    Layout = User.IsInRole("Admin") ? "_AdminLayout" : "_BacSiLayout";
+}
+
+<div class="container">
+    <h2>Chi tiết lịch thăm</h2>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Thông tin lịch hẹn</h5>
+            <dl class="row">
+                <dt class="col-sm-3">Khách thăm:</dt>
+                <dd class="col-sm-9">@Model.KhachThamBenh?.HoTen</dd>
+                
+                <dt class="col-sm-3">Số điện thoại:</dt>
+                <dd class="col-sm-9">@Model.KhachThamBenh?.SoDienThoai</dd>
+                
+                <dt class="col-sm-3">Mối quan hệ:</dt>
+                <dd class="col-sm-9">@Model.KhachThamBenh?.MoiQuanHe</dd>
+                
+                <dt class="col-sm-3">Bệnh nhân:</dt>
+                <dd class="col-sm-9">@Model.BenhNhan?.HoTen</dd>
+                
+                <dt class="col-sm-3">Phòng/Khoa:</dt>
+                <dd class="col-sm-9">@Model.BenhNhan?.Khoa?.TenKhoa</dd>
+                
+                <dt class="col-sm-3">Thời gian thăm:</dt>
+                <dd class="col-sm-9">@Model.ThoiGianTham?.ToString("dd/MM/yyyy HH:mm")</dd>
+                
+                <dt class="col-sm-3">Trạng thái:</dt>
+                <dd class="col-sm-9">
+                    @if (Model.TrangThai == "Chờ duyệt")
+                    {
+                        <span class="badge badge-warning">Chờ duyệt</span>
+                    }
+                    else if (Model.TrangThai == "Đã duyệt")
+                    {
+                        <span class="badge badge-success">Đã duyệt</span>
+                    }
+                    else
+                    {
+                        <span class="badge badge-danger">Hủy</span>
+                    }
+                </dd>
+            </dl>
+            
+            <div>
+                <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                @if (Model.TrangThai == "Chờ duyệt")
+                {
+                    <a asp-action="Approve" asp-route-id="@Model.MaLich" class="btn btn-success">Duyệt</a>
+                    <a asp-action="Cancel" asp-route-id="@Model.MaLich" class="btn btn-danger">Hủy</a>
+                }
+            </div>
+        </div>
+    </div>
+</div>

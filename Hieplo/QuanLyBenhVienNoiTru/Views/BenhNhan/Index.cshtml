@@ -1,0 +1,99 @@
+@model IEnumerable<QuanLyBenhVienNoiTru.Models.BenhNhan>
+
+@{
+    ViewData["Title"] = "Danh sách bệnh nhân";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <h2>Danh sách bệnh nhân</h2>
+
+    <p>
+        <a asp-action="Create" class="btn btn-primary">Thêm mới bệnh nhân</a>
+    </p>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Bệnh nhân nội trú</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Mã BN</th>
+                            <th>Họ tên</th>
+                            <th>Ngày sinh</th>
+                            <th>Giới tính</th>
+                            <th>Số điện thoại</th>
+                            <th>Khoa</th>
+                            <th>Ngày nhập viện</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.MaBenhNhan</td>
+                                <td>@item.HoTen</td>
+                                <td>@(item.NgaySinh.HasValue ? item.NgaySinh.Value.ToString("dd/MM/yyyy") : "")</td>
+                                <td>@item.GioiTinh</td>
+                                <td>@item.SoDienThoai</td>
+                                <td>@item.Khoa.TenKhoa</td>
+                                <td>@item.NgayNhapVien.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    @if (item.NgayXuatVien.HasValue)
+                                    {
+                                        <span class="badge badge-success">Đã xuất viện</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-primary">Đang điều trị</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a asp-action="Details" asp-route-id="@item.MaBenhNhan" class="btn btn-info btn-sm">
+                                            <i class="fas fa-info-circle"></i> Chi tiết
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@item.MaBenhNhan" class="btn btn-warning btn-sm">
+                                            <i class="fas fa-edit"></i> Sửa
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.MaBenhNhan" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-trash"></i> Xóa
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#dataTable').DataTable({
+                "language": {
+                    "lengthMenu": "Hiển thị _MENU_ dòng mỗi trang",
+                    "zeroRecords": "Không tìm thấy bệnh nhân nào",
+                    "info": "Hiển thị trang _PAGE_ / _PAGES_",
+                    "infoEmpty": "Không có dữ liệu",
+                    "infoFiltered": "(lọc từ _MAX_ bản ghi)",
+                    "search": "Tìm kiếm:",
+                    "paginate": {
+                        "first": "Đầu",
+                        "last": "Cuối",
+                        "next": "Sau",
+                        "previous": "Trước"
+                    }
+                }
+            });
+        });
+    </script>
+}

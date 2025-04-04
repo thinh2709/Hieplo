@@ -1,0 +1,90 @@
+@model QuanLyBenhVienNoiTru.Models.BacSi
+@{
+    ViewData["Title"] = "Chỉnh Sửa Bác Sĩ";
+    Layout = "_BacSiLayout";
+}
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Chỉnh Sửa Thông Tin Bác Sĩ</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/BacSi">Danh Sách Bác Sĩ</a></li>
+        <li class="breadcrumb-item active">Chỉnh Sửa</li>
+    </ol>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-user-edit me-1"></i>
+            Thông Tin Bác Sĩ
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="MaBacSi" />
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="HoTen" class="control-label">Họ Tên</label>
+                            <input asp-for="HoTen" class="form-control" />
+                            <span asp-validation-for="HoTen" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="ChuyenKhoa" class="control-label">Chuyên Khoa</label>
+                            <input asp-for="ChuyenKhoa" class="form-control" />
+                            <span asp-validation-for="ChuyenKhoa" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="SoDienThoai" class="control-label">Số Điện Thoại</label>
+                            <input asp-for="SoDienThoai" class="form-control" />
+                            <span asp-validation-for="SoDienThoai" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="MaTaiKhoan" class="control-label">Tài Khoản</label>
+                            <select asp-for="MaTaiKhoan" class="form-control" asp-items="ViewBag.MaTaiKhoan">
+                                <option value="">-- Chọn tài khoản --</option>
+                            </select>
+                            <span asp-validation-for="MaTaiKhoan" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="GioiTinh" class="control-label">Giới tính</label>
+                            <select asp-for="GioiTinh" class="form-control" asp-items="ViewBag.GioiTinhList">
+                                <option value="">-- Chọn giới tính --</option>
+                            </select>
+                            <span asp-validation-for="GioiTinh" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Lưu Thay Đổi
+                    </button>
+                    <a asp-action="Details" asp-route-id="@Model.MaBacSi" class="btn btn-info">
+                        <i class="fas fa-info-circle me-1"></i> Chi Tiết
+                    </a>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> Quay Lại
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

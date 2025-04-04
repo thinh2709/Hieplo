@@ -1,0 +1,90 @@
+@model QuanLyBenhVienNoiTru.Models.BenhNhan
+
+@{
+    ViewData["Title"] = "Xuất viện";
+    Layout = "_BacSiLayout";
+}
+
+<div class="container-fluid">
+    <h2 class="mb-4">Xác nhận xuất viện</h2>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Thông tin bệnh nhân</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th style="width: 25%">Mã bệnh nhân</th>
+                                <td>@Model.MaBenhNhan</td>
+                            </tr>
+                            <tr>
+                                <th>Họ và tên</th>
+                                <td>@Model.HoTen</td>
+                            </tr>
+                            <tr>
+                                <th>Ngày sinh</th>
+                                <td>@(Model.NgaySinh.HasValue ? Model.NgaySinh.Value.ToString("dd/MM/yyyy") : "")</td>
+                            </tr>
+                            <tr>
+                                <th>Giới tính</th>
+                                <td>@Model.GioiTinh</td>
+                            </tr>
+                            <tr>
+                                <th>Số điện thoại</th>
+                                <td>@Model.SoDienThoai</td>
+                            </tr>
+                            <tr>
+                                <th>Ngày nhập viện</th>
+                                <td>@Model.NgayNhapVien.ToString("dd/MM/yyyy HH:mm")</td>
+                            </tr>
+                            <tr>
+                                <th>Thời gian điều trị</th>
+                                <td>@((DateTime.Now - Model.NgayNhapVien).Days) ngày</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="alert alert-warning mt-3">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        Bạn có chắc chắn muốn xuất viện cho bệnh nhân này không?
+                    </div>
+                    
+                    <form asp-action="XuatVienConfirmed" method="post">
+                        <input type="hidden" name="id" value="@Model.MaBenhNhan" />
+                        
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check-circle"></i> Xác nhận xuất viện
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Quay lại
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Lưu ý khi xuất viện</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-check text-success mr-2"></i> Tất cả chi phí điều trị đã được thanh toán</li>
+                        <li class="mb-2"><i class="fas fa-check text-success mr-2"></i> Bệnh nhân đã được hướng dẫn chăm sóc sau xuất viện</li>
+                        <li class="mb-2"><i class="fas fa-check text-success mr-2"></i> Đã chuẩn bị đầy đủ hồ sơ bệnh án</li>
+                        <li class="mb-2"><i class="fas fa-check text-success mr-2"></i> Đã kê đơn thuốc cần thiết (nếu có)</li>
+                    </ul>
+                    <hr>
+                    <p class="mb-0">Sau khi xác nhận, bệnh nhân sẽ được xuất viện và ngày xuất viện sẽ được ghi nhận là thời điểm hiện tại.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
