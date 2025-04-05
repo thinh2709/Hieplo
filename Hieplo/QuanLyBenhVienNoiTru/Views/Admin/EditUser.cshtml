@@ -5,59 +5,199 @@
 }
 
 <div class="container-fluid">
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Chỉnh sửa thông tin người dùng</h6>
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">Chỉnh sửa người dùng</h1>
+            <p class="text-muted mb-0">Cập nhật thông tin tài khoản người dùng</p>
         </div>
-        <div class="card-body">
-            <form asp-action="EditUser" method="post">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <input type="hidden" asp-for="MaTaiKhoan" />
-                
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label asp-for="TenDangNhap" class="control-label">Tên đăng nhập</label>
-                            <input asp-for="TenDangNhap" class="form-control" />
-                            <span asp-validation-for="TenDangNhap" class="text-danger"></span>
+        <a href="@Url.Action("ManageUsers")" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-2"></i>Quay lại
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Thông tin tài khoản</h6>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.LienKetInfo != null)
+                    {
+                        <div class="alert alert-info mb-4">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <span>@ViewBag.LienKetInfo</span>
                         </div>
+                    }
+                    
+                    <form asp-action="EditUser" method="post">
+                        <input type="hidden" asp-for="MaTaiKhoan" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <div class="mb-3 row">
+                            <label asp-for="TenDangNhap" class="col-sm-3 col-form-label">Tên đăng nhập</label>
+                            <div class="col-sm-9">
+                                <input asp-for="TenDangNhap" class="form-control" placeholder="Nhập tên đăng nhập" />
+                                <span asp-validation-for="TenDangNhap" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label asp-for="MatKhau" class="col-sm-3 col-form-label">Mật khẩu</label>
+                            <div class="col-sm-9">
+                                <input asp-for="MatKhau" class="form-control" placeholder="Nhập mật khẩu mới (để trống nếu không đổi)" value="" />
+                                <div class="form-text text-muted">Để trống nếu không muốn thay đổi mật khẩu</div>
+                                <span asp-validation-for="MatKhau" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label asp-for="VaiTro" class="col-sm-3 col-form-label">Vai trò</label>
+                            <div class="col-sm-9">
+                                <select asp-for="VaiTro" class="form-select" asp-items="ViewBag.VaiTros" id="vaiTroSelect">
+                                    <option value="">-- Chọn vai trò --</option>
+                                </select>
+                                <span asp-validation-for="VaiTro" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row" id="bacSiSection" style="display: none;">
+                            <label class="col-sm-3 col-form-label">Liên kết bác sĩ</label>
+                            <div class="col-sm-9">
+                                <select name="bacSiId" class="form-select" asp-items="ViewBag.BacSiList">
+                                    <option value="">-- Chọn bác sĩ --</option>
+                                </select>
+                                <div class="form-text text-muted">
+                                    Liên kết tài khoản với bác sĩ được chọn
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr />
+                        <div class="d-flex justify-content-end">
+                            <a asp-action="ManageUsers" class="btn btn-secondary me-2">Hủy</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Lưu thay đổi
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Thông tin bổ sung</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h6 class="mb-2">ID tài khoản</h6>
+                        <p class="text-primary fw-bold mb-0">@Model.MaTaiKhoan</p>
                     </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label asp-for="MatKhau" class="control-label">Mật khẩu</label>
-                            <input asp-for="MatKhau" class="form-control" type="password" />
-                            <span asp-validation-for="MatKhau" class="text-danger"></span>
-                        </div>
+                    
+                    <div class="mb-4">
+                        <h6 class="mb-2">Hướng dẫn</h6>
+                        <ul class="mb-0 ps-3">
+                            <li class="mb-2">
+                                <strong>Tên đăng nhập</strong> phải là duy nhất trong hệ thống.
+                            </li>
+                            <li class="mb-2">
+                                Để trống <strong>Mật khẩu</strong> nếu không muốn thay đổi.
+                            </li>
+                            <li class="mb-2">
+                                Thay đổi <strong>Vai trò</strong> sẽ ảnh hưởng đến quyền truy cập hệ thống.
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h6 class="mb-2">Thao tác khác</h6>
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" 
+                                data-bs-target="#deleteModal" data-id="@Model.MaTaiKhoan" data-username="@Model.TenDangNhap">
+                            <i class="fas fa-trash me-2"></i>Xóa tài khoản
+                        </button>
                     </div>
                 </div>
-                
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label asp-for="VaiTro" class="control-label">Vai trò</label>
-                            <select asp-for="VaiTro" class="form-select">
-                                <option value="Admin">Admin</option>
-                                <option value="Bác sĩ">Bác sĩ</option>
-                                <option value="Khách">Khách</option>
-                            </select>
-                            <span asp-validation-for="VaiTro" class="text-danger"></span>
-                        </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-3">
+                    <div class="avatar-lg mx-auto mb-3">
+                        <span class="avatar-title rounded-circle bg-danger-soft text-danger">
+                            <i class="fas fa-exclamation-triangle fa-3x"></i>
+                        </span>
                     </div>
+                    <h5>Bạn có chắc chắn muốn xóa người dùng này?</h5>
+                    <p id="userDeleteName" class="mb-0">@Model.TenDangNhap</p>
                 </div>
-                
-                <div class="form-group mt-4">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save mr-1"></i> Lưu thay đổi
-                    </button>
-                    <a asp-action="ManageUsers" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left mr-1"></i> Quay lại
-                    </a>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    Hành động này không thể hoàn tác. Tất cả dữ liệu liên quan có thể bị ảnh hưởng.
                 </div>
-            </form>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <form id="deleteForm" asp-action="DeleteUser" method="post">
+                    <input type="hidden" id="userIdToDelete" name="id" value="@Model.MaTaiKhoan" />
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Hiển thị phần chọn bác sĩ nếu vai trò là "Bác sĩ"
+            function toggleBacSiSection() {
+                if ($('#vaiTroSelect').val() === 'Bác sĩ') {
+                    $('#bacSiSection').show();
+                } else {
+                    $('#bacSiSection').hide();
+                }
+            }
+            
+            $('#vaiTroSelect').change(toggleBacSiSection);
+            
+            // Kiểm tra giá trị ban đầu
+            toggleBacSiSection();
+        });
+    </script>
+    
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+@section Styles {
+    <style>
+        .avatar-lg {
+            width: 5rem;
+            height: 5rem;
+        }
+        
+        .avatar-title {
+            align-items: center;
+            display: flex;
+            height: 100%;
+            justify-content: center;
+            width: 100%;
+        }
+        
+        .bg-danger-soft {
+            background-color: rgba(220, 53, 69, 0.1) !important;
+        }
+    </style>
 }

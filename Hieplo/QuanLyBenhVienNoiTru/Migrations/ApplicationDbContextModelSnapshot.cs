@@ -32,7 +32,18 @@ namespace QuanLyBenhVienNoiTru.Migrations
 
                     b.Property<string>("ChuyenKhoa")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("DiaChi")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("GioiTinh")
                         .IsRequired()
@@ -40,16 +51,31 @@ namespace QuanLyBenhVienNoiTru.Migrations
 
                     b.Property<string>("HoTen")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("MaKhoa")
+                        .HasColumnType("int");
 
                     b.Property<int?>("MaTaiKhoan")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("NgayNghiViec")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("NgayVaoLam")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("SoDienThoai")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("TrangThai")
+                        .HasColumnType("bit");
+
                     b.HasKey("MaBacSi");
+
+                    b.HasIndex("MaKhoa");
 
                     b.HasIndex("MaTaiKhoan")
                         .IsUnique()
@@ -66,10 +92,21 @@ namespace QuanLyBenhVienNoiTru.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaBenhNhan"));
 
+                    b.Property<int?>("BacSiMaBacSi")
+                        .HasColumnType("int");
+
                     b.Property<bool>("BaoHiemYTe")
                         .HasColumnType("bit");
 
+                    b.Property<string>("ChanDoan")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("DiaChi")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -80,6 +117,9 @@ namespace QuanLyBenhVienNoiTru.Migrations
                     b.Property<string>("HoTen")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("MaBacSi")
+                        .HasColumnType("int");
 
                     b.Property<int>("MaKhoa")
                         .HasColumnType("int");
@@ -97,7 +137,14 @@ namespace QuanLyBenhVienNoiTru.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("TrangThai")
+                        .HasColumnType("bit");
+
                     b.HasKey("MaBenhNhan");
+
+                    b.HasIndex("BacSiMaBacSi");
+
+                    b.HasIndex("MaBacSi");
 
                     b.HasIndex("MaKhoa");
 
@@ -140,7 +187,6 @@ namespace QuanLyBenhVienNoiTru.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaDieuTriBenhNhan"));
 
                     b.Property<string>("KetQua")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("MaBacSi")
@@ -152,8 +198,14 @@ namespace QuanLyBenhVienNoiTru.Migrations
                     b.Property<int?>("MaDieuTri")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("NgayKetThuc")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime?>("NgayThucHien")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("NoiDung")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("MaDieuTriBenhNhan");
 
@@ -174,8 +226,17 @@ namespace QuanLyBenhVienNoiTru.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaDieuTri"));
 
+                    b.Property<int?>("BacSiMaBacSi")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("BenhNhanMaBenhNhan")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("ChiPhi")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("MaKhoa")
+                        .HasColumnType("int");
 
                     b.Property<string>("MoTa")
                         .IsRequired()
@@ -186,6 +247,12 @@ namespace QuanLyBenhVienNoiTru.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("MaDieuTri");
+
+                    b.HasIndex("BacSiMaBacSi");
+
+                    b.HasIndex("BenhNhanMaBenhNhan");
+
+                    b.HasIndex("MaKhoa");
 
                     b.ToTable("HinhThucDieuTris");
                 });
@@ -198,16 +265,28 @@ namespace QuanLyBenhVienNoiTru.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaKhach"));
 
+                    b.Property<string>("DiaChi")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("HoTen")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int?>("MaTaiKhoan")
                         .HasColumnType("int");
 
                     b.Property<string>("MoiQuanHe")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("SoDienThoai")
                         .IsRequired()
@@ -237,6 +316,9 @@ namespace QuanLyBenhVienNoiTru.Migrations
                     b.Property<string>("TenKhoa")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TrangThai")
+                        .HasColumnType("bit");
 
                     b.HasKey("MaKhoa");
 
@@ -283,11 +365,13 @@ namespace QuanLyBenhVienNoiTru.Migrations
 
                     b.Property<string>("MatKhau")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("TenDangNhap")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("VaiTro")
                         .IsRequired()
@@ -300,20 +384,40 @@ namespace QuanLyBenhVienNoiTru.Migrations
 
             modelBuilder.Entity("QuanLyBenhVienNoiTru.Models.BacSi", b =>
                 {
+                    b.HasOne("QuanLyBenhVienNoiTru.Models.Khoa", "Khoa")
+                        .WithMany("BacSis")
+                        .HasForeignKey("MaKhoa")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("QuanLyBenhVienNoiTru.Models.TaiKhoan", "TaiKhoan")
                         .WithOne("BacSi")
-                        .HasForeignKey("QuanLyBenhVienNoiTru.Models.BacSi", "MaTaiKhoan");
+                        .HasForeignKey("QuanLyBenhVienNoiTru.Models.BacSi", "MaTaiKhoan")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Khoa");
 
                     b.Navigation("TaiKhoan");
                 });
 
             modelBuilder.Entity("QuanLyBenhVienNoiTru.Models.BenhNhan", b =>
                 {
+                    b.HasOne("QuanLyBenhVienNoiTru.Models.BacSi", null)
+                        .WithMany("BenhNhans")
+                        .HasForeignKey("BacSiMaBacSi");
+
+                    b.HasOne("QuanLyBenhVienNoiTru.Models.BacSi", "BacSi")
+                        .WithMany()
+                        .HasForeignKey("MaBacSi")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("QuanLyBenhVienNoiTru.Models.Khoa", "Khoa")
                         .WithMany("BenhNhans")
                         .HasForeignKey("MaKhoa")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("BacSi");
 
                     b.Navigation("Khoa");
                 });
@@ -322,7 +426,8 @@ namespace QuanLyBenhVienNoiTru.Migrations
                 {
                     b.HasOne("QuanLyBenhVienNoiTru.Models.BenhNhan", "BenhNhan")
                         .WithMany("ChiPhiDieuTris")
-                        .HasForeignKey("MaBenhNhan");
+                        .HasForeignKey("MaBenhNhan")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("BenhNhan");
                 });
@@ -331,15 +436,18 @@ namespace QuanLyBenhVienNoiTru.Migrations
                 {
                     b.HasOne("QuanLyBenhVienNoiTru.Models.BacSi", "BacSi")
                         .WithMany("DieuTriBenhNhans")
-                        .HasForeignKey("MaBacSi");
+                        .HasForeignKey("MaBacSi")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("QuanLyBenhVienNoiTru.Models.BenhNhan", "BenhNhan")
                         .WithMany("DieuTriBenhNhans")
-                        .HasForeignKey("MaBenhNhan");
+                        .HasForeignKey("MaBenhNhan")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("QuanLyBenhVienNoiTru.Models.HinhThucDieuTri", "HinhThucDieuTri")
                         .WithMany("DieuTriBenhNhans")
-                        .HasForeignKey("MaDieuTri");
+                        .HasForeignKey("MaDieuTri")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("BacSi");
 
@@ -348,11 +456,31 @@ namespace QuanLyBenhVienNoiTru.Migrations
                     b.Navigation("HinhThucDieuTri");
                 });
 
+            modelBuilder.Entity("QuanLyBenhVienNoiTru.Models.HinhThucDieuTri", b =>
+                {
+                    b.HasOne("QuanLyBenhVienNoiTru.Models.BacSi", null)
+                        .WithMany("HinhThucDieuTris")
+                        .HasForeignKey("BacSiMaBacSi");
+
+                    b.HasOne("QuanLyBenhVienNoiTru.Models.BenhNhan", null)
+                        .WithMany("HinhThucDieuTris")
+                        .HasForeignKey("BenhNhanMaBenhNhan");
+
+                    b.HasOne("QuanLyBenhVienNoiTru.Models.Khoa", "Khoa")
+                        .WithMany("HinhThucDieuTris")
+                        .HasForeignKey("MaKhoa")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Khoa");
+                });
+
             modelBuilder.Entity("QuanLyBenhVienNoiTru.Models.KhachThamBenh", b =>
                 {
                     b.HasOne("QuanLyBenhVienNoiTru.Models.TaiKhoan", "TaiKhoan")
                         .WithOne("KhachThamBenh")
-                        .HasForeignKey("QuanLyBenhVienNoiTru.Models.KhachThamBenh", "MaTaiKhoan");
+                        .HasForeignKey("QuanLyBenhVienNoiTru.Models.KhachThamBenh", "MaTaiKhoan")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("TaiKhoan");
                 });
@@ -361,11 +489,13 @@ namespace QuanLyBenhVienNoiTru.Migrations
                 {
                     b.HasOne("QuanLyBenhVienNoiTru.Models.BenhNhan", "BenhNhan")
                         .WithMany("LichThamBenhs")
-                        .HasForeignKey("MaBenhNhan");
+                        .HasForeignKey("MaBenhNhan")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("QuanLyBenhVienNoiTru.Models.KhachThamBenh", "KhachThamBenh")
                         .WithMany("LichThamBenhs")
-                        .HasForeignKey("MaKhach");
+                        .HasForeignKey("MaKhach")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("BenhNhan");
 
@@ -374,7 +504,11 @@ namespace QuanLyBenhVienNoiTru.Migrations
 
             modelBuilder.Entity("QuanLyBenhVienNoiTru.Models.BacSi", b =>
                 {
+                    b.Navigation("BenhNhans");
+
                     b.Navigation("DieuTriBenhNhans");
+
+                    b.Navigation("HinhThucDieuTris");
                 });
 
             modelBuilder.Entity("QuanLyBenhVienNoiTru.Models.BenhNhan", b =>
@@ -382,6 +516,8 @@ namespace QuanLyBenhVienNoiTru.Migrations
                     b.Navigation("ChiPhiDieuTris");
 
                     b.Navigation("DieuTriBenhNhans");
+
+                    b.Navigation("HinhThucDieuTris");
 
                     b.Navigation("LichThamBenhs");
                 });
@@ -398,7 +534,11 @@ namespace QuanLyBenhVienNoiTru.Migrations
 
             modelBuilder.Entity("QuanLyBenhVienNoiTru.Models.Khoa", b =>
                 {
+                    b.Navigation("BacSis");
+
                     b.Navigation("BenhNhans");
+
+                    b.Navigation("HinhThucDieuTris");
                 });
 
             modelBuilder.Entity("QuanLyBenhVienNoiTru.Models.TaiKhoan", b =>

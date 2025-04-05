@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using QuanLyBenhVienNoiTru.Models.Attributes;
 
 namespace QuanLyBenhVienNoiTru.Models.ViewModels
 {
@@ -21,6 +22,7 @@ namespace QuanLyBenhVienNoiTru.Models.ViewModels
     {
         [Required(ErrorMessage = "Vui lòng nhập tên đăng nhập")]
         [Display(Name = "Tên đăng nhập")]
+        [StringLength(50, ErrorMessage = "Tên đăng nhập không được vượt quá 50 ký tự")]
         public string TenDangNhap { get; set; }
 
         [Required(ErrorMessage = "Vui lòng nhập mật khẩu")]
@@ -29,6 +31,7 @@ namespace QuanLyBenhVienNoiTru.Models.ViewModels
         [Display(Name = "Mật khẩu")]
         public string MatKhau { get; set; }
 
+        [Required(ErrorMessage = "Vui lòng xác nhận mật khẩu")]
         [DataType(DataType.Password)]
         [Display(Name = "Xác nhận mật khẩu")]
         [Compare("MatKhau", ErrorMessage = "Mật khẩu và xác nhận mật khẩu không khớp.")]
@@ -38,21 +41,38 @@ namespace QuanLyBenhVienNoiTru.Models.ViewModels
         [Display(Name = "Vai trò")]
         public string VaiTro { get; set; }
 
-        // Thông tin khác tùy thuộc vào vai trò
+        [Required(ErrorMessage = "Vui lòng nhập họ tên")]
         [Display(Name = "Họ tên")]
+        [StringLength(100, ErrorMessage = "Họ tên không được vượt quá 100 ký tự")]
         public string HoTen { get; set; }
 
+        [Required(ErrorMessage = "Vui lòng nhập email")]
+        [Display(Name = "Email")]
+        [EmailAddress(ErrorMessage = "Email không hợp lệ")]
+        [StringLength(100, ErrorMessage = "Email không được vượt quá 100 ký tự")]
+        public string Email { get; set; }
+
+        [Required(ErrorMessage = "Vui lòng nhập số điện thoại")]
         [Display(Name = "Số điện thoại")]
-        [Phone(ErrorMessage = "Số điện thoại không hợp lệ")]
+        [RegularExpression(@"^[0-9]{10}$", ErrorMessage = "Số điện thoại phải có 10 chữ số")]
         public string SoDienThoai { get; set; }
+
+        [Required(ErrorMessage = "Vui lòng nhập địa chỉ")]
+        [Display(Name = "Địa chỉ")]
+        [StringLength(200, ErrorMessage = "Địa chỉ không được vượt quá 200 ký tự")]
+        public string DiaChi { get; set; }
 
         [Display(Name = "Chuyên khoa")]
         public string ChuyenKhoa { get; set; }
 
         [Display(Name = "Mối quan hệ")]
-        public string? MoiQuanHe { get; set; }
+        [StringLength(50, ErrorMessage = "Mối quan hệ không được vượt quá 50 ký tự")]
+        public string MoiQuanHe { get; set; }
 
         [Display(Name = "Giới tính")]
-        public string? GioiTinh { get; set; }
+        public string GioiTinh { get; set; }
+
+        [Display(Name = "Khoa")]
+        public int MaKhoa { get; set; }
     }
 }

@@ -149,25 +149,25 @@
                     <div class="row text-center">
                         <div class="col-6 mb-3">
                             <div class="p-3 bg-light rounded">
-                                <h3 class="text-primary" id="patientCount">--</h3>
+                                <h3 class="text-primary">@ViewBag.BenhNhanCount</h3>
                                 <p class="mb-0">Bệnh nhân đang điều trị</p>
                             </div>
                         </div>
                         <div class="col-6 mb-3">
                             <div class="p-3 bg-light rounded">
-                                <h3 class="text-success" id="doctorCount">--</h3>
+                                <h3 class="text-success">@ViewBag.BacSiCount</h3>
                                 <p class="mb-0">Bác sĩ</p>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="p-3 bg-light rounded">
-                                <h3 class="text-info" id="deptCount">--</h3>
+                                <h3 class="text-info">@ViewBag.KhoaCount</h3>
                                 <p class="mb-0">Khoa phòng</p>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="p-3 bg-light rounded">
-                                <h3 class="text-danger" id="visitCount">--</h3>
+                                <h3 class="text-danger">@ViewBag.LichThamBenhCount</h3>
                                 <p class="mb-0">Lượt thăm khám hôm nay</p>
                             </div>
                         </div>
@@ -239,7 +239,56 @@
             </div>
         </div>
     </div>
+
+    <!-- Thêm phần trợ giúp bệnh nhân mới -->
+    <div class="col-12 mt-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0">Hướng dẫn sử dụng hệ thống</h5>
+            </div>
+            <div class="card-body">
+                <div class="accordion" id="helpAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                <i class="fas fa-user-plus me-2"></i> Cách thêm bệnh nhân mới
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#helpAccordion">
+                            <div class="accordion-body">
+                                <ol class="mb-0">
+                                    <li class="mb-2">Chuyển đến trang <a href="@Url.Action("Index", "BenhNhan")">Danh sách bệnh nhân</a></li>
+                                    <li class="mb-2">Nhấn vào nút <span class="badge bg-primary"><i class="fas fa-plus me-1"></i>Thêm bệnh nhân mới</span></li>
+                                    <li class="mb-2">Điền đầy đủ thông tin bệnh nhân: Họ tên, Ngày sinh, Giới tính, và các thông tin khác.</li>
+                                    <li class="mb-2"><strong class="text-danger">Lưu ý:</strong> Các trường có dấu * là bắt buộc phải nhập.</li>
+                                    <li class="mb-2">Ngày nhập viện sẽ tự động được ghi nhận là thời điểm hiện tại.</li>
+                                    <li>Nhấn nút <span class="badge bg-primary"><i class="fas fa-save me-1"></i>Lưu thông tin</span> để hoàn tất.</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Thông báo popup nếu có lỗi -->
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="errorToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+            <div class="toast-header bg-danger text-white">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong class="me-auto">Thông báo</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                @TempData["ErrorMessage"]
+            </div>
+        </div>
+    </div>
+}
 
 @section Scripts {
     <script>
@@ -249,6 +298,12 @@
             $("#doctorCount").text("15");
             $("#deptCount").text("8");
             $("#visitCount").text("26");
+
+            // Khởi tạo toast
+            var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+            var toastList = toastElList.map(function(toastEl) {
+                return new bootstrap.Toast(toastEl)
+            });
         });
     </script>
 }

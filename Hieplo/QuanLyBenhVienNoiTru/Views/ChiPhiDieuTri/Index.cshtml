@@ -75,6 +75,7 @@
                             <th>Mã chi phí</th>
                             <th>Bệnh nhân</th>
                             <th>Tổng chi phí</th>
+                            <th>BHYT</th>
                             <th>Trạng thái</th>
                             <th>Ngày lập</th>
                             <th>Thao tác</th>
@@ -88,7 +89,30 @@
                                 <tr>
                                     <td>@item.MaChiPhi</td>
                                     <td>@(item.BenhNhan?.HoTen ?? "N/A")</td>
-                                    <td>@item.TongChiPhi.ToString("N0") VNĐ</td>
+                                    <td>
+                                        @string.Format("{0:N0}", item.TongChiPhi) VNĐ
+                                        @if (item.BenhNhan != null && item.BenhNhan.BaoHiemYTe)
+                                        {
+                                            <div>
+                                                <small class="text-success">
+                                                    <i class="fas fa-arrow-down"></i>
+                                                    @string.Format("{0:N0}", item.TongChiPhi * 0.2m) VNĐ (giảm 80%)
+                                                </small>
+                                            </div>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (item.BenhNhan != null && item.BenhNhan.BaoHiemYTe)
+                                        {
+                                            <span class="badge badge-success">
+                                                <i class="fas fa-check-circle"></i> Có
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-secondary">Không</span>
+                                        }
+                                    </td>
                                     <td>
                                         @if (item.DaThanhToan)
                                         {

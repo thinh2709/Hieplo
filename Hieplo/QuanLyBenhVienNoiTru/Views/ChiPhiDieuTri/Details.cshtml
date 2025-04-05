@@ -35,8 +35,27 @@
                     </div>
                     <div class="row mb-2">
                         <div class="col-md-4 font-weight-bold">Tổng chi phí:</div>
-                        <div class="col-md-8">@Model.TongChiPhi.ToString("N0") VNĐ</div>
+                        <div class="col-md-8">@string.Format("{0:N0}", Model.TongChiPhi) VNĐ</div>
                     </div>
+                    @if (ViewBag.CoBaoHiem)
+                    {
+                        <div class="row mb-2">
+                            <div class="col-md-4 font-weight-bold">Giảm giá BHYT (80%):</div>
+                            <div class="col-md-8 text-success">-@string.Format("{0:N0}", ViewBag.GiamGia) VNĐ</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-4 font-weight-bold">Số tiền phải trả:</div>
+                            <div class="col-md-8 text-danger fw-bold">@string.Format("{0:N0}", ViewBag.ChiPhiSauGiamGia) VNĐ</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-12">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Bệnh nhân được giảm 80% chi phí do có bảo hiểm y tế.
+                                </div>
+                            </div>
+                        </div>
+                    }
                     <div class="row mb-2">
                         <div class="col-md-4 font-weight-bold">Ngày lập:</div>
                         <div class="col-md-8">@(Model.NgayLap?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")</div>
@@ -144,7 +163,7 @@
                                 <td>@(item.HinhThucDieuTri?.TenDieuTri ?? "N/A")</td>
                                 <td>@(item.BacSi?.HoTen ?? "N/A")</td>
                                 <td>@(item.NgayThucHien?.ToString("dd/MM/yyyy") ?? "N/A")</td>
-                                <td>@(item.HinhThucDieuTri?.ChiPhi.ToString("N0") ?? "0") VNĐ</td>
+                                <td>@(item.HinhThucDieuTri?.ChiPhi != null ? string.Format("{0:N0}", item.HinhThucDieuTri.ChiPhi) : "0") VNĐ</td>
                                 <td>@(string.IsNullOrEmpty(item.KetQua) ? "Không có" : item.KetQua)</td>
                             </tr>
                         }
@@ -152,9 +171,22 @@
                     <tfoot>
                         <tr>
                             <th colspan="4" class="text-right">Tổng chi phí:</th>
-                            <th>@Model.TongChiPhi.ToString("N0") VNĐ</th>
+                            <th>@string.Format("{0:N0}", Model.TongChiPhi) VNĐ</th>
                             <th></th>
                         </tr>
+                        @if (ViewBag.CoBaoHiem)
+                        {
+                            <tr class="table-success">
+                                <th colspan="4" class="text-right">Giảm giá BHYT (80%):</th>
+                                <th>-@string.Format("{0:N0}", ViewBag.GiamGia) VNĐ</th>
+                                <th></th>
+                            </tr>
+                            <tr class="table-danger">
+                                <th colspan="4" class="text-right">Số tiền phải trả:</th>
+                                <th>@string.Format("{0:N0}", ViewBag.ChiPhiSauGiamGia) VNĐ</th>
+                                <th></th>
+                            </tr>
+                        }
                     </tfoot>
                 </table>
             }

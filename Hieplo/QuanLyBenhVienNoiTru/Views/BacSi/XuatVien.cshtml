@@ -2,88 +2,84 @@
 
 @{
     ViewData["Title"] = "Xuất viện";
-    Layout = "_BacSiLayout";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container-fluid">
-    <h2 class="mb-4">Xác nhận xuất viện</h2>
-    
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Thông tin bệnh nhân</h6>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Xác nhận xuất viện</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info mb-4">
+                    <div class="d-flex">
+                        <div class="me-3">
+                            <i class="fas fa-info-circle fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5>Thông tin quan trọng</h5>
+                            <p class="mb-0">Khi xác nhận xuất viện, ngày xuất viện sẽ tự động được ghi nhận là <strong>thời điểm hiện tại</strong>. Hành động này không thể hoàn tác.</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered">
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold">Thông tin bệnh nhân</h6>
+                        <table class="table table-borderless table-sm">
                             <tr>
-                                <th style="width: 25%">Mã bệnh nhân</th>
+                                <td width="40%">Mã bệnh nhân:</td>
                                 <td>@Model.MaBenhNhan</td>
                             </tr>
                             <tr>
-                                <th>Họ và tên</th>
+                                <td>Họ và tên:</td>
                                 <td>@Model.HoTen</td>
                             </tr>
                             <tr>
-                                <th>Ngày sinh</th>
-                                <td>@(Model.NgaySinh.HasValue ? Model.NgaySinh.Value.ToString("dd/MM/yyyy") : "")</td>
-                            </tr>
-                            <tr>
-                                <th>Giới tính</th>
+                                <td>Giới tính:</td>
                                 <td>@Model.GioiTinh</td>
                             </tr>
                             <tr>
-                                <th>Số điện thoại</th>
-                                <td>@Model.SoDienThoai</td>
-                            </tr>
-                            <tr>
-                                <th>Ngày nhập viện</th>
-                                <td>@Model.NgayNhapVien.ToString("dd/MM/yyyy HH:mm")</td>
-                            </tr>
-                            <tr>
-                                <th>Thời gian điều trị</th>
-                                <td>@((DateTime.Now - Model.NgayNhapVien).Days) ngày</td>
+                                <td>Khoa điều trị:</td>
+                                <td>@Model.Khoa?.TenKhoa</td>
                             </tr>
                         </table>
                     </div>
-                    
-                    <div class="alert alert-warning mt-3">
-                        <i class="fas fa-exclamation-triangle"></i> 
-                        Bạn có chắc chắn muốn xuất viện cho bệnh nhân này không?
+                    <div class="col-md-6">
+                        <h6 class="fw-bold">Thông tin nhập viện</h6>
+                        <table class="table table-borderless table-sm">
+                            <tr>
+                                <td width="40%">Ngày nhập viện:</td>
+                                <td>@Model.NgayNhapVien.ToString("dd/MM/yyyy HH:mm")</td>
+                            </tr>
+                            <tr>
+                                <td>Thời gian điều trị:</td>
+                                <td>@((DateTime.Now - Model.NgayNhapVien).Days) ngày</td>
+                            </tr>
+                            <tr>
+                                <td>Bảo hiểm y tế:</td>
+                                <td>@(Model.BaoHiemYTe ? "Có" : "Không")</td>
+                            </tr>
+                            <tr>
+                                <td>Chẩn đoán:</td>
+                                <td>@Model.ChanDoan</td>
+                            </tr>
+                        </table>
                     </div>
-                    
-                    <form asp-action="XuatVienConfirmed" method="post">
-                        <input type="hidden" name="id" value="@Model.MaBenhNhan" />
-                        
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-success">
-                                <i class="fas fa-check-circle"></i> Xác nhận xuất viện
-                            </button>
-                            <a asp-action="Index" class="btn btn-secondary">
-                                <i class="fas fa-arrow-left"></i> Quay lại
-                            </a>
-                        </div>
-                    </form>
                 </div>
-            </div>
-        </div>
-        
-        <div class="col-md-4">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Lưu ý khi xuất viện</h6>
-                </div>
-                <div class="card-body">
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><i class="fas fa-check text-success mr-2"></i> Tất cả chi phí điều trị đã được thanh toán</li>
-                        <li class="mb-2"><i class="fas fa-check text-success mr-2"></i> Bệnh nhân đã được hướng dẫn chăm sóc sau xuất viện</li>
-                        <li class="mb-2"><i class="fas fa-check text-success mr-2"></i> Đã chuẩn bị đầy đủ hồ sơ bệnh án</li>
-                        <li class="mb-2"><i class="fas fa-check text-success mr-2"></i> Đã kê đơn thuốc cần thiết (nếu có)</li>
-                    </ul>
-                    <hr>
-                    <p class="mb-0">Sau khi xác nhận, bệnh nhân sẽ được xuất viện và ngày xuất viện sẽ được ghi nhận là thời điểm hiện tại.</p>
-                </div>
+                
+                <form asp-action="XuatVienConfirmed" method="post">
+                    <input type="hidden" name="id" value="@Model.MaBenhNhan" />
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="@Url.Action("DanhSachBenhNhan")" class="btn btn-light">
+                            <i class="fas fa-arrow-left me-2"></i>Quay lại
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check-circle me-2"></i>Xác nhận xuất viện
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

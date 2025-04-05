@@ -19,7 +19,10 @@ namespace QuanLyBenhVienNoiTru.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var khoas = await _context.Khoas.ToListAsync();
+            var khoas = await _context.Khoas
+                .Include(k => k.BenhNhans)
+                .Include(k => k.BacSis)
+                .ToListAsync();
             return View(khoas);
         }
 
@@ -31,6 +34,9 @@ namespace QuanLyBenhVienNoiTru.Controllers
             }
 
             var khoa = await _context.Khoas
+                .Include(k => k.BenhNhans)
+                .Include(k => k.BacSis)
+                .Include(k => k.HinhThucDieuTris)
                 .FirstOrDefaultAsync(m => m.MaKhoa == id);
 
             if (khoa == null)

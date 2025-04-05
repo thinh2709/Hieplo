@@ -1,62 +1,140 @@
 @model QuanLyBenhVienNoiTru.Models.BacSi
 @{
-    ViewData["Title"] = "Xóa Bác Sĩ";
-    Layout = "_BacSiLayout";
+    ViewData["Title"] = "Xóa bác sĩ";
+    ViewData["Subtitle"] = "Xác nhận xóa bác sĩ khỏi hệ thống";
 }
 
-<div class="container-fluid px-4">
-    <h1 class="mt-4">Xóa Bác Sĩ</h1>
-    <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item"><a href="/BacSi">Danh Sách Bác Sĩ</a></li>
-        <li class="breadcrumb-item active">Xóa</li>
-    </ol>
-    
-    <div class="alert alert-danger">
-        <h4><i class="fas fa-exclamation-triangle me-2"></i>Cảnh báo!</h4>
-        <p>Bạn có chắc chắn muốn xóa bác sĩ này? Hành động này không thể hoàn tác.</p>
-    </div>
-    
-    <div class="card mb-4">
-        <div class="card-header">
-            <i class="fas fa-user-md me-1"></i>
-            Thông Tin Bác Sĩ
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a href="@Url.Action("Index")">Bác sĩ</a></li>
+    <li class="breadcrumb-item active">Xóa</li>
+}
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+        <div class="text-center mb-4">
+            <div class="avatar-lg mx-auto mb-3">
+                <span class="avatar-title rounded-circle bg-danger-soft text-danger">
+                    <i class="fas fa-exclamation-triangle fa-2x"></i>
+                </span>
+            </div>
+            <h3 class="fw-bold">Xác nhận xóa</h3>
+            <p class="lead text-muted">Bạn có chắc chắn muốn xóa bác sĩ sau đây?</p>
         </div>
-        <div class="card-body">
-            <div class="row mb-2">
-                <div class="col-md-3 fw-bold">Mã Bác Sĩ:</div>
-                <div class="col-md-9">@Model.MaBacSi</div>
-            </div>
-            <div class="row mb-2">
-                <div class="col-md-3 fw-bold">Họ và tên:</div>
-                <div class="col-md-9">@Model.HoTen</div>
-            </div>
-            <div class="row mb-2">
-                <div class="col-md-3 fw-bold">Chuyên khoa:</div>
-                <div class="col-md-9">@Model.ChuyenKhoa</div>
-            </div>
-            <div class="row mb-2">
-                <div class="col-md-3 fw-bold">Số điện thoại:</div>
-                <div class="col-md-9">@Model.SoDienThoai</div>
-            </div>
-            
-            @if (Model.DieuTriBenhNhans != null && Model.DieuTriBenhNhans.Any())
-            {
-                <div class="alert alert-warning mt-3">
-                    <i class="fas fa-exclamation-circle me-1"></i>
-                    <strong>Lưu ý:</strong> Bác sĩ này đã thực hiện @Model.DieuTriBenhNhans.Count điều trị.
-                    Xóa bác sĩ này có thể ảnh hưởng đến dữ liệu liên quan.
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card bg-light border-0 mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="avatar-sm me-3">
+                                <span class="avatar-title rounded-circle bg-white text-primary">
+                                    @Model.HoTen.Substring(0, 1).ToUpper()
+                                </span>
+                            </div>
+                            <div>
+                                <h5 class="mb-0">@Model.HoTen</h5>
+                                <p class="text-muted mb-0">Mã bác sĩ: @Model.MaBacSi</p>
+                            </div>
+                        </div>
+
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Chuyên khoa</dt>
+                            <dd class="col-sm-8">@Model.ChuyenKhoa</dd>
+
+                            <dt class="col-sm-4">Khoa</dt>
+                            <dd class="col-sm-8">@Model.Khoa?.TenKhoa</dd>
+
+                            <dt class="col-sm-4">Số điện thoại</dt>
+                            <dd class="col-sm-8">@Model.SoDienThoai</dd>
+
+                            <dt class="col-sm-4">Email</dt>
+                            <dd class="col-sm-8">@Model.Email</dd>
+
+                            <dt class="col-sm-4">Ngày vào làm</dt>
+                            <dd class="col-sm-8">@Model.NgayVaoLam.ToString("dd/MM/yyyy")</dd>
+
+                            <dt class="col-sm-4">Trạng thái</dt>
+                            <dd class="col-sm-8">
+                                @if (Model.TrangThai)
+                                {
+                                    <span class="badge bg-success">Đang hoạt động</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Ngừng hoạt động</span>
+                                }
+                            </dd>
+                        </dl>
+                    </div>
                 </div>
-            }
-            
-            <form asp-action="Delete" method="post" class="mt-4">
-                <input type="hidden" asp-for="MaBacSi" />
-                <button type="submit" class="btn btn-danger">
-                    <i class="fas fa-trash-alt me-1"></i> Xác Nhận Xóa
-                </button>
-                <a asp-action="Index" class="btn btn-secondary ms-2">
-                    <i class="fas fa-arrow-left me-1"></i> Quay Lại
-                </a>
-            </form>
+
+                @if (ViewBag.CoThongTinLienQuan == true)
+                {
+                    <div class="alert alert-warning">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <i class="fas fa-exclamation-circle fa-2x"></i>
+                            </div>
+                            <div>
+                                <h5 class="alert-heading">Cảnh báo!</h5>
+                                <p class="mb-0">@ViewBag.ThongBao</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <div class="alert alert-danger">
+                    <div class="d-flex">
+                        <div class="me-3">
+                            <i class="fas fa-trash-alt fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5 class="alert-heading">Thông tin quan trọng!</h5>
+                            <p class="mb-0">Việc xóa bác sĩ này sẽ ảnh hưởng đến dữ liệu liên quan như bệnh nhân và lịch điều trị. Hành động này không thể hoàn tác.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-center gap-3 mt-4">
+                    <a href="@Url.Action("Details", new { id = Model.MaBacSi })" class="btn btn-light btn-lg px-4">
+                        <i class="fas fa-arrow-left me-2"></i> Quay lại
+                    </a>
+                    <form asp-action="Delete" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.MaBacSi" />
+                        <button type="submit" class="btn btn-danger btn-lg px-4">
+                            <i class="fas fa-trash-alt me-2"></i> Xóa
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+@section Styles {
+    <style>
+        .avatar-sm {
+            height: 3rem;
+            width: 3rem;
+        }
+        
+        .avatar-lg {
+            height: 5rem;
+            width: 5rem;
+        }
+        
+        .avatar-title {
+            align-items: center;
+            display: flex;
+            font-weight: 500;
+            height: 100%;
+            justify-content: center;
+            width: 100%;
+        }
+        
+        .bg-danger-soft {
+            background-color: rgba(220, 53, 69, 0.1) !important;
+        }
+    </style>
+}

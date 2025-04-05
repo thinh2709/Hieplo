@@ -1,0 +1,124 @@
+@model QuanLyBenhVienNoiTru.Models.TaiKhoan
+@{
+    ViewData["Title"] = "Thêm người dùng";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">Thêm người dùng</h1>
+            <p class="text-muted mb-0">Tạo tài khoản người dùng mới trong hệ thống</p>
+        </div>
+        <a href="@Url.Action("ManageUsers")" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-2"></i>Quay lại
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Thông tin tài khoản</h6>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CreateUser" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <div class="mb-3 row">
+                            <label asp-for="TenDangNhap" class="col-sm-3 col-form-label">Tên đăng nhập</label>
+                            <div class="col-sm-9">
+                                <input asp-for="TenDangNhap" class="form-control" placeholder="Nhập tên đăng nhập" />
+                                <span asp-validation-for="TenDangNhap" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label asp-for="MatKhau" class="col-sm-3 col-form-label">Mật khẩu</label>
+                            <div class="col-sm-9">
+                                <input asp-for="MatKhau" class="form-control" placeholder="Nhập mật khẩu" />
+                                <span asp-validation-for="MatKhau" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label asp-for="VaiTro" class="col-sm-3 col-form-label">Vai trò</label>
+                            <div class="col-sm-9">
+                                <select asp-for="VaiTro" class="form-select" asp-items="ViewBag.VaiTros" id="vaiTroSelect">
+                                    <option value="">-- Chọn vai trò --</option>
+                                </select>
+                                <span asp-validation-for="VaiTro" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row" id="bacSiSection" style="display: none;">
+                            <label class="col-sm-3 col-form-label">Liên kết bác sĩ</label>
+                            <div class="col-sm-9">
+                                <select name="bacSiId" class="form-select" asp-items="ViewBag.BacSiList">
+                                    <option value="">-- Chọn bác sĩ --</option>
+                                </select>
+                                <div class="form-text text-muted">
+                                    Liên kết tài khoản với bác sĩ được chọn
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr />
+                        <div class="d-flex justify-content-end">
+                            <a asp-action="ManageUsers" class="btn btn-secondary me-2">Hủy</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Lưu
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Hướng dẫn</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0 ps-3">
+                        <li class="mb-2">
+                            <strong>Tên đăng nhập</strong> phải là duy nhất trong hệ thống.
+                        </li>
+                        <li class="mb-2">
+                            <strong>Mật khẩu</strong> phải có ít nhất 6 ký tự.
+                        </li>
+                        <li class="mb-2">
+                            Nếu chọn vai trò <strong>Bác sĩ</strong>, hãy liên kết với bác sĩ tương ứng.
+                        </li>
+                        <li class="mb-2">
+                            Người dùng có vai trò <strong>Admin</strong> có toàn quyền quản lý hệ thống.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Hiển thị phần chọn bác sĩ nếu vai trò là "Bác sĩ"
+            $('#vaiTroSelect').change(function() {
+                if ($(this).val() === 'Bác sĩ') {
+                    $('#bacSiSection').show();
+                } else {
+                    $('#bacSiSection').hide();
+                }
+            });
+            
+            // Kiểm tra giá trị ban đầu
+            if ($('#vaiTroSelect').val() === 'Bác sĩ') {
+                $('#bacSiSection').show();
+            }
+        });
+    </script>
+    
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 

@@ -81,6 +81,10 @@ namespace QuanLyBenhVienNoiTru.Models.ViewModels
         [RegularExpression(@"^[0-9]{10,11}$", ErrorMessage = "Số điện thoại không hợp lệ")]
         public string SoDienThoai { get; set; }
 
+        [Display(Name = "Email")]
+        [EmailAddress(ErrorMessage = "Email không đúng định dạng")]
+        public string Email { get; set; }
+
         [Display(Name = "Địa chỉ")]
         public string DiaChi { get; set; }
 
@@ -100,8 +104,34 @@ namespace QuanLyBenhVienNoiTru.Models.ViewModels
         [Display(Name = "Khoa")]
         public int MaKhoa { get; set; }
         
-        public SelectList KhoaSelectList { get; set; }
-        public List<SelectListItem> GioiTinhOptions { get; set; }
+        [Display(Name = "Chẩn đoán")]
+        public string ChanDoan { get; set; }
+        
+        [Display(Name = "Trạng thái")]
+        public bool TrangThai { get; set; } = true;
+        
+        // Thông tin điều trị mới
+        [Display(Name = "Thêm điều trị mới")]
+        public bool ThemDieuTri { get; set; } = false;
+        
+        [Display(Name = "Bác sĩ phụ trách")]
+        public int? MaBacSi { get; set; }
+        
+        [Display(Name = "Bác sĩ thực hiện điều trị")]
+        public int? DieuTriMaBacSi { get; set; }
+        
+        [Display(Name = "Danh sách hình thức điều trị")]
+        public List<int>? HinhThucDieuTriIds { get; set; } = new List<int>();
+        
+        [Display(Name = "Ngày thực hiện")]
+        [DataType(DataType.Date)]
+        public DateTime? NgayThucHien { get; set; } = DateTime.Now;
+        
+        // Danh sách select list
+        public SelectList? KhoaSelectList { get; set; }
+        public List<SelectListItem>? GioiTinhOptions { get; set; }
+        public SelectList? BacSiSelectList { get; set; }
+        public SelectList? HinhThucDieuTriSelectList { get; set; }
     }
 
     public class BenhNhanDetailsViewModel
@@ -137,5 +167,34 @@ namespace QuanLyBenhVienNoiTru.Models.ViewModels
         public int SoBenhNhanDaXuatVien { get; set; }
         public Dictionary<string, int> SoBenhNhanTheoKhoa { get; set; }
         public Dictionary<string, int> SoBenhNhanTheoThang { get; set; }
+    }
+
+    public class BenhNhanCreateWithTreatmentViewModel
+    {
+        // Thông tin bệnh nhân
+        public BenhNhan BenhNhan { get; set; } = new BenhNhan {
+            NgayNhapVien = DateTime.Now,
+            TrangThai = true
+        };
+
+        // Thông tin điều trị
+        [Display(Name = "Bạn có muốn thêm hình thức điều trị ngay?")]
+        public bool ThemDieuTri { get; set; } = false;
+
+        [Display(Name = "Danh sách hình thức điều trị")]
+        public List<int>? HinhThucDieuTriIds { get; set; } = new List<int>();
+
+        [Display(Name = "Bác sĩ phụ trách")]
+        public int? MaBacSi { get; set; }
+
+        [Display(Name = "Ngày thực hiện")]
+        [DataType(DataType.Date)]
+        public DateTime? NgayThucHien { get; set; } = DateTime.Now;
+
+        // Lưu trữ các danh sách SelectList
+        public SelectList? KhoaSelectList { get; set; }
+        public SelectList? BacSiSelectList { get; set; }
+        public SelectList? HinhThucDieuTriSelectList { get; set; }
+        public List<SelectListItem>? GioiTinhOptions { get; set; }
     }
 }

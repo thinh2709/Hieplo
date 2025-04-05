@@ -20,6 +20,9 @@
                 <dt class="col-sm-3">@Html.DisplayNameFor(model => model.TenDieuTri)</dt>
                 <dd class="col-sm-9">@Html.DisplayFor(model => model.TenDieuTri)</dd>
 
+                <dt class="col-sm-3">Khoa áp dụng</dt>
+                <dd class="col-sm-9">@(Model.Khoa?.TenKhoa ?? "Không có khoa")</dd>
+
                 <dt class="col-sm-3">@Html.DisplayNameFor(model => model.ChiPhi)</dt>
                 <dd class="col-sm-9">@Html.DisplayFor(model => model.ChiPhi) VNĐ</dd>
 

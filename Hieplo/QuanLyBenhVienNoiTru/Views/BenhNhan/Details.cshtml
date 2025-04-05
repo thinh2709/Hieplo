@@ -1,165 +1,353 @@
-@model QuanLyBenhVienNoiTru.Models.BenhNhan
+@model QuanLyBenhVienNoiTru.Models.ViewModels.BenhNhanDetailsViewModel
 
 @{
     ViewData["Title"] = "Chi tiết bệnh nhân";
-    Layout = "_Layout";
+    ViewData["Subtitle"] = "Thông tin chi tiết về bệnh nhân";
 }
 
-<div class="container-fluid">
-    <h2>Chi tiết bệnh nhân</h2>
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a href="@Url.Action("Index")">Bệnh nhân</a></li>
+    <li class="breadcrumb-item active">Chi tiết</li>
+}
 
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Thông tin bệnh nhân</h6>
+@section PageActions {
+    <div class="d-flex gap-2">
+        <a href="@Url.Action("Edit", new { id = Model.BenhNhan.MaBenhNhan })" class="btn btn-primary">
+            <i class="fas fa-edit me-2"></i>
+            Chỉnh sửa
+        </a>
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+            <i class="fas fa-trash me-2"></i>
+            Xóa
+        </button>
+        <a href="@Url.Action("Index")" class="btn btn-light">
+            <i class="fas fa-arrow-left me-2"></i>
+            Quay lại
+        </a>
+    </div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body text-center p-4">
+                <div class="mb-3">
+                    <div class="avatar-circle mx-auto mb-3">
+                        <span class="avatar-text">@Model.BenhNhan.HoTen.Substring(0, 1).ToUpper()</span>
+                    </div>
+                    <h4 class="mb-1">@Model.BenhNhan.HoTen</h4>
+                    <p class="text-muted mb-2">Mã BN: @Model.BenhNhan.MaBenhNhan</p>
+                    <div class="d-flex justify-content-center gap-2">
+                        <span class="badge bg-primary">@Model.BenhNhan.GioiTinh</span>
+                        @if (Model.BenhNhan.TrangThai)
+                        {
+                            <span class="badge bg-success">Đang điều trị</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Đã xuất viện</span>
+                        }
+                        @if (Model.BenhNhan.BaoHiemYTe)
+                        {
+                            <span class="badge bg-info">Có BHYT</span>
+                        }
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="row mb-2">
-                        <div class="col-md-4"><strong>Mã bệnh nhân:</strong></div>
-                        <div class="col-md-8">@Model.MaBenhNhan</div>
+                <hr>
+                <div class="text-start">
+                    <div class="mb-3">
+                        <label class="small text-muted d-block">Số điện thoại</label>
+                        <p class="mb-0">
+                            <i class="fas fa-phone-alt me-2 text-primary"></i>
+                            @(string.IsNullOrEmpty(Model.BenhNhan.SoDienThoai) ? "Chưa cập nhật" : Model.BenhNhan.SoDienThoai)
+                        </p>
                     </div>
-                    <div class="row mb-2">
-                        <div class="col-md-4"><strong>Họ tên:</strong></div>
-                        <div class="col-md-8">@Model.HoTen</div>
+                    <div class="mb-3">
+                        <label class="small text-muted d-block">Email</label>
+                        <p class="mb-0">
+                            <i class="fas fa-envelope me-2 text-primary"></i>
+                            @(string.IsNullOrEmpty(Model.BenhNhan.Email) ? "Chưa cập nhật" : Model.BenhNhan.Email)
+                        </p>
                     </div>
-                    <div class="row mb-2">
-                        <div class="col-md-4"><strong>Ngày sinh:</strong></div>
-                        <div class="col-md-8">@(Model.NgaySinh.HasValue ? Model.NgaySinh.Value.ToString("dd/MM/yyyy") : "")</div>
+                    <div class="mb-3">
+                        <label class="small text-muted d-block">Địa chỉ</label>
+                        <p class="mb-0">
+                            <i class="fas fa-map-marker-alt me-2 text-primary"></i>
+                            @(string.IsNullOrEmpty(Model.BenhNhan.DiaChi) ? "Chưa cập nhật" : Model.BenhNhan.DiaChi)
+                        </p>
                     </div>
-                    <div class="row mb-2">
-                        <div class="col-md-4"><strong>Giới tính:</strong></div>
-                        <div class="col-md-8">@Model.GioiTinh</div>
+                </div>
+                <hr>
+                <div class="d-flex gap-2">
+                    <a asp-action="Edit" asp-route-id="@Model.BenhNhan.MaBenhNhan" class="btn btn-primary flex-grow-1">
+                        <i class="fas fa-edit me-2"></i>
+                        Chỉnh sửa
+                    </a>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Thông tin điều trị</h5>
+                @if (Model.BenhNhan.TrangThai)
+                {
+                    <a href="@Url.Action("XuatVien", new { id = Model.BenhNhan.MaBenhNhan })" class="btn btn-sm btn-outline-success">
+                        <i class="fas fa-sign-out-alt me-1"></i>
+                        Xuất viện
+                    </a>
+                }
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="small text-muted d-block">Khoa điều trị</label>
+                        <p class="mb-0">
+                            <i class="fas fa-hospital me-2 text-primary"></i>
+                            @Model.BenhNhan.Khoa.TenKhoa
+                        </p>
                     </div>
-                    <div class="row mb-2">
-                        <div class="col-md-4"><strong>Số điện thoại:</strong></div>
-                        <div class="col-md-8">@Model.SoDienThoai</div>
+                    <div class="col-md-6">
+                        <label class="small text-muted d-block">Bác sĩ phụ trách</label>
+                        <p class="mb-0">
+                            <i class="fas fa-user-md me-2 text-primary"></i>
+                            @(Model.BenhNhan.BacSi != null ? Model.BenhNhan.BacSi.HoTen : "Chưa phân công")
+                        </p>
                     </div>
-                    <div class="row mb-2">
-                        <div class="col-md-4"><strong>Địa chỉ:</strong></div>
-                        <div class="col-md-8">@Model.DiaChi</div>
+                    <div class="col-md-6">
+                        <label class="small text-muted d-block">Ngày nhập viện</label>
+                        <p class="mb-0">
+                            <i class="fas fa-calendar-check me-2 text-primary"></i>
+                            @string.Format("{0:dd/MM/yyyy}", Model.BenhNhan.NgayNhapVien)
+                        </p>
                     </div>
-                    <div class="row mb-2">
-                        <div class="col-md-4"><strong>Bảo hiểm y tế:</strong></div>
-                        <div class="col-md-8">@(Model.BaoHiemYTe ? "Có" : "Không")</div>
+                    <div class="col-md-6">
+                        <label class="small text-muted d-block">Ngày xuất viện</label>
+                        <p class="mb-0">
+                            <i class="fas fa-calendar-times me-2 text-primary"></i>
+                            @(Model.BenhNhan.NgayXuatVien.HasValue ? string.Format("{0:dd/MM/yyyy}", Model.BenhNhan.NgayXuatVien.Value) : "Chưa xuất viện")
+                        </p>
                     </div>
-                    <div class="row mb-2">
-                        <div class="col-md-4"><strong>Khoa điều trị:</strong></div>
-                        <div class="col-md-8">@Model.Khoa.TenKhoa</div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-md-4"><strong>Ngày nhập viện:</strong></div>
-                        <div class="col-md-8">@(Model.NgaySinh?.ToString("dd/MM/yyyy") ?? "")</div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-md-4"><strong>Ngày xuất viện:</strong></div>
-                        <div class="col-md-8">
-                            @if (Model.NgayXuatVien.HasValue)
-                            {
-                                @Model.NgayXuatVien.Value.ToString("dd/MM/yyyy")
-                            }
-                            else
-                            {
-                                <span class="badge badge-primary">Đang điều trị</span>
-                            }
-                        </div>
+                    <div class="col-12">
+                        <label class="small text-muted d-block">Chẩn đoán</label>
+                        <p class="mb-0">
+                            <i class="fas fa-stethoscope me-2 text-primary"></i>
+                            @(string.IsNullOrEmpty(Model.BenhNhan.ChanDoan) ? "Chưa có chẩn đoán" : Model.BenhNhan.ChanDoan)
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <div class="col-md-6">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Chi phí điều trị</h6>
-                </div>
-                <div class="card-body">
-                    @if (Model.ChiPhiDieuTris != null && Model.ChiPhiDieuTris.Any())
-                    {
-                        <table class="table table-bordered">
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Chi phí điều trị</h5>
+                <a href="@Url.Action("Create", "ChiPhiDieuTri", new { maBenhNhan = Model.BenhNhan.MaBenhNhan })" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-plus me-1"></i>
+                    Thêm chi phí
+                </a>
+            </div>
+            <div class="card-body">
+                @if (!Model.ChiPhis.Any())
+                {
+                    <div class="alert alert-info mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Chưa có thông tin chi phí điều trị
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover">
                             <thead>
                                 <tr>
                                     <th>Mã chi phí</th>
-                                    <th>Tổng chi phí</th>
                                     <th>Ngày lập</th>
+                                    <th>Số tiền</th>
                                     <th>Trạng thái</th>
+                                    <th>Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var chiPhi in Model.ChiPhiDieuTris)
+                                @foreach (var item in Model.ChiPhis.OrderByDescending(c => c.NgayLap))
                                 {
                                     <tr>
-                                        <td>@chiPhi.MaChiPhi</td>
-                                        <td>@chiPhi.TongChiPhi.ToString("N0") VNĐ</td>
-                                        <td>@chiPhi.NgayLap?.ToString("dd/MM/yyyy")</td>
+                                        <td>@item.MaChiPhi</td>
+                                        <td>@string.Format("{0:dd/MM/yyyy}", item.NgayLap)</td>
+                                        <td>@string.Format("{0:N0}", item.TongChiPhi) VNĐ</td>
                                         <td>
-                                            @if (chiPhi.DaThanhToan)
+                                            @if (item.DaThanhToan)
                                             {
-                                                <span class="badge badge-success">Đã thanh toán</span>
+                                                <span class="badge bg-success">Đã thanh toán</span>
                                             }
                                             else
                                             {
-                                                <span class="badge badge-warning">Chưa thanh toán</span>
+                                                <span class="badge bg-warning">Chưa thanh toán</span>
                                             }
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="@Url.Action("Details", "ChiPhiDieuTri", new { id = item.MaChiPhi })" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                @if (!item.DaThanhToan)
+                                                {
+                                                    <a href="@Url.Action("ThanhToan", "ChiPhiDieuTri", new { id = item.MaChiPhi })" class="btn btn-sm btn-outline-success">
+                                                        <i class="fas fa-money-bill-wave"></i>
+                                                    </a>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-light">
+                                    <td colspan="2" class="fw-bold">Tổng chi phí</td>
+                                    <td colspan="3" class="fw-bold">
+                                        <span class="text-danger">@string.Format("{0:N0}", Model.TongChiPhiChuaThanhToan) VNĐ</span>
+                                        <small class="text-muted">(Chưa thanh toán)</small>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Lịch sử điều trị</h5>
+                <a href="@Url.Action("Create", "DieuTriBenhNhan", new { maBenhNhan = Model.BenhNhan.MaBenhNhan })" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-plus me-1"></i>
+                    Thêm điều trị
+                </a>
+            </div>
+            <div class="card-body">
+                @if (!Model.DieuTris.Any())
+                {
+                    <div class="alert alert-info mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Chưa có thông tin điều trị
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Mã điều trị</th>
+                                    <th>Bác sĩ thực hiện</th>
+                                    <th>Hình thức điều trị</th>
+                                    <th>Ngày thực hiện</th>
+                                    <th>Kết quả</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.DieuTris.OrderByDescending(d => d.NgayThucHien))
+                                {
+                                    <tr>
+                                        <td>@item.MaDieuTriBenhNhan</td>
+                                        <td>@(item.BacSi != null ? item.BacSi.HoTen : "Không có")</td>
+                                        <td>@item.HinhThucDieuTri.TenDieuTri</td>
+                                        <td>@(item.NgayThucHien.HasValue ? string.Format("{0:dd/MM/yyyy}", item.NgayThucHien.Value) : "N/A")</td>
+                                        <td>@(string.IsNullOrEmpty(item.KetQua) ? "Chưa có kết quả" : item.KetQua)</td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="@Url.Action("Details", "DieuTriBenhNhan", new { id = item.MaDieuTriBenhNhan })" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="@Url.Action("Edit", "DieuTriBenhNhan", new { id = item.MaDieuTriBenhNhan })" class="btn btn-sm btn-outline-secondary">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
-                    }
-                    else
-                    {
-                        <p class="text-muted">Chưa có thông tin chi phí điều trị</p>
-                    }
-                </div>
+                    </div>
+                }
             </div>
         </div>
     </div>
+</div>
 
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Lịch sử điều trị</h6>
+<!-- Modal xác nhận xóa -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger mb-2">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span>Bạn có chắc chắn muốn xóa bệnh nhân <strong>@Model.BenhNhan.HoTen</strong>?</span>
+                    <div class="mt-2">Hành động này không thể hoàn tác.</div>
+                </div>
+                @if (ViewBag.CoThongTinLienQuan == true)
+                {
+                    <div class="alert alert-warning mt-3">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        @ViewBag.ThongBao
+                    </div>
+                }
+            </div>
+            <div class="modal-footer border-0">
+                <form asp-action="Delete" method="post">
+                    <input type="hidden" name="id" value="@Model.BenhNhan.MaBenhNhan" />
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-danger">Xác nhận xóa</button>
+                </form>
+            </div>
         </div>
-        <div class="card-body">
-            @if (Model.DieuTriBenhNhans != null && Model.DieuTriBenhNhans.Any())
-            {
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Mã điều trị</th>
-                            <th>Hình thức điều trị</th>
-                            <th>Bác sĩ thực hiện</th>
-                            <th>Ngày thực hiện</th>
-                            <th>Kết quả</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var dieuTri in Model.DieuTriBenhNhans.OrderByDescending(d => d.NgayThucHien))
-                        {
-                            <tr>
-                                <td>@dieuTri.MaDieuTriBenhNhan</td>
-                                <td>@dieuTri.HinhThucDieuTri.TenDieuTri</td>
-                                <td>@dieuTri.BacSi.HoTen</td>
-                                <td>@dieuTri.NgayThucHien?.ToString("dd/MM/yyyy")</td>
-                                <td>@dieuTri.KetQua</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            }
-            else
-            {
-                <p class="text-muted">Chưa có thông tin điều trị</p>
-            }
-        </div>
-    </div>
-
-    <div>
-        <a asp-action="Edit" asp-route-id="@Model.MaBenhNhan" class="btn btn-warning">
-            <i class="fas fa-edit"></i> Chỉnh sửa
-        </a>
-        <a asp-action="Index" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Quay lại danh sách
-        </a>
     </div>
 </div>
+
+@section Styles {
+    <style>
+        .avatar-circle {
+            width: 100px;
+            height: 100px;
+            background-color: var(--bs-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar-text {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 500;
+        }
+    </style>
+}

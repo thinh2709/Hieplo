@@ -2,97 +2,221 @@
 
 @{
     ViewData["Title"] = "Danh sách bệnh nhân";
-    Layout = "_Layout";
+    ViewData["Subtitle"] = "Quản lý thông tin bệnh nhân trong bệnh viện";
 }
 
-<div class="container-fluid">
-    <h2>Danh sách bệnh nhân</h2>
-
-    <p>
-        <a asp-action="Create" class="btn btn-primary">Thêm mới bệnh nhân</a>
-    </p>
-
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Bệnh nhân nội trú</h6>
+@section PageActions {
+    <div class="d-flex gap-2">
+        <a href="@Url.Action("Create")" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>
+            Thêm bệnh nhân mới
+        </a>
+        <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#filterModal">
+            <i class="fas fa-filter me-2"></i>
+            Lọc
+        </button>
+        <div class="dropdown">
+            <button class="btn btn-light dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-download me-2"></i>
+                Xuất
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="exportDropdown">
+                <li><a class="dropdown-item" href="#"><i class="fas fa-file-excel me-2"></i>Xuất Excel</a></li>
+                <li><a class="dropdown-item" href="#"><i class="fas fa-file-pdf me-2"></i>Xuất PDF</a></li>
+            </ul>
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                    <thead>
+    </div>
+}
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Mã BN</th>
+                        <th>Họ và tên</th>
+                        <th>Ngày sinh</th>
+                        <th>Giới tính</th>
+                        <th>Địa chỉ</th>
+                        <th>Số điện thoại</th>
+                        <th>BHYT</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
                         <tr>
-                            <th>Mã BN</th>
-                            <th>Họ tên</th>
-                            <th>Ngày sinh</th>
-                            <th>Giới tính</th>
-                            <th>Số điện thoại</th>
-                            <th>Khoa</th>
-                            <th>Ngày nhập viện</th>
-                            <th>Trạng thái</th>
-                            <th>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model)
-                        {
-                            <tr>
-                                <td>@item.MaBenhNhan</td>
-                                <td>@item.HoTen</td>
-                                <td>@(item.NgaySinh.HasValue ? item.NgaySinh.Value.ToString("dd/MM/yyyy") : "")</td>
-                                <td>@item.GioiTinh</td>
-                                <td>@item.SoDienThoai</td>
-                                <td>@item.Khoa.TenKhoa</td>
-                                <td>@item.NgayNhapVien.ToString("dd/MM/yyyy")</td>
-                                <td>
-                                    @if (item.NgayXuatVien.HasValue)
-                                    {
-                                        <span class="badge badge-success">Đã xuất viện</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge badge-primary">Đang điều trị</span>
-                                    }
-                                </td>
-                                <td>
-                                    <div class="btn-group">
-                                        <a asp-action="Details" asp-route-id="@item.MaBenhNhan" class="btn btn-info btn-sm">
-                                            <i class="fas fa-info-circle"></i> Chi tiết
-                                        </a>
-                                        <a asp-action="Edit" asp-route-id="@item.MaBenhNhan" class="btn btn-warning btn-sm">
-                                            <i class="fas fa-edit"></i> Sửa
-                                        </a>
-                                        <a asp-action="Delete" asp-route-id="@item.MaBenhNhan" class="btn btn-danger btn-sm">
-                                            <i class="fas fa-trash"></i> Xóa
+                            <td>
+                                <span class="fw-medium">@item.MaBenhNhan</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-xs me-2">
+                                        <span class="avatar-title rounded-circle bg-primary-soft text-primary">
+                                            @item.HoTen.Substring(0, 1).ToUpper()
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <a href="@Url.Action("Details", new { id = item.MaBenhNhan })" class="text-body fw-medium">
+                                            @item.HoTen
                                         </a>
                                     </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                                </div>
+                            </td>
+                            <td>@string.Format("{0:dd/MM/yyyy}", item.NgaySinh)</td>
+                            <td>@item.GioiTinh</td>
+                            <td>@item.DiaChi</td>
+                            <td>@item.SoDienThoai</td>
+                            <td>
+                                @if (item.BaoHiemYTe)
+                                {
+                                    <span class="badge bg-success">Có</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Không</span>
+                                }
+                            </td>
+                            <td>
+                                @if (item.TrangThai)
+                                {
+                                    <span class="badge bg-success">Đang điều trị</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Đã xuất viện</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a href="@Url.Action("Details", new { id = item.MaBenhNhan })" 
+                                       class="btn btn-sm btn-light" 
+                                       data-bs-toggle="tooltip" 
+                                       title="Xem chi tiết">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="@Url.Action("Edit", new { id = item.MaBenhNhan })" 
+                                       class="btn btn-sm btn-light"
+                                       data-bs-toggle="tooltip" 
+                                       title="Chỉnh sửa">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" 
+                                            class="btn btn-sm btn-light text-danger" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#deleteModal@(item.MaBenhNhan)"
+                                            title="Xóa">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Delete Modal -->
+                                <div class="modal fade" id="deleteModal@(item.MaBenhNhan)" tabindex="-1" aria-labelledby="deleteModalLabel@(item.MaBenhNhan)" aria-hidden="true" data-bs-backdrop="static">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deleteModalLabel@(item.MaBenhNhan)">Xác nhận xóa</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="alert alert-danger mb-0">
+                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                    <span>Bạn có chắc chắn muốn xóa bệnh nhân <strong>@item.HoTen</strong>?</span>
+                                                    <div class="mt-2 mb-0">Hành động này không thể hoàn tác.</div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
+                                                <form asp-action="Delete" asp-route-id="@item.MaBenhNhan" method="post" class="d-inline">
+                                                    <button type="submit" class="btn btn-danger">Xác nhận xóa</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Lọc bệnh nhân</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="filterForm">
+                    <div class="mb-3">
+                        <label class="form-label">Trạng thái</label>
+                        <select class="form-select" name="trangThai">
+                            <option value="">Tất cả</option>
+                            <option value="Đang điều trị">Đang điều trị</option>
+                            <option value="Đã xuất viện">Đã xuất viện</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Giới tính</label>
+                        <select class="form-select" name="gioiTinh">
+                            <option value="">Tất cả</option>
+                            <option value="Nam">Nam</option>
+                            <option value="Nữ">Nữ</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Sắp xếp theo</label>
+                        <select class="form-select" name="sortBy">
+                            <option value="name">Tên</option>
+                            <option value="date">Ngày nhập viện</option>
+                            <option value="status">Trạng thái</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" onclick="applyFilter()">Áp dụng</button>
             </div>
         </div>
     </div>
 </div>
 
+@section Styles {
+    <style>
+        .avatar-circle {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+    </style>
+}
+
 @section Scripts {
     <script>
-        $(document).ready(function () {
-            $('#dataTable').DataTable({
-                "language": {
-                    "lengthMenu": "Hiển thị _MENU_ dòng mỗi trang",
-                    "zeroRecords": "Không tìm thấy bệnh nhân nào",
-                    "info": "Hiển thị trang _PAGE_ / _PAGES_",
-                    "infoEmpty": "Không có dữ liệu",
-                    "infoFiltered": "(lọc từ _MAX_ bản ghi)",
-                    "search": "Tìm kiếm:",
-                    "paginate": {
-                        "first": "Đầu",
-                        "last": "Cuối",
-                        "next": "Sau",
-                        "previous": "Trước"
-                    }
-                }
+        function applyFilter() {
+            // Implement filter logic here
+            $('#filterModal').modal('hide');
+        }
+
+        $(document).ready(function() {
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
             });
         });
     </script>

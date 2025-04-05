@@ -1,0 +1,176 @@
+@{
+    ViewData["Title"] = "Trợ giúp";
+    ViewData["Subtitle"] = "Câu hỏi thường gặp & hướng dẫn sử dụng";
+}
+
+@section Breadcrumb {
+    <li class="breadcrumb-item active">Trợ giúp</li>
+}
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0">Câu hỏi thường gặp</h5>
+            </div>
+            <div class="card-body">
+                <div class="accordion" id="faqAccordion">
+                    <!-- Câu hỏi 1 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                <i class="fas fa-question-circle me-2 text-primary"></i>
+                                Tôi không thể thêm bệnh nhân mới, hệ thống báo lỗi?
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
+                            data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <p>Khi thêm bệnh nhân mới, cần lưu ý các điểm sau:</p>
+                                <ul>
+                                    <li>Các trường có dấu <strong class="text-danger">*</strong> là bắt buộc phải nhập, bao gồm: Họ tên, Giới tính, và Khoa điều trị.</li>
+                                    <li>Ngày nhập viện sẽ tự động được ghi nhận là thời điểm hiện tại, không cần nhập thủ công.</li>
+                                    <li>Mã bệnh nhân sẽ được hệ thống tự động tạo, không cần nhập.</li>
+                                    <li>Nếu vẫn gặp lỗi, hãy kiểm tra thông báo lỗi chi tiết hiển thị ở đầu form để biết thêm thông tin.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Câu hỏi 2 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                <i class="fas fa-question-circle me-2 text-primary"></i>
+                                Làm thế nào để xuất viện cho bệnh nhân?
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+                            data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <ol>
+                                    <li>Vào trang <a href="@Url.Action("Index", "BenhNhan")">Danh sách bệnh nhân</a>.</li>
+                                    <li>Nhấn vào nút xem chi tiết <i class="fas fa-eye"></i> của bệnh nhân cần xuất viện.</li>
+                                    <li>Trên trang chi tiết, nhấn vào nút "Xuất viện".</li>
+                                    <li>Xác nhận thông tin xuất viện.</li>
+                                    <li>Hệ thống sẽ tự động ghi nhận thời gian xuất viện là thời điểm hiện tại và cập nhật trạng thái bệnh nhân.</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Câu hỏi 3 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                <i class="fas fa-question-circle me-2 text-primary"></i>
+                                Làm thế nào để phân công bác sĩ cho bệnh nhân?
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
+                            data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <ol>
+                                    <li>Vào trang <a href="@Url.Action("Index", "BenhNhan")">Danh sách bệnh nhân</a>.</li>
+                                    <li>Nhấn vào nút chỉnh sửa <i class="fas fa-edit"></i> của bệnh nhân cần phân công bác sĩ.</li>
+                                    <li>Trên form chỉnh sửa, chọn bác sĩ phụ trách từ danh sách dropdown.</li>
+                                    <li>Nhấn "Lưu thông tin" để hoàn tất.</li>
+                                </ol>
+                                <p>Lưu ý: Chỉ có thể phân công bác sĩ thuộc cùng khoa với bệnh nhân.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Câu hỏi 4 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingFour">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                <i class="fas fa-question-circle me-2 text-primary"></i>
+                                Tìm kiếm thông tin bệnh nhân như thế nào?
+                            </button>
+                        </h2>
+                        <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour"
+                            data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                <p>Hệ thống cung cấp nhiều cách để tìm kiếm bệnh nhân:</p>
+                                <ul>
+                                    <li>Sử dụng thanh tìm kiếm ở đầu trang để tìm theo tên hoặc mã bệnh nhân.</li>
+                                    <li>Sử dụng bộ lọc (nhấn vào nút "Lọc") để lọc theo khoa, trạng thái, giới tính, v.v.</li>
+                                    <li>Sắp xếp danh sách bằng cách nhấn vào tiêu đề cột.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0">Tài liệu hướng dẫn</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    <a href="#" class="list-group-item list-group-item-action d-flex align-items-center">
+                        <i class="fas fa-file-pdf text-danger me-3 fa-lg"></i>
+                        <div>
+                            <h6 class="mb-0">Hướng dẫn sử dụng đầy đủ</h6>
+                            <small class="text-muted">PDF, 2.5MB</small>
+                        </div>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action d-flex align-items-center">
+                        <i class="fas fa-video text-primary me-3 fa-lg"></i>
+                        <div>
+                            <h6 class="mb-0">Video hướng dẫn</h6>
+                            <small class="text-muted">5 videos</small>
+                        </div>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action d-flex align-items-center">
+                        <i class="fas fa-question-circle text-success me-3 fa-lg"></i>
+                        <div>
+                            <h6 class="mb-0">Câu hỏi thường gặp đầy đủ</h6>
+                            <small class="text-muted">25 câu hỏi & câu trả lời</small>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0">Hỗ trợ kỹ thuật</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-3">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-headset fs-4 text-primary me-3"></i>
+                        <div>
+                            <h6 class="mb-0">Hotline</h6>
+                            <p class="mb-0 text-muted">0123.456.789</p>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-envelope fs-4 text-primary me-3"></i>
+                        <div>
+                            <h6 class="mb-0">Email hỗ trợ</h6>
+                            <p class="mb-0 text-muted">support@hospital.com</p>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-clock fs-4 text-primary me-3"></i>
+                        <div>
+                            <h6 class="mb-0">Giờ làm việc</h6>
+                            <p class="mb-0 text-muted">Thứ 2 - Thứ 6: 8:00 - 17:00</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

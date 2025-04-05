@@ -40,6 +40,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/thinh/Downloads/DoAnDataBase/Hieplo/QuanLyBenhVienNoiTru/Views/Admin/CreateUser.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQ3JlYXRlVXNlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/thinh/Downloads/DoAnDataBase/Hieplo/QuanLyBenhVienNoiTru/Views/Admin/Dashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRGFzaGJvYXJkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -58,6 +62,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/thinh/Downloads/DoAnDataBase/Hieplo/QuanLyBenhVienNoiTru/Views/BacSi/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmFjU2lcQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/thinh/Downloads/DoAnDataBase/Hieplo/QuanLyBenhVienNoiTru/Views/BacSi/DanhSachBenhNhan.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmFjU2lcRGFuaFNhY2hCZW5oTmhhbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/thinh/Downloads/DoAnDataBase/Hieplo/QuanLyBenhVienNoiTru/Views/BacSi/Delete.cshtml]
@@ -166,6 +174,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/thinh/Downloads/DoAnDataBase/Hieplo/QuanLyBenhVienNoiTru/Views/HinhThucDieuTri/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSGluaFRodWNEaWV1VHJpXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/thinh/Downloads/DoAnDataBase/Hieplo/QuanLyBenhVienNoiTru/Views/Home/Help.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxIZWxwLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/thinh/Downloads/DoAnDataBase/Hieplo/QuanLyBenhVienNoiTru/Views/Home/Index.cshtml]

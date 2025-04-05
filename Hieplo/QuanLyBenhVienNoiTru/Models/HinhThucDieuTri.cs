@@ -3,11 +3,15 @@ namespace QuanLyBenhVienNoiTru.Models
     public class HinhThucDieuTri
     {
         public int MaDieuTri { get; set; }
-        public string TenDieuTri { get; set; }
+        public required string TenDieuTri { get; set; }
         public decimal ChiPhi { get; set; }
-        public string MoTa { get; set; }
+        public required string MoTa { get; set; }
+        
+        // Khóa ngoại đến bảng Khoa
+        public int MaKhoa { get; set; }
 
         // Navigation properties
-        public virtual ICollection<DieuTriBenhNhan> DieuTriBenhNhans { get; set; }
+        public virtual ICollection<DieuTriBenhNhan> DieuTriBenhNhans { get; set; } = new List<DieuTriBenhNhan>();
+        public virtual Khoa Khoa { get; set; }
     }
 }

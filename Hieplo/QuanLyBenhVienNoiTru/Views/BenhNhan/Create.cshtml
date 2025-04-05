@@ -1,100 +1,270 @@
-@model QuanLyBenhVienNoiTru.Models.BenhNhan
+@model QuanLyBenhVienNoiTru.Models.ViewModels.BenhNhanCreateWithTreatmentViewModel
 
 @{
     ViewData["Title"] = "Thêm bệnh nhân mới";
-    Layout = "_Layout";
+    ViewData["Subtitle"] = "Nhập thông tin bệnh nhân mới";
 }
 
-<div class="container-fluid">
-    <h2>Thêm bệnh nhân mới</h2>
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a href="@Url.Action("Index")">Bệnh nhân</a></li>
+    <li class="breadcrumb-item active">Thêm mới</li>
+}
 
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Thông tin bệnh nhân</h6>
-        </div>
-        <div class="card-body">
-            <form asp-action="Create" method="post">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label asp-for="HoTen" class="control-label">Họ tên</label>
-                            <input asp-for="HoTen" class="form-control" required />
-                            <span asp-validation-for="HoTen" class="text-danger"></span>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label asp-for="NgaySinh" class="control-label">Ngày sinh</label>
-                            <input asp-for="NgaySinh" class="form-control" type="date" />
-                            <span asp-validation-for="NgaySinh" class="text-danger"></span>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label asp-for="GioiTinh" class="control-label">Giới tính</label>
-                            <select asp-for="GioiTinh" class="form-control">
-                                <option value="">-- Chọn giới tính --</option>
-                                <option value="Nam">Nam</option>
-                                <option value="Nữ">Nữ</option>
-                                <option value="Khác">Khác</option>
-                            </select>
-                            <span asp-validation-for="GioiTinh" class="text-danger"></span>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label asp-for="SoDienThoai" class="control-label">Số điện thoại</label>
-                            <input asp-for="SoDienThoai" class="form-control" />
-                            <span asp-validation-for="SoDienThoai" class="text-danger"></span>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label asp-for="DiaChi" class="control-label">Địa chỉ</label>
-                            <textarea asp-for="DiaChi" class="form-control" rows="3"></textarea>
-                            <span asp-validation-for="DiaChi" class="text-danger"></span>
-                        </div>
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="All" class="alert alert-danger mb-4" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <span>Vui lòng kiểm tra lại thông tin.</span>
                     </div>
-                    
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label asp-for="BaoHiemYTe" class="control-label">Bảo hiểm y tế</label>
-                            <div class="form-check">
-                                <input asp-for="BaoHiemYTe" class="form-check-input" type="checkbox" />
-                                <label class="form-check-label">Có bảo hiểm y tế</label>
+
+                    @if (ViewBag.ValidationErrors != null)
+                    {
+                        <div class="alert alert-warning mb-4">
+                            <h5>Chi tiết lỗi validation:</h5>
+                            <ul>
+                                @foreach (var error in ViewBag.ValidationErrors)
+                                {
+                                    <li>
+                                        <strong>@error.Property</strong>: 
+                                        <ul>
+                                            @foreach (var msg in error.Errors)
+                                            {
+                                                <li>@msg</li>
+                                            }
+                                        </ul>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+
+                    <ul class="nav nav-tabs mb-4" id="createTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="patient-tab" data-bs-toggle="tab" data-bs-target="#patient-content" type="button" role="tab" aria-controls="patient-content" aria-selected="true">
+                                <i class="fas fa-user-injured me-2"></i>Thông tin bệnh nhân
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="treatment-tab" data-bs-toggle="tab" data-bs-target="#treatment-content" type="button" role="tab" aria-controls="treatment-content" aria-selected="false">
+                                <i class="fas fa-stethoscope me-2"></i>Hình thức điều trị
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="createTabsContent">
+                        <!-- Tab thông tin bệnh nhân -->
+                        <div class="tab-pane fade show active" id="patient-content" role="tabpanel" aria-labelledby="patient-tab">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input asp-for="BenhNhan.HoTen" class="form-control" placeholder="Nguyễn Văn A" />
+                                        <label asp-for="BenhNhan.HoTen">Họ và tên</label>
+                                        <span asp-validation-for="BenhNhan.HoTen" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input asp-for="BenhNhan.NgaySinh" class="form-control" type="date" />
+                                        <label asp-for="BenhNhan.NgaySinh">Ngày sinh</label>
+                                        <span asp-validation-for="BenhNhan.NgaySinh" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <select asp-for="BenhNhan.GioiTinh" class="form-select" asp-items="Model.GioiTinhOptions">
+                                            <option value="">-- Chọn giới tính --</option>
+                                        </select>
+                                        <label asp-for="BenhNhan.GioiTinh">Giới tính</label>
+                                        <span asp-validation-for="BenhNhan.GioiTinh" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input asp-for="BenhNhan.SoDienThoai" class="form-control" placeholder="0123456789" />
+                                        <label asp-for="BenhNhan.SoDienThoai">Số điện thoại</label>
+                                        <span asp-validation-for="BenhNhan.SoDienThoai" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <input asp-for="BenhNhan.Email" class="form-control" placeholder="name@example.com" />
+                                        <label asp-for="BenhNhan.Email">Email</label>
+                                        <span asp-validation-for="BenhNhan.Email" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <input asp-for="BenhNhan.DiaChi" class="form-control" placeholder="Địa chỉ" />
+                                        <label asp-for="BenhNhan.DiaChi">Địa chỉ</label>
+                                        <span asp-validation-for="BenhNhan.DiaChi" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-floating">
+                                        <select asp-for="BenhNhan.MaKhoa" class="form-select" asp-items="Model.KhoaSelectList" id="khoaSelect">
+                                            <option value="">-- Chọn khoa --</option>
+                                        </select>
+                                        <label asp-for="BenhNhan.MaKhoa">Khoa điều trị</label>
+                                        <span asp-validation-for="BenhNhan.MaKhoa" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <textarea asp-for="BenhNhan.ChanDoan" class="form-control" style="height: 100px" placeholder="Chẩn đoán"></textarea>
+                                        <label asp-for="BenhNhan.ChanDoan">Chẩn đoán</label>
+                                        <span asp-validation-for="BenhNhan.ChanDoan" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        <input asp-for="BenhNhan.BaoHiemYTe" class="form-check-input" type="checkbox" />
+                                        <label class="form-check-label" asp-for="BenhNhan.BaoHiemYTe">
+                                            Có bảo hiểm y tế
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <input type="hidden" asp-for="BenhNhan.NgayNhapVien" value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")" />
+                                <input type="hidden" asp-for="BenhNhan.TrangThai" value="true" />
+                                
+                                <div class="col-12">
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Ngày nhập viện sẽ tự động được ghi nhận là thời điểm hiện tại.
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-check form-switch">
+                                        <input asp-for="ThemDieuTri" class="form-check-input" id="themDieuTriSwitch" />
+                                        <label class="form-check-label" asp-for="ThemDieuTri">
+                                            Thêm hình thức điều trị ngay
+                                        </label>
+                                    </div>
+                                    <div class="form-text text-muted">
+                                        Bạn có thể thêm hình thức điều trị ngay, hoặc để bác sĩ thêm sau.
+                                    </div>
+                                </div>
                             </div>
-                            <span asp-validation-for="BaoHiemYTe" class="text-danger"></span>
                         </div>
-                        
-                        <div class="form-group">
-                            <label asp-for="MaKhoa" class="control-label">Khoa điều trị</label>
-                            <select asp-for="MaKhoa" class="form-control" asp-items="ViewBag.MaKhoa" required>
-                                <option value="">-- Chọn khoa --</option>
-                            </select>
-                            <span asp-validation-for="MaKhoa" class="text-danger"></span>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label asp-for="NgayNhapVien" class="control-label">Ngày nhập viện</label>
-                            <input asp-for="NgayNhapVien" class="form-control" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
-                            <span asp-validation-for="NgayNhapVien" class="text-danger"></span>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label asp-for="NgayXuatVien" class="control-label">Ngày xuất viện (để trống nếu chưa xuất viện)</label>
-                            <input asp-for="NgayXuatVien" class="form-control" type="date" />
-                            <span asp-validation-for="NgayXuatVien" class="text-danger"></span>
+
+                        <!-- Tab hình thức điều trị -->
+                        <div class="tab-pane fade" id="treatment-content" role="tabpanel" aria-labelledby="treatment-tab">
+                            <div id="dieuTriOptions" class="mt-4">
+                                <h4 class="mb-3">Hình thức điều trị cho bệnh nhân</h4>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <select asp-for="MaBacSi" class="form-select" asp-items="Model.BacSiSelectList">
+                                                <option value="">-- Chọn bác sĩ phụ trách --</option>
+                                            </select>
+                                            <label asp-for="MaBacSi">Bác sĩ phụ trách</label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input asp-for="NgayThucHien" class="form-control" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                            <label asp-for="NgayThucHien">Ngày thực hiện</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">Chọn hình thức điều trị</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="dieuTriList">
+                                            <div class="alert alert-warning" id="emptyKhoaAlert">
+                                                <i class="fas fa-exclamation-circle me-2"></i>
+                                                Vui lòng chọn khoa điều trị trước để xem danh sách hình thức điều trị phù hợp.
+                                            </div>
+                                            <div id="hinhThucDieuTriContainer" class="row g-3" style="display: none;">
+                                                <div class="col-12 mb-3">
+                                                    <div class="alert alert-info">
+                                                        <i class="fas fa-info-circle me-2"></i>
+                                                        Bạn có thể chọn nhiều hình thức điều trị bằng cách tick vào các ô tương ứng.
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="col-12">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-hover border">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th style="width: 50px;"></th>
+                                                                    <th>Tên điều trị</th>
+                                                                    <th>Mô tả</th>
+                                                                    <th class="text-end">Chi phí</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach (var item in Model.HinhThucDieuTriSelectList)
+                                                                {
+                                                                    <tr class="treatment-option">
+                                                                        <td>
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input treatment-checkbox" type="checkbox"
+                                                                                    name="HinhThucDieuTriIds" value="@item.Value" id="dieuTri@(item.Value)">
+                                                                                <label class="form-check-label" for="dieuTri@(item.Value)"></label>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td><label for="dieuTri@(item.Value)" class="cursor-pointer fw-medium">@item.Text</label></td>
+                                                                        <td class="treatment-description">Thông tin chi tiết về hình thức điều trị</td>
+                                                                        <td class="text-end"><span class="treatment-cost fw-bold">0</span> VNĐ</td>
+                                                                    </tr>
+                                                                }
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="col-12 mt-3">
+                                                    <div class="card bg-light">
+                                                        <div class="card-body">
+                                                            <div class="d-flex justify-content-between align-items-center">
+                                                                <span>Tổng chi phí dự kiến:</span>
+                                                                <span class="fw-bold fs-5" id="totalCost">0 VNĐ</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                
-                <div class="form-group text-center mt-4">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Lưu thông tin
-                    </button>
-                    <a asp-action="Index" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left"></i> Quay lại danh sách
-                    </a>
-                </div>
-            </form>
+
+                    <div class="col-12 mt-4">
+                        <hr class="my-4">
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>
+                                Lưu thông tin
+                            </button>
+                            <a href="@Url.Action("Index")" class="btn btn-light">
+                                <i class="fas fa-times me-2"></i>
+                                Hủy
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -103,11 +273,201 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     
     <script>
-        $(document).ready(function () {
-            // Tự động điền ngày hiện tại cho ngày nhập viện
-            if (!$('#NgayNhapVien').val()) {
-                $('#NgayNhapVien').val(new Date().toISOString().split('T')[0]);
+        $(document).ready(function() {
+            // Dữ liệu cho tất cả các hình thức điều trị
+            var allTreatmentDetails = {};
+            var allTreatmentCosts = {};
+            var selectedDepartmentId = null;
+            
+            // Xử lý hiển thị tab điều trị nếu được chọn
+            $('#themDieuTriSwitch').change(function() {
+                if($(this).is(':checked')) {
+                    $('#treatment-tab').tab('show');
+                }
+            });
+            
+            // Xử lý khi chọn khoa
+            $('#khoaSelect').change(function() {
+                selectedDepartmentId = $(this).val();
+                
+                if(selectedDepartmentId) {
+                    // Hiển thị container hình thức điều trị và ẩn thông báo
+                    $('#emptyKhoaAlert').hide();
+                    $('#hinhThucDieuTriContainer').show();
+                    
+                    // Tải danh sách bác sĩ theo khoa
+                    $.ajax({
+                        url: '/api/BacSiApi/ByKhoa/' + selectedDepartmentId,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(doctors) {
+                            updateDoctorList(doctors);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Lỗi khi tải danh sách bác sĩ:", error);
+                        }
+                    });
+                    
+                    // Tải hình thức điều trị theo khoa
+                    $.ajax({
+                        url: '/api/HinhThucDieuTriApi/ByKhoa/' + selectedDepartmentId,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(treatments) {
+                            // Lưu thông tin chi tiết và chi phí của các hình thức điều trị
+                            treatments.forEach(treatment => {
+                                allTreatmentDetails[treatment.maDieuTri] = treatment;
+                                allTreatmentCosts[treatment.maDieuTri] = treatment.chiPhi;
+                            });
+                            
+                            // Cập nhật bảng hình thức điều trị
+                            updateTreatmentTable(treatments);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Lỗi khi tải hình thức điều trị:", error);
+                            // Sử dụng dữ liệu mẫu nếu API lỗi
+                            mockTreatmentCosts();
+                        }
+                    });
+                } else {
+                    // Nếu không chọn khoa, hiển thị thông báo và ẩn container
+                    $('#emptyKhoaAlert').show();
+                    $('#hinhThucDieuTriContainer').hide();
+                }
+            });
+            
+            // Cập nhật bảng hình thức điều trị với dữ liệu mới
+            function updateTreatmentTable(treatments) {
+                var tbody = $('.table tbody');
+                tbody.empty();
+                
+                if(treatments.length === 0) {
+                    tbody.append('<tr><td colspan="4" class="text-center">Không có hình thức điều trị nào cho khoa này</td></tr>');
+                } else {
+                    treatments.forEach(treatment => {
+                        var row = $('<tr class="treatment-option"></tr>');
+                        row.append(
+                            '<td>' +
+                            '<div class="form-check">' +
+                            '<input class="form-check-input treatment-checkbox" type="checkbox" name="HinhThucDieuTriIds" value="' + treatment.maDieuTri + '" id="dieuTri' + treatment.maDieuTri + '">' +
+                            '<label class="form-check-label" for="dieuTri' + treatment.maDieuTri + '"></label>' +
+                            '</div>' +
+                            '</td>'
+                        );
+                        row.append('<td><label for="dieuTri' + treatment.maDieuTri + '" class="cursor-pointer fw-medium">' + treatment.tenDieuTri + '</label></td>');
+                        row.append('<td class="treatment-description">' + (treatment.moTa || 'Không có mô tả') + '</td>');
+                        row.append('<td class="text-end"><span class="treatment-cost fw-bold">' + formatCurrency(treatment.chiPhi) + '</span> VNĐ</td>');
+                        
+                        // Thêm dữ liệu chi phí vào data attribute để sử dụng sau này
+                        row.attr('data-cost', treatment.chiPhi);
+                        
+                        tbody.append(row);
+                    });
+                }
+                
+                // Cập nhật lại sự kiện cho các checkbox
+                updateTreatmentCheckboxEvents();
             }
+            
+            // Khởi tạo sự kiện cho các checkbox hình thức điều trị
+            function updateTreatmentCheckboxEvents() {
+                $('.treatment-checkbox').change(function() {
+                    calculateTotalCost();
+                });
+            }
+            
+            // Tính tổng chi phí khi chọn hình thức điều trị
+            function calculateTotalCost() {
+                var totalCost = 0;
+                $('.treatment-checkbox:checked').each(function() {
+                    var row = $(this).closest('tr');
+                    var cost = parseFloat(row.attr('data-cost')) || 0;
+                    totalCost += cost;
+                });
+                
+                $('#totalCost').text(formatCurrency(totalCost) + ' VNĐ');
+            }
+
+            // Tạo dữ liệu chi phí mẫu nếu không tải được từ API
+            function mockTreatmentCosts() {
+                $(".treatment-option").each(function() {
+                    var dieuTriId = $(this).find("input").val();
+                    var randomCost = Math.floor(Math.random() * 10) * 100000 + 100000;
+                    allTreatmentCosts[dieuTriId] = randomCost;
+                });
+            }
+
+            // Định dạng tiền tệ
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat('vi-VN').format(amount);
+            }
+
+            // Cập nhật danh sách bác sĩ dựa trên dữ liệu từ API
+            function updateDoctorList(doctors) {
+                var doctorSelect = $("#MaBacSi");
+                
+                // Xóa các option hiện tại
+                doctorSelect.empty();
+                doctorSelect.append('<option value="">-- Chọn bác sĩ phụ trách --</option>');
+                
+                // Thêm các bác sĩ mới
+                if (doctors && doctors.length > 0) {
+                    doctors.forEach(doctor => {
+                        doctorSelect.append(`<option value="${doctor.maBacSi}">${doctor.hoTen}</option>`);
+                    });
+                }
+            }
+            
+            // Kiểm tra nếu đã chọn khoa thì hiển thị hình thức điều trị
+            if($('#khoaSelect').val()) {
+                $('#khoaSelect').trigger('change');
+            }
+            
+            // Xác nhận trước khi submit form
+            $('form').submit(function(e) {
+                // Nếu đã chọn thêm điều trị nhưng chưa chọn bác sĩ
+                if($('#themDieuTriSwitch').is(':checked') && $('.treatment-checkbox:checked').length > 0 && !$('#MaBacSi').val()) {
+                    e.preventDefault();
+                    
+                    // Hiển thị thông báo lỗi
+                    var validationSummary = $('.validation-summary-errors ul');
+                    if (validationSummary.length === 0) {
+                        $('.validation-summary-valid').removeClass('validation-summary-valid').addClass('validation-summary-errors');
+                        validationSummary = $('.validation-summary-errors ul');
+                    }
+                    
+                    // Thêm thông báo lỗi nếu chưa tồn tại
+                    var errorMessage = 'Vui lòng chọn bác sĩ phụ trách cho hình thức điều trị';
+                    var errorExists = false;
+                    
+                    validationSummary.find('li').each(function() {
+                        if ($(this).text() === errorMessage) {
+                            errorExists = true;
+                            return false;
+                        }
+                    });
+                    
+                    if (!errorExists) {
+                        validationSummary.append('<li>' + errorMessage + '</li>');
+                    }
+                    
+                    // Chuyển tab và focus vào trường bác sĩ
+                    $('#treatment-tab').tab('show');
+                    $('#MaBacSi').focus();
+                    return false;
+                }
+                
+                return true;
+            });
+            
+            // Thêm CSS cho con trỏ chuột
+            $("<style>")
+                .prop("type", "text/css")
+                .html(`
+                    .cursor-pointer { cursor: pointer; }
+                    .treatment-option:hover { background-color: rgba(0, 0, 0, 0.03); }
+                `)
+                .appendTo("head");
         });
     </script>
 }

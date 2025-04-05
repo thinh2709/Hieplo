@@ -1,74 +1,153 @@
-@page "/bacsi"
- @model QuanLyBenhVienNoiTru.Models.BacSi
+@model QuanLyBenhVienNoiTru.Models.BacSi
 
 @{
     ViewData["Title"] = "Thêm Bác Sĩ";
-    Layout = "_BacSiLayout";
+    Layout = "_Layout";
 }
 
-<div class="container-fluid px-4">
-    <h1 class="mt-4">Thêm Bác Sĩ Mới</h1>
-    <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item"><a href="/BacSi">Danh Sách Bác Sĩ</a></li>
-        <li class="breadcrumb-item active">Thêm Mới</li>
-    </ol>
-    
-    <div class="card mb-4">
-        <div class="card-header">
-            <i class="fas fa-user-md me-1"></i>
-            Thông Tin Bác Sĩ
-        </div>
-        <div class="card-body">
-            <form asp-action="Create" method="post">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label asp-for="HoTen" class="control-label">Họ Tên</label>
-                            <input asp-for="HoTen" class="form-control" />
-                            <span asp-validation-for="HoTen" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label asp-for="ChuyenKhoa" class="control-label">Chuyên Khoa</label>
-                            <input asp-for="ChuyenKhoa" class="form-control" />
-                            <span asp-validation-for="ChuyenKhoa" class="text-danger"></span>
-                        </div>
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a href="@Url.Action("Index")">Bác sĩ</a></li>
+    <li class="breadcrumb-item active">Thêm mới</li>
+}
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-transparent border-0">
+        <h5 class="card-title mb-0">Thông tin bác sĩ</h5>
+        <p class="text-muted small mb-0">Các trường có dấu <span class="text-danger">*</span> là bắt buộc</p>
+    </div>
+    <div class="card-body">
+        <form asp-action="Create" method="post" id="formBacSi">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="HoTen" class="form-control" placeholder="Nguyễn Văn A" required />
+                        <label asp-for="HoTen">Họ tên <span class="text-danger">*</span></label>
+                        <span asp-validation-for="HoTen" class="text-danger"></span>
                     </div>
                 </div>
-                
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label asp-for="SoDienThoai" class="control-label">Số Điện Thoại</label>
-                            <input asp-for="SoDienThoai" class="form-control" />
-                            <span asp-validation-for="SoDienThoai" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label asp-for="MaTaiKhoan" class="control-label">Tài Khoản</label>
-                            <select asp-for="MaTaiKhoan" class="form-control" asp-items="ViewBag.MaTaiKhoan"></select>
-                            <span asp-validation-for="MaTaiKhoan" class="text-danger"></span>
-                        </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <select asp-for="GioiTinh" class="form-select" required>
+                            <option value="">-- Chọn giới tính --</option>
+                            <option value="Nam">Nam</option>
+                            <option value="Nữ">Nữ</option>
+                        </select>
+                        <label asp-for="GioiTinh">Giới tính <span class="text-danger">*</span></label>
+                        <span asp-validation-for="GioiTinh" class="text-danger"></span>
                     </div>
                 </div>
-                
-                <div class="form-group mt-4">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-1"></i> Lưu
-                    </button>
-                    <a asp-action="Index" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left me-1"></i> Quay Lại
-                    </a>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="ChuyenKhoa" class="form-control" placeholder="Nội khoa" required />
+                        <label asp-for="ChuyenKhoa">Chuyên khoa <span class="text-danger">*</span></label>
+                        <span asp-validation-for="ChuyenKhoa" class="text-danger"></span>
+                    </div>
                 </div>
-            </form>
-        </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <select asp-for="MaKhoa" class="form-select" asp-items="ViewBag.MaKhoa" required>
+                            <option value="">-- Chọn khoa --</option>
+                        </select>
+                        <label asp-for="MaKhoa">Khoa <span class="text-danger">*</span></label>
+                        <span asp-validation-for="MaKhoa" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="SoDienThoai" class="form-control" placeholder="0123456789" required pattern="[0-9]{10}" />
+                        <label asp-for="SoDienThoai">Số điện thoại <span class="text-danger">*</span></label>
+                        <div class="form-text">Số điện thoại phải có 10 chữ số</div>
+                        <span asp-validation-for="SoDienThoai" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="Email" class="form-control" placeholder="example@gmail.com" required type="email" />
+                        <label asp-for="Email">Email <span class="text-danger">*</span></label>
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-floating">
+                        <input asp-for="DiaChi" class="form-control" placeholder="123 Đường ABC, Quận XYZ" />
+                        <label asp-for="DiaChi">Địa chỉ</label>
+                        <div class="form-text">Nếu không nhập, mặc định là "Chưa cập nhật"</div>
+                        <span asp-validation-for="DiaChi" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="NgayVaoLam" class="form-control" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                        <label asp-for="NgayVaoLam">Ngày vào làm</label>
+                        <div class="form-text">Mặc định là ngày hiện tại</div>
+                        <span asp-validation-for="NgayVaoLam" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check form-switch mt-4">
+                        <input class="form-check-input" type="checkbox" asp-for="TrangThai" checked>
+                        <label class="form-check-label" asp-for="TrangThai">Đang hoạt động</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i> Lưu
+                </button>
+                <a asp-action="Index" class="btn btn-light">
+                    <i class="fas fa-arrow-left me-1"></i> Quay lại
+                </a>
+            </div>
+        </form>
     </div>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function() {
+            $("#formBacSi").submit(function(event) {
+                var isValid = true;
+                
+                // Kiểm tra các trường bắt buộc
+                if ($("#HoTen").val() === "") {
+                    isValid = false;
+                }
+                
+                if ($("#GioiTinh").val() === "") {
+                    isValid = false;
+                }
+                
+                if ($("#ChuyenKhoa").val() === "") {
+                    isValid = false;
+                }
+                
+                if ($("#MaKhoa").val() === "") {
+                    isValid = false;
+                }
+                
+                if ($("#SoDienThoai").val() === "" || !$("#SoDienThoai").val().match(/^[0-9]{10}$/)) {
+                    isValid = false;
+                }
+                
+                if ($("#Email").val() === "" || !isValidEmail($("#Email").val())) {
+                    isValid = false;
+                }
+                
+                if (!isValid) {
+                    alert("Vui lòng điền đầy đủ thông tin bắt buộc");
+                    event.preventDefault();
+                }
+            });
+            
+            // Kiểm tra định dạng email
+            function isValidEmail(email) {
+                var emailRegex = new RegExp("^[a-zA-Z0-9._-]+@([a-zA-Z0-9-]+\\.)+[a-zA-Z0-9-]{2,4}$");
+                return emailRegex.test(email);
+            }
+        });
+    </script>
 }

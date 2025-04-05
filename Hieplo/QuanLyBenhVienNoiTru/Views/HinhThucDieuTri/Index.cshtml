@@ -25,6 +25,7 @@
                         <tr>
                             <th>@Html.DisplayNameFor(model => model.MaDieuTri)</th>
                             <th>@Html.DisplayNameFor(model => model.TenDieuTri)</th>
+                            <th>Khoa áp dụng</th>
                             <th>@Html.DisplayNameFor(model => model.ChiPhi)</th>
                             <th>@Html.DisplayNameFor(model => model.MoTa)</th>
                             <th>Thao tác</th>
@@ -36,6 +37,7 @@
                             <tr>
                                 <td>@Html.DisplayFor(modelItem => item.MaDieuTri)</td>
                                 <td>@Html.DisplayFor(modelItem => item.TenDieuTri)</td>
+                                <td>@(item.Khoa?.TenKhoa ?? "Không có khoa")</td>
                                 <td>@Html.DisplayFor(modelItem => item.ChiPhi)</td>
                                 <td>@Html.DisplayFor(modelItem => item.MoTa)</td>
                                 <td>

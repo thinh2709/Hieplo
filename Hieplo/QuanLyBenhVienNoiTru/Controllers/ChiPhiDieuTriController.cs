@@ -36,6 +36,7 @@ namespace QuanLyBenhVienNoiTru.Controllers
 
             var chiPhi = await _context.ChiPhiDieuTris
                 .Include(c => c.BenhNhan)
+                    .ThenInclude(b => b.Khoa)
                 .FirstOrDefaultAsync(c => c.MaChiPhi == id);
                 
             if (chiPhi == null)
@@ -51,6 +52,23 @@ namespace QuanLyBenhVienNoiTru.Controllers
                 .ToListAsync();
                 
             ViewBag.DieuTriList = dieuTriList;
+            
+            // Tính toán chi phí nếu bệnh nhân có bảo hiểm y tế (giảm 80%)
+            if (chiPhi.BenhNhan != null && chiPhi.BenhNhan.BaoHiemYTe)
+            {
+                decimal chiPhiGoc = chiPhi.TongChiPhi;
+                decimal giamGia = chiPhiGoc * 0.8m; // Giảm 80%
+                decimal chiPhiSauGiamGia = chiPhiGoc * 0.2m; // Chỉ trả 20%
+                
+                ViewBag.ChiPhiGoc = chiPhiGoc;
+                ViewBag.GiamGia = giamGia;
+                ViewBag.ChiPhiSauGiamGia = chiPhiSauGiamGia;
+                ViewBag.CoBaoHiem = true;
+            }
+            else
+            {
+                ViewBag.CoBaoHiem = false;
+            }
             
             return View(chiPhi);
         }
@@ -122,6 +140,23 @@ namespace QuanLyBenhVienNoiTru.Controllers
             {
                 TempData["Message"] = "Chi phí này đã được thanh toán trước đó.";
                 return RedirectToAction(nameof(Details), new { id });
+            }
+            
+            // Tính toán chi phí nếu bệnh nhân có bảo hiểm y tế (giảm 80%)
+            if (chiPhi.BenhNhan != null && chiPhi.BenhNhan.BaoHiemYTe)
+            {
+                decimal chiPhiGoc = chiPhi.TongChiPhi;
+                decimal giamGia = chiPhiGoc * 0.8m; // Giảm 80%
+                decimal chiPhiSauGiamGia = chiPhiGoc * 0.2m; // Chỉ trả 20%
+                
+                ViewBag.ChiPhiGoc = chiPhiGoc;
+                ViewBag.GiamGia = giamGia;
+                ViewBag.ChiPhiSauGiamGia = chiPhiSauGiamGia;
+                ViewBag.CoBaoHiem = true;
+            }
+            else
+            {
+                ViewBag.CoBaoHiem = false;
             }
             
             return View(chiPhi);

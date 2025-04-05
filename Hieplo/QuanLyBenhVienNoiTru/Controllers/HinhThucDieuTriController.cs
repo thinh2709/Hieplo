@@ -20,7 +20,9 @@ namespace QuanLyBenhVienNoiTru.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var hinhThucDieuTris = await _context.HinhThucDieuTris.ToListAsync();
+            var hinhThucDieuTris = await _context.HinhThucDieuTris
+                .Include(h => h.Khoa)
+                .ToListAsync();
             return View(hinhThucDieuTris);
         }
 
@@ -32,6 +34,7 @@ namespace QuanLyBenhVienNoiTru.Controllers
             }
 
             var hinhThucDieuTri = await _context.HinhThucDieuTris
+                .Include(h => h.Khoa)
                 .FirstOrDefaultAsync(m => m.MaDieuTri == id);
                 
             if (hinhThucDieuTri == null)
@@ -44,6 +47,7 @@ namespace QuanLyBenhVienNoiTru.Controllers
 
         public IActionResult Create()
         {
+            ViewBag.MaKhoa = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(_context.Khoas, "MaKhoa", "TenKhoa");
             return View();
         }
 
@@ -57,6 +61,7 @@ namespace QuanLyBenhVienNoiTru.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewBag.MaKhoa = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(_context.Khoas, "MaKhoa", "TenKhoa", hinhThucDieuTri.MaKhoa);
             return View(hinhThucDieuTri);
         }
 
@@ -72,6 +77,7 @@ namespace QuanLyBenhVienNoiTru.Controllers
             {
                 return NotFound();
             }
+            ViewBag.MaKhoa = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(_context.Khoas, "MaKhoa", "TenKhoa", hinhThucDieuTri.MaKhoa);
             return View(hinhThucDieuTri);
         }
 
@@ -104,6 +110,7 @@ namespace QuanLyBenhVienNoiTru.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewBag.MaKhoa = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(_context.Khoas, "MaKhoa", "TenKhoa", hinhThucDieuTri.MaKhoa);
             return View(hinhThucDieuTri);
         }
 

@@ -15,18 +15,19 @@
                     <form asp-action="Register" method="post">
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                         
+                        <!-- Thông tin cơ bản -->
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label asp-for="TenDangNhap" class="control-label">Tên đăng nhập</label>
-                                    <input asp-for="TenDangNhap" class="form-control" />
+                                    <label asp-for="TenDangNhap" class="control-label"></label>
+                                    <input asp-for="TenDangNhap" class="form-control" placeholder="Nhập tên đăng nhập" />
                                     <span asp-validation-for="TenDangNhap" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label asp-for="HoTen" class="control-label">Họ và tên</label>
-                                    <input asp-for="HoTen" class="form-control" />
+                                    <label asp-for="HoTen" class="control-label"></label>
+                                    <input asp-for="HoTen" class="form-control" placeholder="Nhập họ và tên" />
                                     <span asp-validation-for="HoTen" class="text-danger"></span>
                                 </div>
                             </div>
@@ -35,69 +36,91 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label asp-for="MatKhau" class="control-label">Mật khẩu</label>
-                                    <input asp-for="MatKhau" class="form-control" type="password" />
+                                    <label asp-for="MatKhau" class="control-label"></label>
+                                    <input asp-for="MatKhau" class="form-control" type="password" placeholder="Nhập mật khẩu" />
                                     <span asp-validation-for="MatKhau" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label asp-for="XacNhanMatKhau" class="control-label">Xác nhận mật khẩu</label>
-                                    <input asp-for="XacNhanMatKhau" class="form-control" type="password" />
+                                    <label asp-for="XacNhanMatKhau" class="control-label"></label>
+                                    <input asp-for="XacNhanMatKhau" class="form-control" type="password" placeholder="Xác nhận mật khẩu" />
                                     <span asp-validation-for="XacNhanMatKhau" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label asp-for="VaiTro" class="control-label">Vai trò</label>
-                                    <select asp-for="VaiTro" class="form-select" id="vaiTroSelect">
-                                        <option value="">-- Chọn vai trò --</option>
-                                        <option value="Bác sĩ">Bác sĩ</option>
-                                        <option value="Khách">Khách thăm bệnh</option>
-                                        <option value="Admin">Admin</option>
-                                    </select>
-                                    <span asp-validation-for="VaiTro" class="text-danger"></span>
+                                    <label asp-for="Email" class="control-label"></label>
+                                    <input asp-for="Email" class="form-control" type="email" placeholder="Nhập email" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label asp-for="SoDienThoai" class="control-label">Số điện thoại</label>
-                                    <input asp-for="SoDienThoai" class="form-control" />
+                                    <label asp-for="SoDienThoai" class="control-label"></label>
+                                    <input asp-for="SoDienThoai" class="form-control" placeholder="Nhập số điện thoại" />
                                     <span asp-validation-for="SoDienThoai" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Trường thông tin cho Bác sĩ -->
-                        <div id="bacSiFields" class="row mb-3" style="display: none;">
+
+                        <div class="row mb-3">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label asp-for="ChuyenKhoa" class="control-label">Chuyên khoa</label>
-                                    <select asp-for="ChuyenKhoa" class="form-select" asp-items="ViewBag.DanhSachKhoa"></select>
-                                    <span asp-validation-for="ChuyenKhoa" class="text-danger"></span>
+                                    <label asp-for="DiaChi" class="control-label"></label>
+                                    <input asp-for="DiaChi" class="form-control" placeholder="Nhập địa chỉ" />
+                                    <span asp-validation-for="DiaChi" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="GioiTinh" class="control-label">Giới tính</label>
-                                    <select name="GioiTinh" id="GioiTinh" class="form-select">
-                                        <option value="">-- Chọn giới tính --</option>
-                                        <option value="Nam">Nam</option>
-                                        <option value="Nữ">Nữ</option>
+                                    <label asp-for="VaiTro" class="control-label"></label>
+                                    <select asp-for="VaiTro" class="form-select" id="vaiTroSelect">
+                                        <option value="">-- Chọn vai trò --</option>
+                                        <option value="Bác sĩ">Bác sĩ</option>
+                                        <option value="Khách">Khách thăm bệnh</option>
                                     </select>
+                                    <span asp-validation-for="VaiTro" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Trường thông tin cho Khách thăm bệnh -->
-                        <div id="khachFields" class="row mb-3" style="display: none;">
+                        <!-- Thông tin cho Bác sĩ -->
+                        <div id="bacSiFields" class="row mb-3" style="display: none;">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label asp-for="MoiQuanHe" class="control-label">Mối quan hệ với bệnh nhân</label>
-                                    <input asp-for="MoiQuanHe" class="form-control" />
+                                    <label asp-for="MaKhoa" class="control-label">Khoa/Chuyên khoa</label>
+                                    <select asp-for="MaKhoa" class="form-select" asp-items="ViewBag.DanhSachKhoaID">
+                                        <option value="">-- Chọn khoa --</option>
+                                    </select>
+                                    <span asp-validation-for="MaKhoa" class="text-danger"></span>
+                                    <small class="form-text text-muted">Khoa được chọn sẽ là chuyên khoa của bạn</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="GioiTinh" class="control-label"></label>
+                                    <select asp-for="GioiTinh" class="form-select">
+                                        <option value="">-- Chọn giới tính --</option>
+                                        <option value="Nam">Nam</option>
+                                        <option value="Nữ">Nữ</option>
+                                        <option value="Khác">Khác</option>
+                                    </select>
+                                    <span asp-validation-for="GioiTinh" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <input type="hidden" asp-for="ChuyenKhoa" id="hiddenChuyenKhoa" />
+                        </div>
+                        
+                        <!-- Thông tin cho Khách thăm bệnh -->
+                        <div id="khachFields" class="row mb-3" style="display: none;">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label asp-for="MoiQuanHe" class="control-label"></label>
+                                    <input asp-for="MoiQuanHe" class="form-control" placeholder="Nhập mối quan hệ với bệnh nhân" />
                                     <span asp-validation-for="MoiQuanHe" class="text-danger"></span>
                                 </div>
                             </div>
@@ -120,18 +143,47 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
         $(document).ready(function() {
-            // Hiển thị/ẩn các trường thông tin tùy theo vai trò được chọn
-            $('#vaiTroSelect').change(function() {
-                var vaiTro = $(this).val();
+            function updateValidation(vaiTro) {
+                // Reset all validations first
+                $('#MaKhoa, #GioiTinh, #MoiQuanHe').prop('required', false);
+                
                 if (vaiTro === 'Bác sĩ') {
                     $('#bacSiFields').show();
                     $('#khachFields').hide();
+                    // Bật validation cho các trường bắt buộc của bác sĩ
+                    $('#MaKhoa').prop('required', true);
+                    $('#GioiTinh').prop('required', true);
+                    // Xóa giá trị và validation của trường MoiQuanHe
+                    $('#MoiQuanHe').val('').prop('required', false);
                 } else if (vaiTro === 'Khách') {
                     $('#bacSiFields').hide();
                     $('#khachFields').show();
+                    // Bật validation cho các trường bắt buộc của khách
+                    $('#MoiQuanHe').prop('required', true);
+                    // Xóa giá trị và validation của các trường bác sĩ
+                    $('#MaKhoa, #GioiTinh').val('').prop('required', false);
+                    $('#hiddenChuyenKhoa').val('');
                 } else {
                     $('#bacSiFields').hide();
                     $('#khachFields').hide();
+                    // Xóa tất cả giá trị và validation
+                    $('#MaKhoa, #GioiTinh, #MoiQuanHe').val('').prop('required', false);
+                    $('#hiddenChuyenKhoa').val('');
+                }
+            }
+
+            // Xử lý sự kiện thay đổi vai trò
+            $('#vaiTroSelect').change(function() {
+                updateValidation($(this).val());
+            });
+
+            // Tự động cập nhật chuyên khoa khi chọn khoa
+            $('#MaKhoa').change(function() {
+                var selectedOption = $(this).find('option:selected');
+                if (selectedOption.val()) {
+                    $('#hiddenChuyenKhoa').val(selectedOption.text());
+                } else {
+                    $('#hiddenChuyenKhoa').val('');
                 }
             });
             

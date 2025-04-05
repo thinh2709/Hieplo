@@ -1,47 +1,244 @@
 @model IEnumerable<QuanLyBenhVienNoiTru.Models.Khoa>
 @{
     ViewData["Title"] = "Danh sách khoa";
-    Layout = User.IsInRole("Admin") ? "_AdminLayout" : "_Layout";
+    ViewData["Subtitle"] = "Quản lý thông tin các khoa trong bệnh viện";
 }
 
-<div class="container">
-    <h2>Danh sách khoa</h2>
-    
-    @if (User.IsInRole("Admin"))
-    {
-        <p>
-            <a asp-action="Create" class="btn btn-primary">Thêm mới</a>
-        </p>
-    }
-    
-    <div class="table-responsive">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Mã khoa</th>
-                    <th>Tên khoa</th>
-                    <th>Mô tả</th>
-                    <th>Thao tác</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
+@section Breadcrumb {
+    <li class="breadcrumb-item active">Khoa</li>
+}
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+        <div>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDepartmentModal">
+                <i class="fas fa-plus me-2"></i>
+                Thêm khoa
+            </button>
+        </div>
+        <div class="btn-group">
+            <button type="button" class="btn btn-light" id="exportExcel">
+                <i class="fas fa-file-excel me-2"></i>
+                Excel
+            </button>
+            <button type="button" class="btn btn-light" id="exportPdf">
+                <i class="fas fa-file-pdf me-2"></i>
+                PDF
+            </button>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" id="departmentsTable">
+                <thead class="bg-light">
                     <tr>
-                        <td>@item.MaKhoa</td>
-                        <td>@item.TenKhoa</td>
-                        <td>@item.MoTa</td>
-                        <td>
-                            <a asp-action="Details" asp-route-id="@item.MaKhoa" class="btn btn-info btn-sm">Chi tiết</a>
-                            @if (User.IsInRole("Admin"))
-                            {
-                                <a asp-action="Edit" asp-route-id="@item.MaKhoa" class="btn btn-primary btn-sm">Sửa</a>
-                                <a asp-action="Delete" asp-route-id="@item.MaKhoa" class="btn btn-danger btn-sm">Xóa</a>
-                            }
-                        </td>
+                        <th class="border-0">Mã khoa</th>
+                        <th class="border-0">Tên khoa</th>
+                        <th class="border-0">Số bác sĩ</th>
+                        <th class="border-0">Số bệnh nhân</th>
+                        <th class="border-0">Trạng thái</th>
+                        <th class="border-0 text-end">Thao tác</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.MaKhoa</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-xs me-2">
+                                        <span class="avatar-title rounded-circle bg-primary-soft text-primary">
+                                            @item.TenKhoa.Substring(0, 1).ToUpper()
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <a href="@Url.Action("Details", new { id = item.MaKhoa })" class="text-body fw-medium">
+                                            @item.TenKhoa
+                                        </a>
+                                        <br>
+                                        <small class="text-muted">@item.MoTa</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>@item.BacSis.Count()</td>
+                            <td>@item.BenhNhans.Count()</td>
+                            <td>
+                                @if (item.TrangThai)
+                                {
+                                    <span class="badge bg-success">Đang hoạt động</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Ngừng hoạt động</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <div class="dropdown">
+                                    <button class="btn btn-light btn-sm" type="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-h"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            <a class="dropdown-item" href="@Url.Action("Details", new { id = item.MaKhoa })">
+                                                <i class="fas fa-eye me-2 text-primary"></i>
+                                                Xem chi tiết
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="@Url.Action("Edit", new { id = item.MaKhoa })">
+                                                <i class="fas fa-edit me-2 text-warning"></i>
+                                                Chỉnh sửa
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item text-danger" href="#" 
+                                               onclick="confirmDelete('@item.MaKhoa', '@item.TenKhoa')">
+                                                <i class="fas fa-trash-alt me-2"></i>
+                                                Xóa
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
+
+<!-- Modal thêm khoa -->
+<div class="modal fade" id="addDepartmentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">Thêm khoa mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="Create" method="post">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <input name="TenKhoa" class="form-control" placeholder="Tên khoa" required />
+                                <label>Tên khoa</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea name="MoTa" class="form-control" style="height: 100px" placeholder="Mô tả"></textarea>
+                                <label>Mô tả</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Thêm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xác nhận xóa -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0">Bạn có chắc chắn muốn xóa khoa <span id="departmentName"></span>? Hành động này không thể hoàn tác.</p>
+            </div>
+            <div class="modal-footer border-0">
+                <form id="deleteForm" asp-action="Delete" method="post">
+                    <input type="hidden" id="departmentId" name="id" />
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Khởi tạo DataTable
+            var table = $('#departmentsTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/vi.json',
+                },
+                dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+                     "<'row'<'col-sm-12'tr>>" +
+                     "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+                buttons: [
+                    {
+                        extend: 'excel',
+                        text: '<i class="fas fa-file-excel me-2"></i>Excel',
+                        className: 'btn btn-light',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4]
+                        }
+                    },
+                    {
+                        extend: 'pdf',
+                        text: '<i class="fas fa-file-pdf me-2"></i>PDF',
+                        className: 'btn btn-light',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4]
+                        }
+                    }
+                ]
+            });
+
+            // Xử lý xuất Excel
+            $('#exportExcel').click(function() {
+                table.button('.buttons-excel').trigger();
+            });
+
+            // Xử lý xuất PDF
+            $('#exportPdf').click(function() {
+                table.button('.buttons-pdf').trigger();
+            });
+        });
+
+        // Xử lý xác nhận xóa
+        function confirmDelete(id, name) {
+            $('#departmentId').val(id);
+            $('#departmentName').text(name);
+            $('#deleteModal').modal('show');
+        }
+    </script>
+}
+
+@section Styles {
+    <style>
+        .avatar-xs {
+            width: 2rem;
+            height: 2rem;
+        }
+
+        .avatar-title {
+            align-items: center;
+            background-color: var(--bs-primary-bg-subtle);
+            color: var(--bs-primary);
+            display: flex;
+            font-weight: 500;
+            height: 100%;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .bg-primary-soft {
+            background-color: var(--bs-primary-bg-subtle) !important;
+        }
+    </style>
+}

@@ -12,6 +12,7 @@
     <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
     <!-- Custom styles -->
     <link href="~/css/admin-style.css" rel="stylesheet" />
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body id="page-top">
     <!-- Page Wrapper -->
@@ -20,8 +21,8 @@
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="@Url.Action("Index", "Admin")">
-                <div class="sidebar-brand-icon rotate-n-15">
-                    <i class="fas fa-hospital"></i>
+                <div class="sidebar-brand-icon">
+                    <i class="fas fa-hospital-alt"></i>
                 </div>
                 <div class="sidebar-brand-text mx-3">QLBV Admin</div>
             </a>
@@ -54,7 +55,7 @@
             </li>
 
             <!-- Nav Item - Departments -->
-            <li class="nav-item">
+            <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "Khoa" ? "active" : "")">
                 <a class="nav-link" href="@Url.Action("Index", "Khoa")">
                     <i class="fas fa-fw fa-hospital"></i>
                     <span>Quản lý khoa</span>
@@ -62,7 +63,7 @@
             </li>
 
             <!-- Nav Item - Doctors -->
-            <li class="nav-item">
+            <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "BacSi" ? "active" : "")">
                 <a class="nav-link" href="@Url.Action("Index", "BacSi")">
                     <i class="fas fa-fw fa-user-md"></i>
                     <span>Quản lý bác sĩ</span>
@@ -70,7 +71,7 @@
             </li>
 
             <!-- Nav Item - Patients -->
-            <li class="nav-item">
+            <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "BenhNhan" ? "active" : "")">
                 <a class="nav-link" href="@Url.Action("Index", "BenhNhan")">
                     <i class="fas fa-fw fa-procedures"></i>
                     <span>Quản lý bệnh nhân</span>
@@ -87,22 +88,27 @@
 
             <!-- Nav Item - Treatment -->
             <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseTreatment"
-                   aria-expanded="false" aria-controls="collapseTreatment">
+                <a class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "HinhThucDieuTri" || ViewContext.RouteData.Values["Controller"].ToString() == "DieuTriBenhNhan" ? "" : "collapsed")" 
+                   href="#" data-bs-toggle="collapse" data-bs-target="#collapseTreatment"
+                   aria-expanded="@(ViewContext.RouteData.Values["Controller"].ToString() == "HinhThucDieuTri" || ViewContext.RouteData.Values["Controller"].ToString() == "DieuTriBenhNhan" ? "true" : "false")" 
+                   aria-controls="collapseTreatment">
                     <i class="fas fa-fw fa-notes-medical"></i>
                     <span>Điều trị</span>
                 </a>
-                <div id="collapseTreatment" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                <div id="collapseTreatment" class="collapse @(ViewContext.RouteData.Values["Controller"].ToString() == "HinhThucDieuTri" || ViewContext.RouteData.Values["Controller"].ToString() == "DieuTriBenhNhan" ? "show" : "")" 
+                     aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Quản lý điều trị:</h6>
-                        <a class="collapse-item" href="@Url.Action("Index", "HinhThucDieuTri")">Hình thức điều trị</a>
-                        <a class="collapse-item" href="@Url.Action("Index", "DieuTriBenhNhan")">Điều trị bệnh nhân</a>
+                        <a class="collapse-item @(ViewContext.RouteData.Values["Controller"].ToString() == "HinhThucDieuTri" ? "active" : "")" 
+                           href="@Url.Action("Index", "HinhThucDieuTri")">Hình thức điều trị</a>
+                        <a class="collapse-item @(ViewContext.RouteData.Values["Controller"].ToString() == "DieuTriBenhNhan" ? "active" : "")" 
+                           href="@Url.Action("Index", "DieuTriBenhNhan")">Điều trị bệnh nhân</a>
                     </div>
                 </div>
             </li>
 
             <!-- Nav Item - Finances -->
-            <li class="nav-item">
+            <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "ChiPhiDieuTri" ? "active" : "")">
                 <a class="nav-link" href="@Url.Action("Index", "ChiPhiDieuTri")">
                     <i class="fas fa-fw fa-money-bill-wave"></i>
                     <span>Chi phí điều trị</span>
@@ -110,7 +116,7 @@
             </li>
 
             <!-- Nav Item - Visiting -->
-            <li class="nav-item">
+            <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "LichThamBenh" ? "active" : "")">
                 <a class="nav-link" href="@Url.Action("Index", "LichThamBenh")">
                     <i class="fas fa-fw fa-calendar-check"></i>
                     <span>Lịch thăm bệnh</span>
@@ -122,7 +128,9 @@
 
             <!-- Sidebar Toggler (Sidebar) -->
             <div class="text-center d-none d-md-inline">
-                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+                <button class="rounded-circle border-0" id="sidebarToggle">
+                    <i class="fas fa-angle-left"></i>
+                </button>
             </div>
         </ul>
         <!-- End of Sidebar -->
@@ -139,20 +147,18 @@
                     </button>
 
                     <!-- Topbar Search -->
-                    <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                    <form class="d-none d-sm-inline-block form-inline me-auto ms-md-3 my-2 my-md-0 mw-100 navbar-search">
                         <div class="input-group">
                             <input type="text" class="form-control bg-light border-0 small" placeholder="Tìm kiếm..."
                                    aria-label="Search" aria-describedby="basic-addon2">
-                            <div class="input-group-append">
-                                <button class="btn btn-primary" type="button">
-                                    <i class="fas fa-search fa-sm"></i>
-                                </button>
-                            </div>
+                            <button class="btn btn-primary" type="button">
+                                <i class="fas fa-search fa-sm"></i>
+                            </button>
                         </div>
                     </form>
 
                     <!-- Topbar Navbar -->
-                    <ul class="navbar-nav ml-auto">
+                    <ul class="navbar-nav ms-auto">
                         <!-- Nav Item - Search Dropdown (Visible Only XS) -->
                         <li class="nav-item dropdown no-arrow d-sm-none">
                             <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
@@ -162,7 +168,7 @@
                             <!-- Dropdown - Messages -->
                             <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
                                  aria-labelledby="searchDropdown">
-                                <form class="form-inline mr-auto w-100 navbar-search">
+                                <form class="form-inline me-auto w-100 navbar-search">
                                     <div class="input-group">
                                         <input type="text" class="form-control bg-light border-0 small"
                                                placeholder="Tìm kiếm..." aria-label="Search"
@@ -192,7 +198,7 @@
                                     Thông báo
                                 </h6>
                                 <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
+                                    <div class="me-3">
                                         <div class="icon-circle bg-primary">
                                             <i class="fas fa-file-alt text-white"></i>
                                         </div>
@@ -203,7 +209,7 @@
                                     </div>
                                 </a>
                                 <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
+                                    <div class="me-3">
                                         <div class="icon-circle bg-success">
                                             <i class="fas fa-calendar text-white"></i>
                                         </div>
@@ -223,23 +229,23 @@
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Quản trị viên</span>
-                                <img class="img-profile rounded-circle" src="/api/placeholder/36/36" alt="User">
+                                <span class="me-2 d-none d-lg-inline text-gray-600 small">Quản trị viên</span>
+                                <img class="img-profile rounded-circle" src="~/images/admin-avatar.png" alt="User">
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                  aria-labelledby="userDropdown">
                                 <a class="dropdown-item" href="#">
-                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    <i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i>
                                     Hồ sơ
                                 </a>
                                 <a class="dropdown-item" href="#">
-                                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    <i class="fas fa-cogs fa-sm fa-fw me-2 text-gray-400"></i>
                                     Cài đặt
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">
-                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i>
                                     Đăng xuất
                                 </a>
                             </div>
@@ -249,10 +255,10 @@
                 <!-- End of Topbar -->
 
                 <!-- Begin Page Content -->
-                <main role="main">
+                <div class="container-fluid">
                     @RenderBody()
-                </main>
-                <!-- End Page Content -->
+                </div>
+                <!-- End of Page Content -->
             </div>
             <!-- End of Main Content -->
 
@@ -260,7 +266,7 @@
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; Quản Lý Bệnh Viện Nội Trú 2025</span>
+                        <span>Copyright &copy; Quản Lý Bệnh Viện Nội Trú @DateTime.Now.Year</span>
                     </div>
                 </div>
             </footer>
@@ -281,12 +287,12 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Xác nhận đăng xuất?</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Bạn muốn đăng xuất?</h5>
                     <button class="close" type="button" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
-                <div class="modal-body">Chọn "Đăng xuất" nếu bạn muốn kết thúc phiên đăng nhập hiện tại.</div>
+                <div class="modal-body">Chọn "Đăng xuất" bên dưới nếu bạn đã sẵn sàng kết thúc phiên làm việc hiện tại.</div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Hủy</button>
                     <a class="btn btn-primary" href="@Url.Action("Logout", "Account")">Đăng xuất</a>
@@ -295,20 +301,15 @@
         </div>
     </div>
 
-    <!-- Bootstrap core JavaScript-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Core plugin JavaScript-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
-
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- DataTables -->
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
-
     <!-- Custom scripts -->
     <script src="~/js/admin-scripts.js"></script>
-
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

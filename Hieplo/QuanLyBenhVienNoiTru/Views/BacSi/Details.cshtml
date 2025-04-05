@@ -1,107 +1,329 @@
 @model QuanLyBenhVienNoiTru.Models.BacSi
 @{
-    ViewData["Title"] = "Chi Tiết Bác Sĩ";
-    Layout = "_BacSiLayout";
+    ViewData["Title"] = "Chi tiết bác sĩ";
+    ViewData["Subtitle"] = "Thông tin chi tiết bác sĩ";
 }
 
-<div class="container-fluid px-4">
-    <h1 class="mt-4">Chi Tiết Bác Sĩ</h1>
-    <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item"><a href="/BacSi">Danh Sách Bác Sĩ</a></li>
-        <li class="breadcrumb-item active">Chi Tiết</li>
-    </ol>
-    
-    <div class="row">
-        <div class="col-xl-6">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <i class="fas fa-user-md me-1"></i>
-                    Thông Tin Cá Nhân
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a href="@Url.Action("Index")">Bác sĩ</a></li>
+    <li class="breadcrumb-item active">Chi tiết</li>
+}
+
+<div class="row">
+    <div class="col-lg-4">
+        <!-- Thông tin chính -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body text-center py-5">
+                <div class="avatar-lg mx-auto mb-3">
+                    <span class="avatar-title rounded-circle bg-primary-soft text-primary">
+                        @Model.HoTen.Substring(0, 1).ToUpper()
+                    </span>
                 </div>
-                <div class="card-body">
-                    <div class="row mb-2">
-                        <div class="col-md-4 fw-bold">Họ và tên:</div>
-                        <div class="col-md-8">@Model.HoTen</div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-md-4 fw-bold">Chuyên khoa:</div>
-                        <div class="col-md-8">@Model.ChuyenKhoa</div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-md-4 fw-bold">Số điện thoại:</div>
-                        <div class="col-md-8">@Model.SoDienThoai</div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-md-4 fw-bold">Mã tài khoản:</div>
-                        <div class="col-md-8">
-                            @(Model.MaTaiKhoan != null ? Model.MaTaiKhoan.ToString() : "Chưa gán tài khoản")
+                <h4 class="mb-0">@Model.HoTen</h4>
+                <p class="text-muted">@Model.ChuyenKhoa</p>
+                
+                <div class="mt-4">
+                    <span class="badge @(Model.TrangThai ? "bg-success" : "bg-danger") mb-2">
+                        @(Model.TrangThai ? "Đang hoạt động" : "Ngừng hoạt động")
+                    </span>
+                    <p class="mb-1">
+                        <i class="fas fa-hospital me-2"></i> @Model.Khoa?.TenKhoa
+                    </p>
+                </div>
+                
+                <div class="d-flex justify-content-center mt-4">
+                    <a href="@Url.Action("Edit", new { id = Model.MaBacSi })" class="btn btn-primary me-2">
+                        <i class="fas fa-edit me-1"></i> Chỉnh sửa
+                    </a>
+                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                        <i class="fas fa-trash me-1"></i> Xóa
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Thông tin liên hệ -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent">
+                <h6 class="mb-0">Thông tin liên hệ</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="d-flex mb-3">
+                        <div class="avatar-xs me-3">
+                            <span class="avatar-title rounded-circle bg-light text-primary">
+                                <i class="fas fa-phone"></i>
+                            </span>
                         </div>
+                        <div class="flex-grow-1">
+                            <p class="text-muted mb-0">Số điện thoại</p>
+                            <p class="mb-0">@Model.SoDienThoai</p>
+                        </div>
+                    </li>
+                    <li class="d-flex mb-3">
+                        <div class="avatar-xs me-3">
+                            <span class="avatar-title rounded-circle bg-light text-primary">
+                                <i class="fas fa-envelope"></i>
+                            </span>
+                        </div>
+                        <div class="flex-grow-1">
+                            <p class="text-muted mb-0">Email</p>
+                            <p class="mb-0">@Model.Email</p>
+                        </div>
+                    </li>
+                    <li class="d-flex mb-3">
+                        <div class="avatar-xs me-3">
+                            <span class="avatar-title rounded-circle bg-light text-primary">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </span>
+                        </div>
+                        <div class="flex-grow-1">
+                            <p class="text-muted mb-0">Địa chỉ</p>
+                            <p class="mb-0">@Model.DiaChi</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-8">
+        <!-- Thông tin chi tiết -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">Thông tin chi tiết</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <p class="text-muted mb-1">Mã bác sĩ</p>
+                        <p class="mb-0 fw-medium">@Model.MaBacSi</p>
                     </div>
-                    
-                    <div class="mt-4">
-                        <a asp-action="Edit" asp-route-id="@Model.MaBacSi" class="btn btn-primary">
-                            <i class="fas fa-edit me-1"></i> Chỉnh Sửa
-                        </a>
-                        <a asp-action="Index" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left me-1"></i> Quay Lại
-                        </a>
+                    <div class="col-md-6 mb-3">
+                        <p class="text-muted mb-1">Họ tên</p>
+                        <p class="mb-0 fw-medium">@Model.HoTen</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="text-muted mb-1">Chuyên khoa</p>
+                        <p class="mb-0 fw-medium">@Model.ChuyenKhoa</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="text-muted mb-1">Khoa</p>
+                        <p class="mb-0 fw-medium">@Model.Khoa?.TenKhoa</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="text-muted mb-1">Giới tính</p>
+                        <p class="mb-0 fw-medium">@Model.GioiTinh</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="text-muted mb-1">Tài khoản liên kết</p>
+                        <p class="mb-0 fw-medium">
+                            @if (Model.TaiKhoan != null)
+                            {
+                                @Model.TaiKhoan.TenDangNhap
+                            }
+                            else
+                            {
+                                <span class="text-muted">Chưa liên kết</span>
+                            }
+                        </p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="text-muted mb-1">Ngày vào làm</p>
+                        <p class="mb-0 fw-medium">@Model.NgayVaoLam.ToString("dd/MM/yyyy")</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <p class="text-muted mb-1">Ngày nghỉ việc</p>
+                        <p class="mb-0 fw-medium">
+                            @if (Model.NgayNghiViec.HasValue)
+                            {
+                                @Model.NgayNghiViec.Value.ToString("dd/MM/yyyy")
+                            }
+                            else
+                            {
+                                <span class="text-muted">Đang làm việc</span>
+                            }
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
         
-        <div class="col-xl-6">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <i class="fas fa-clipboard-list me-1"></i>
-                    Danh Sách Điều Trị Gần Đây
-                </div>
-                <div class="card-body">
-                    @if (Model.DieuTriBenhNhans != null && Model.DieuTriBenhNhans.Any())
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-hover">
-                                <thead>
+        <!-- Bệnh nhân đang điều trị -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">Bệnh nhân đang điều trị</h6>
+                <span class="badge bg-info">@ViewBag.SoBenhNhanDangDieuTri bệnh nhân</span>
+            </div>
+            <div class="card-body">
+                @if (Model.BenhNhans?.Any(bn => bn.NgayXuatVien == null) == true)
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Mã BN</th>
+                                    <th>Họ tên</th>
+                                    <th>Ngày nhập viện</th>
+                                    <th>Khoa</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var bn in Model.BenhNhans.Where(b => b.NgayXuatVien == null))
+                                {
                                     <tr>
-                                        <th>Bệnh Nhân</th>
-                                        <th>Ngày Thực Hiện</th>
-                                        <th>Điều Trị</th>
+                                        <td>@bn.MaBenhNhan</td>
+                                        <td>@bn.HoTen</td>
+                                        <td>@bn.NgayNhapVien.ToString("dd/MM/yyyy")</td>
+                                        <td>@bn.Khoa?.TenKhoa</td>
+                                        <td>
+                                            <a href="@Url.Action("Details", "BenhNhan", new { id = bn.MaBenhNhan })" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var item in Model.DieuTriBenhNhans.OrderByDescending(d => d.NgayThucHien).Take(5))
-                                    {
-                                        <tr>
-                                            <td>
-                                                <a asp-controller="BenhNhan" asp-action="Details" asp-route-id="@item.MaBenhNhan">
-                                                    @(item.BenhNhan?.HoTen ?? "N/A")
-                                                </a>
-                                            </td>
-                                            <td>@String.Format("{0:dd/MM/yyyy}", item.NgayThucHien)</td>
-                                            <td>
-                                                <a asp-controller="DieuTriBenhNhan" asp-action="Details" asp-route-id="@item.MaDieuTriBenhNhan">
-                                                    @(item.HinhThucDieuTri?.TenDieuTri ?? "N/A")
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="text-end">
-                            <a asp-controller="DieuTriBenhNhan" asp-action="Index" asp-route-bacSiId="@Model.MaBacSi" class="btn btn-sm btn-info">
-                                <i class="fas fa-list me-1"></i> Xem Tất Cả
-                            </a>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="alert alert-info">
-                            Bác sĩ chưa có lịch sử điều trị nào.
-                        </div>
-                    }
-                </div>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-4">
+                        <img src="~/images/no-data.svg" alt="Không có dữ liệu" class="mb-3" width="120">
+                        <h6 class="text-muted">Không có bệnh nhân đang điều trị</h6>
+                    </div>
+                }
+            </div>
+        </div>
+        
+        <!-- Lịch sử điều trị -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">Lịch sử điều trị</h6>
+                <a href="#" class="text-decoration-none">Xem tất cả</a>
+            </div>
+            <div class="card-body">
+                @if (ViewBag.DieuTri != null && ViewBag.DieuTri.Count > 0)
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var dieuTri in ViewBag.DieuTri)
+                        {
+                            <div class="list-group-item px-0">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-xs me-3">
+                                        <span class="avatar-title rounded-circle bg-success-soft text-success">
+                                            <i class="fas fa-procedures"></i>
+                                        </span>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">@dieuTri.HinhThucDieuTri?.TenDieuTri</h6>
+                                        <p class="text-muted mb-0">
+                                            Bệnh nhân: @dieuTri.BenhNhan?.HoTen
+                                        </p>
+                                        <small class="text-muted">
+                                            @(dieuTri.NgayThucHien?.ToString("dd/MM/yyyy HH:mm"))
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-4">
+                        <img src="~/images/no-data.svg" alt="Không có dữ liệu" class="mb-3" width="120">
+                        <h6 class="text-muted">Chưa có lịch sử điều trị</h6>
+                    </div>
+                }
             </div>
         </div>
     </div>
 </div>
+
+<!-- Modal xác nhận xóa -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="avatar-lg mx-auto mb-3">
+                    <span class="avatar-title rounded-circle bg-danger-soft text-danger">
+                        <i class="fas fa-exclamation-triangle fa-2x"></i>
+                    </span>
+                </div>
+                <h5 class="mb-3">Bạn có chắc chắn muốn xóa bác sĩ này?</h5>
+                <p class="text-muted mb-0">
+                    Hành động này không thể hoàn tác. Tất cả thông tin liên quan đến bác sĩ này sẽ bị xóa khỏi hệ thống.
+                </p>
+                
+                @if (ViewBag.CoThongTinLienQuan == true)
+                {
+                    <div class="alert alert-warning mt-3">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        @ViewBag.ThongBao
+                    </div>
+                }
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
+                <form asp-action="Delete" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.MaBacSi" />
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Xử lý hiển thị thông báo
+            if (window.location.search.includes('success=true')) {
+                toastr.success('Cập nhật thông tin bác sĩ thành công');
+            }
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .avatar-xs {
+            height: 2.2rem;
+            width: 2.2rem;
+        }
+        
+        .avatar-lg {
+            height: 5rem;
+            width: 5rem;
+        }
+        
+        .avatar-title {
+            align-items: center;
+            display: flex;
+            font-weight: 500;
+            height: 100%;
+            justify-content: center;
+            width: 100%;
+        }
+        
+        .bg-primary-soft {
+            background-color: rgba(13, 110, 253, 0.1) !important;
+        }
+        
+        .bg-success-soft {
+            background-color: rgba(25, 135, 84, 0.1) !important;
+        }
+        
+        .bg-danger-soft {
+            background-color: rgba(220, 53, 69, 0.1) !important;
+        }
+    </style>
+}
