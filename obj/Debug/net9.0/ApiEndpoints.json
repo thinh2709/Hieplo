@@ -1,0 +1,166 @@
+[
+  {
+    "ContainingType": "QuanLyBenhVienNoiTru.Controllers.Api.BacSiApiController",
+    "Method": "GetAllBacSi",
+    "RelativePath": "api/BacSiApi",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[QuanLyBenhVienNoiTru.Models.BacSi, QuanLyBenhVienNoiTru, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "QuanLyBenhVienNoiTru.Controllers.Api.BacSiApiController",
+    "Method": "GetBacSi",
+    "RelativePath": "api/BacSiApi/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "QuanLyBenhVienNoiTru.Models.BacSi",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "QuanLyBenhVienNoiTru.Controllers.Api.BacSiApiController",
+    "Method": "GetBacSiByKhoa",
+    "RelativePath": "api/BacSiApi/ByKhoa/{khoaId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "khoaId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[QuanLyBenhVienNoiTru.Models.BacSi, QuanLyBenhVienNoiTru, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "QuanLyBenhVienNoiTru.Controllers.Api.HinhThucDieuTriApiController",
+    "Method": "GetAllHinhThucDieuTri",
+    "RelativePath": "api/HinhThucDieuTriApi",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[QuanLyBenhVienNoiTru.Models.HinhThucDieuTri, QuanLyBenhVienNoiTru, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "QuanLyBenhVienNoiTru.Controllers.Api.HinhThucDieuTriApiController",
+    "Method": "GetHinhThucDieuTri",
+    "RelativePath": "api/HinhThucDieuTriApi/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "QuanLyBenhVienNoiTru.Models.HinhThucDieuTri",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "QuanLyBenhVienNoiTru.Controllers.Api.HinhThucDieuTriApiController",
+    "Method": "GetHinhThucDieuTriByKhoa",
+    "RelativePath": "api/HinhThucDieuTriApi/ByKhoa/{khoaId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "khoaId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[QuanLyBenhVienNoiTru.Models.HinhThucDieuTri, QuanLyBenhVienNoiTru, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "QuanLyBenhVienNoiTru.Controllers.Api.HinhThucDieuTriApiController",
+    "Method": "GetAllCosts",
+    "RelativePath": "api/HinhThucDieuTriApi/Costs",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.Dictionary\u00602[[System.Int32, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Decimal, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  }
+]

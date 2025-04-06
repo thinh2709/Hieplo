@@ -1,0 +1,211 @@
+@model System.Collections.Generic.IEnumerable<dynamic>
+
+@{
+    ViewData["Title"] = "Báo cáo sử dụng giường bệnh";
+}
+
+<div class="row">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Tổng số giường</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.TotalBeds</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-bed fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Giường trống</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.TotalEmptyBeds</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Giường đã sử dụng</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@ViewBag.TotalOccupiedBeds</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-procedures fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Tỷ lệ sử dụng</div>
+                        <div class="row no-gutters align-items-center">
+                            <div class="col-auto">
+                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">@ViewBag.OverallOccupancyRate.ToString("0.00")%</div>
+                            </div>
+                            <div class="col">
+                                <div class="progress progress-sm mr-2">
+                                    <div class="progress-bar bg-info" role="progressbar" style="width: @ViewBag.OverallOccupancyRate%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">Báo cáo sử dụng giường theo khoa</h6>
+        <div class="dropdown no-arrow">
+            <a class="btn btn-primary" asp-action="Index">
+                <i class="fas fa-arrow-left fa-sm text-white-50"></i> Quay lại danh sách
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Khoa</th>
+                        <th>Tổng số giường</th>
+                        <th>Giường trống</th>
+                        <th>Giường đã sử dụng</th>
+                        <th>Giường đang sửa chữa</th>
+                        <th>Tỷ lệ sử dụng</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.DepartmentName</td>
+                            <td>@item.TotalBeds</td>
+                            <td>@item.EmptyBeds</td>
+                            <td>@item.OccupiedBeds</td>
+                            <td>@item.MaintenanceBeds</td>
+                            <td>
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" 
+                                         style="width: @item.OccupancyRate%; @(item.OccupancyRate > 80 ? "background-color: #e74a3b" : item.OccupancyRate > 60 ? "background-color: #f6c23e" : "background-color: #36b9cc")" 
+                                         aria-valuenow="@item.OccupancyRate" aria-valuemin="0" aria-valuemax="100">
+                                        @item.OccupancyRate.ToString("0.00")%
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <a asp-action="BedUsageDetails" asp-route-id="@item.DepartmentId" class="btn btn-sm btn-info">
+                                    <i class="fas fa-info-circle"></i> Chi tiết
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Biểu đồ sử dụng giường</h6>
+    </div>
+    <div class="card-body">
+        <div class="chart-bar">
+            <canvas id="bedUsageChart"></canvas>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#dataTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Vietnamese.json"
+                }
+            });
+
+            // Chart.js
+            var ctx = document.getElementById("bedUsageChart");
+            var departmentNames = [@Html.Raw(string.Join(",", Model.Select(item => $"'{item.DepartmentName}'")))];
+            var occupiedData = [@string.Join(",", Model.Select(item => item.OccupiedBeds))];
+            var emptyData = [@string.Join(",", Model.Select(item => item.EmptyBeds))];
+            var maintenanceData = [@string.Join(",", Model.Select(item => item.MaintenanceBeds))];
+
+            var bedUsageChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: departmentNames,
+                    datasets: [
+                        {
+                            label: "Giường đã sử dụng",
+                            backgroundColor: "#f6c23e",
+                            data: occupiedData
+                        },
+                        {
+                            label: "Giường trống",
+                            backgroundColor: "#1cc88a",
+                            data: emptyData
+                        },
+                        {
+                            label: "Giường đang sửa chữa",
+                            backgroundColor: "#e74a3b",
+                            data: maintenanceData
+                        }
+                    ]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    layout: {
+                        padding: {
+                            left: 10,
+                            right: 25,
+                            top: 25,
+                            bottom: 0
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true
+                        },
+                        y: {
+                            stacked: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+} 

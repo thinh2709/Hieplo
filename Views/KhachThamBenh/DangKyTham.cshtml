@@ -1,0 +1,142 @@
+@model QuanLyBenhVienNoiTru.Models.ViewModels.DangKyThamViewModel
+@{
+    ViewData["Title"] = "Đăng ký thăm bệnh";
+    Layout = "_KhachLayout";
+}
+
+<div class="container">
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-primary text-white py-3">
+            <h4 class="mb-0"><i class="fas fa-calendar-plus me-2"></i>Đăng ký thăm bệnh</h4>
+        </div>
+        <div class="card-body p-4">
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    @TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            
+            @if (TempData["Warning"] != null)
+            {
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    @TempData["Warning"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+            
+            <form asp-action="DangKyTham" method="post" id="dangKyThamForm">
+                <input type="hidden" asp-for="MaKhach" />
+                
+                <div class="mb-3">
+                    <label asp-for="MaBenhNhan" class="form-label fw-bold">Bệnh nhân <span class="text-danger">*</span></label>
+                    <select asp-for="MaBenhNhan" class="form-select" required>
+                        <option value="">-- Chọn bệnh nhân --</option>
+                        @if (Model.BenhNhans != null && Model.BenhNhans.Any())
+                        {
+                            foreach (var item in Model.BenhNhans)
+                            {
+                                <option value="@item.MaBenhNhan">@item.HoTen @(item.NgaySinh.HasValue ? $"({item.NgaySinh.Value.ToShortDateString()})" : "")</option>
+                            }
+                        }
+                        else
+                        {
+                            <option value="" disabled>Không có bệnh nhân nội trú</option>
+                        }
+                    </select>
+                    <span asp-validation-for="MaBenhNhan" class="text-danger"></span>
+                    <div class="form-text">Chọn bệnh nhân bạn muốn thăm</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label asp-for="ThoiGianTham" class="form-label fw-bold">Thời gian thăm <span class="text-danger">*</span></label>
+                    <input asp-for="ThoiGianTham" class="form-control" type="datetime-local" required min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                    <span asp-validation-for="ThoiGianTham" class="text-danger"></span>
+                    <div class="form-text">Lưu ý: Thời gian thăm có thể thay đổi tùy thuộc vào lịch của bệnh viện</div>
+                </div>
+                
+                <div class="d-flex justify-content-end mt-4">
+                    <a asp-action="Index" class="btn btn-secondary me-2">
+                        <i class="fas fa-arrow-left me-1"></i> Quay lại
+                    </a>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <i class="fas fa-save me-1"></i> Đăng ký
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            // Validate form before submission
+            $('#dangKyThamForm').submit(function(e) {
+                try {
+                    console.log('Form submitted');
+                    
+                    // Check patient selection
+                    if ($('#MaBenhNhan').val() === '') {
+                        e.preventDefault();
+                        alert('Vui lòng chọn bệnh nhân');
+                        $('#MaBenhNhan').focus();
+                        return false;
+                    }
+                    
+                    // Check visit time
+                    var visitTime = new Date($('#ThoiGianTham').val());
+                    var now = new Date();
+                    
+                    if (isNaN(visitTime.getTime())) {
+                        e.preventDefault();
+                        alert('Vui lòng chọn thời gian thăm');
+                        $('#ThoiGianTham').focus();
+                        return false;
+                    }
+                    
+                    if (visitTime <= now) {
+                        e.preventDefault();
+                        alert('Thời gian thăm phải lớn hơn thời gian hiện tại');
+                        $('#ThoiGianTham').focus();
+                        return false;
+                    }
+                    
+                    // Debug info
+                    console.log('Form data:');
+                    console.log('MaKhach: ' + $('#MaKhach').val());
+                    console.log('MaBenhNhan: ' + $('#MaBenhNhan').val());
+                    console.log('ThoiGianTham: ' + $('#ThoiGianTham').val());
+                    
+                    return true;
+                } catch (error) {
+                    console.error('Error in form validation: ', error);
+                    return true; // Continue with form submission
+                }
+            });
+            
+            // Set minimum time for the datetime-local input
+            var now = new Date();
+            now.setMinutes(now.getMinutes() + 30); // Add 30 minutes buffer
+            var minDateTime = now.toISOString().slice(0, 16);
+            $('#ThoiGianTham').attr('min', minDateTime);
+            
+            // Initialize with a default time (tomorrow)
+            var tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(10, 0, 0, 0);
+            var defaultDateTime = tomorrow.toISOString().slice(0, 16);
+            
+            if (!$('#ThoiGianTham').val()) {
+                $('#ThoiGianTham').val(defaultDateTime);
+            }
+        });
+    </script>
+}

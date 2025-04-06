@@ -1,0 +1,62 @@
+@model QuanLyBenhVienNoiTru.Models.Giuong
+
+@{
+    ViewData["Title"] = "Xóa giường bệnh";
+}
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Xác nhận xóa giường bệnh</h6>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-danger">
+            <h5>Bạn có chắc chắn muốn xóa giường bệnh này?</h5>
+            <p>Hành động này không thể hoàn tác.</p>
+        </div>
+        
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <dl class="row">
+                    <dt class="col-sm-4">Mã giường:</dt>
+                    <dd class="col-sm-8">@Model.MaGiuong</dd>
+                    
+                    <dt class="col-sm-4">Tên giường:</dt>
+                    <dd class="col-sm-8">@Model.TenGiuong</dd>
+                    
+                    <dt class="col-sm-4">Khoa:</dt>
+                    <dd class="col-sm-8">@Model.Khoa?.TenKhoa</dd>
+                </dl>
+            </div>
+            <div class="col-md-6">
+                <dl class="row">
+                    <dt class="col-sm-4">Giá theo ngày:</dt>
+                    <dd class="col-sm-8">@Model.GiaTheoNgay.ToString("N0") VND</dd>
+                    
+                    <dt class="col-sm-4">Trạng thái:</dt>
+                    <dd class="col-sm-8">
+                        @if (Model.TrangThai == "Trống")
+                        {
+                            <span class="badge bg-success">Trống</span>
+                        }
+                        else if (Model.TrangThai == "Đã sử dụng")
+                        {
+                            <span class="badge bg-warning text-dark">Đã sử dụng</span>
+                        }
+                        else if (Model.TrangThai == "Đang sửa chữa")
+                        {
+                            <span class="badge bg-danger">Đang sửa chữa</span>
+                        }
+                    </dd>
+                </dl>
+            </div>
+        </div>
+        
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="MaGiuong" />
+            <div class="text-right">
+                <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                <input type="submit" value="Xóa" class="btn btn-danger" />
+            </div>
+        </form>
+    </div>
+</div> 

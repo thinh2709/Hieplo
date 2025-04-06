@@ -1,0 +1,178 @@
+@model KhachThamBenh
+@{
+    ViewData["Title"] = "Chi tiết khách thăm";
+    Layout = User.IsInRole("Admin") || User.IsInRole("Bác sĩ") ? "_Layout" : "_KhachLayout";
+}
+
+<div class="container-fluid">
+    <h2 class="mt-4 mb-4">Chi tiết khách thăm</h2>
+
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Thông tin khách thăm</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="avatar-circle mx-auto mb-3">
+                            <span class="initials">@(string.IsNullOrEmpty(Model.HoTen) ? "?" : Model.HoTen.Substring(0, 1))</span>
+                        </div>
+                        <h4>@Model.HoTen</h4>
+                    </div>
+                    
+                    <div class="info-item mb-3">
+                        <span class="info-label"><i class="fas fa-phone me-2"></i> Số điện thoại:</span>
+                        <span class="info-value">@Model.SoDienThoai</span>
+                    </div>
+                    
+                    <div class="info-item mb-3">
+                        <span class="info-label"><i class="fas fa-envelope me-2"></i> Email:</span>
+                        <span class="info-value">@Model.Email</span>
+                    </div>
+                    
+                    <div class="info-item mb-3">
+                        <span class="info-label"><i class="fas fa-map-marker-alt me-2"></i> Địa chỉ:</span>
+                        <span class="info-value">@Model.DiaChi</span>
+                    </div>
+                    
+                    <div class="info-item mb-3">
+                        <span class="info-label"><i class="fas fa-users me-2"></i> Mối quan hệ:</span>
+                        <span class="info-value">@Model.MoiQuanHe</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    @if (User.IsInRole("Admin") || User.IsInRole("Bác sĩ"))
+                    {
+                        <a href="javascript:history.back()" class="btn btn-secondary">Quay lại</a>
+                    }
+                    else
+                    {
+                        <a asp-action="Index" class="btn btn-secondary">Quay lại trang chủ</a>
+                    }
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">Lịch sử thăm bệnh</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.LichThamBenhs != null && Model.LichThamBenhs.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Mã lịch</th>
+                                        <th>Bệnh nhân</th>
+                                        <th>Thời gian thăm</th>
+                                        <th>Trạng thái</th>
+                                        @if (User.IsInRole("Admin") || User.IsInRole("Bác sĩ"))
+                                        {
+                                            <th>Thao tác</th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var lichTham in Model.LichThamBenhs.OrderByDescending(l => l.ThoiGianTham))
+                                    {
+                                        <tr>
+                                            <td>@lichTham.MaLich</td>
+                                            <td>
+                                                @if (lichTham.BenhNhan != null)
+                                                {
+                                                    <a asp-controller="BenhNhan" asp-action="Details" asp-route-id="@lichTham.MaBenhNhan">
+                                                        @lichTham.BenhNhan.HoTen
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span>Không xác định</span>
+                                                }
+                                            </td>
+                                            <td>@(lichTham.ThoiGianTham.HasValue ? lichTham.ThoiGianTham.Value.ToString("dd/MM/yyyy HH:mm") : "N/A")</td>
+                                            <td>
+                                                @if (lichTham.TrangThai == "Chờ duyệt")
+                                                {
+                                                    <span class="badge bg-warning text-dark">Chờ duyệt</span>
+                                                }
+                                                else if (lichTham.TrangThai == "Đã duyệt")
+                                                {
+                                                    <span class="badge bg-success">Đã duyệt</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger">Từ chối</span>
+                                                }
+                                            </td>
+                                            @if (User.IsInRole("Admin") || User.IsInRole("Bác sĩ"))
+                                            {
+                                                <td>
+                                                    <a asp-controller="LichThamBenh" asp-action="Details" asp-route-id="@lichTham.MaLich" 
+                                                       class="btn btn-primary btn-sm">
+                                                        <i class="fas fa-eye"></i> Chi tiết
+                                                    </a>
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Chưa có lịch sử thăm bệnh nào.
+                        </div>
+
+                        @if (!User.IsInRole("Admin") && !User.IsInRole("Bác sĩ"))
+                        {
+                            <a asp-action="DangKyTham" class="btn btn-primary mt-3">
+                                <i class="fas fa-calendar-plus me-2"></i>
+                                Đăng ký thăm bệnh
+                            </a>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-circle {
+        width: 80px;
+        height: 80px;
+        background-color: #007bff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .initials {
+        font-size: 40px;
+        color: white;
+        text-transform: uppercase;
+    }
+    
+    .info-item {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #6c757d;
+        margin-bottom: 5px;
+    }
+    
+    .info-value {
+        font-size: 16px;
+    }
+</style> 

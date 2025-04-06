@@ -1,0 +1,92 @@
+@model QuanLyBenhVienNoiTru.Models.Giuong
+
+@{
+    ViewData["Title"] = "Chi tiết giường bệnh";
+}
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Chi tiết giường bệnh</h6>
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <dl class="row">
+                    <dt class="col-sm-4">Mã giường:</dt>
+                    <dd class="col-sm-8">@Model.MaGiuong</dd>
+                    
+                    <dt class="col-sm-4">Tên giường:</dt>
+                    <dd class="col-sm-8">@Model.TenGiuong</dd>
+                    
+                    <dt class="col-sm-4">Khoa:</dt>
+                    <dd class="col-sm-8">@Model.Khoa?.TenKhoa</dd>
+                    
+                    <dt class="col-sm-4">Giá theo ngày:</dt>
+                    <dd class="col-sm-8">@Model.GiaTheoNgay.ToString("N0") VND</dd>
+                </dl>
+            </div>
+            <div class="col-md-6">
+                <dl class="row">
+                    <dt class="col-sm-4">Trạng thái:</dt>
+                    <dd class="col-sm-8">
+                        @if (Model.TrangThai == "Trống")
+                        {
+                            <span class="badge bg-success">Trống</span>
+                        }
+                        else if (Model.TrangThai == "Đã sử dụng")
+                        {
+                            <span class="badge bg-warning text-dark">Đã sử dụng</span>
+                        }
+                        else if (Model.TrangThai == "Đang sửa chữa")
+                        {
+                            <span class="badge bg-danger">Đang sửa chữa</span>
+                        }
+                    </dd>
+                    
+                    <dt class="col-sm-4">Bệnh nhân:</dt>
+                    <dd class="col-sm-8">
+                        @if (Model.BenhNhan != null)
+                        {
+                            <a asp-controller="BenhNhan" asp-action="Details" asp-route-id="@Model.MaBenhNhan">@Model.BenhNhan.HoTen</a>
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+                    </dd>
+                </dl>
+            </div>
+        </div>
+        
+        @if (!string.IsNullOrEmpty(Model.MoTa))
+        {
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <h6 class="font-weight-bold">Mô tả:</h6>
+                    <p>@Model.MoTa</p>
+                </div>
+            </div>
+        }
+        
+        <div class="row">
+            <div class="col-md-12 text-right">
+                <div class="btn-group">
+                    <a asp-action="Index" class="btn btn-secondary mr-2">Quay lại</a>
+                    <a asp-action="Edit" asp-route-id="@Model.MaGiuong" class="btn btn-primary mr-2">Sửa</a>
+                    @if (Model.TrangThai == "Trống")
+                    {
+                        <a asp-action="AssignPatient" asp-route-id="@Model.MaGiuong" class="btn btn-success mr-2">Phân bệnh nhân</a>
+                    }
+                    @if (Model.TrangThai == "Đã sử dụng" && Model.MaBenhNhan != null)
+                    {
+                        <a asp-action="ReleasePatient" asp-route-id="@Model.MaGiuong" class="btn btn-warning mr-2">Xuất bệnh nhân</a>
+                    }
+                    @if (Model.TrangThai != "Đã sử dụng")
+                    {
+                        <a asp-action="Delete" asp-route-id="@Model.MaGiuong" class="btn btn-danger">Xóa</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

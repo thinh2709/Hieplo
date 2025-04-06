@@ -1,0 +1,334 @@
+@model QuanLyBenhVienNoiTru.Models.TaiKhoan
+@{
+    ViewData["Title"] = "Thêm người dùng";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">Thêm người dùng</h1>
+            <p class="text-muted mb-0">Tạo tài khoản người dùng mới trong hệ thống</p>
+        </div>
+        <a href="@Url.Action("ManageUsers")" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-2"></i>Quay lại
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Thông tin tài khoản</h6>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CreateUser" method="post" id="createUserForm">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <div class="mb-3 row">
+                            <label asp-for="TenDangNhap" class="col-sm-3 col-form-label">Tên đăng nhập <span class="text-danger">*</span></label>
+                            <div class="col-sm-9">
+                                <input asp-for="TenDangNhap" class="form-control" placeholder="Nhập tên đăng nhập" required />
+                                <span asp-validation-for="TenDangNhap" class="text-danger"></span>
+                                <small class="form-text text-muted">Tên đăng nhập phải là duy nhất trong hệ thống</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label asp-for="MatKhau" class="col-sm-3 col-form-label">Mật khẩu <span class="text-danger">*</span></label>
+                            <div class="col-sm-9">
+                                <div class="input-group">
+                                    <input asp-for="MatKhau" type="password" class="form-control" placeholder="Nhập mật khẩu" id="password" required />
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                        <i class="fas fa-eye" id="toggleIcon"></i>
+                                    </button>
+                                </div>
+                                <span asp-validation-for="MatKhau" class="text-danger"></span>
+                                <small class="form-text text-muted">Mật khẩu phải có ít nhất 6 ký tự</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <label asp-for="VaiTro" class="col-sm-3 col-form-label">Vai trò <span class="text-danger">*</span></label>
+                            <div class="col-sm-9">
+                                <select asp-for="VaiTro" class="form-select" id="vaiTroSelect" required>
+                                    <option value="">-- Chọn vai trò --</option>
+                                    <option value="Admin">Admin</option>
+                                    <option value="Bác sĩ">Bác sĩ</option>
+                                    <option value="Khách">Khách thăm bệnh</option>
+                                </select>
+                                <span asp-validation-for="VaiTro" class="text-danger"></span>
+                                <small class="form-text text-muted">Quyền hạn của người dùng trong hệ thống</small>
+                            </div>
+                        </div>
+
+                        <!-- Phần thông tin cho Bác sĩ -->
+                        <div id="bacSiSection" class="role-specific-section mb-3" style="display: none;">
+                            <div class="card border-left-primary">
+                                <div class="card-body">
+                                    <h6 class="card-title text-primary mb-3">Thông tin Bác sĩ</h6>
+                                    <div class="mb-3 row">
+                                        <label class="col-sm-3 col-form-label">Liên kết bác sĩ</label>
+                                        <div class="col-sm-9">
+                                            <select name="bacSiId" class="form-select" asp-items="ViewBag.BacSiList" id="bacSiSelect">
+                                                <option value="">-- Chọn bác sĩ --</option>
+                                            </select>
+                                            <small class="form-text text-muted">
+                                                Liên kết tài khoản với bác sĩ đã có trong hệ thống
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Phần thông tin cho Khách thăm bệnh -->
+                        <div id="khachSection" class="role-specific-section mb-3" style="display: none;">
+                            <div class="card border-left-info">
+                                <div class="card-body">
+                                    <h6 class="card-title text-info mb-3">Thông tin Khách thăm bệnh</h6>
+                                    
+                                    <div class="mb-3 row">
+                                        <label class="col-sm-3 col-form-label">Họ tên <span class="text-danger">*</span></label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" name="HoTen" id="hoTenKhach" placeholder="Nhập họ tên khách thăm" />
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3 row">
+                                        <label class="col-sm-3 col-form-label">Số điện thoại <span class="text-danger">*</span></label>
+                                        <div class="col-sm-9">
+                                            <input type="tel" class="form-control" name="SoDienThoai" id="soDienThoaiKhach" placeholder="Nhập số điện thoại" pattern="[0-9]{10}" />
+                                            <small class="form-text text-muted">Số điện thoại phải có 10 chữ số</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3 row">
+                                        <label class="col-sm-3 col-form-label">Email <span class="text-danger">*</span></label>
+                                        <div class="col-sm-9">
+                                            <input type="email" class="form-control" name="Email" id="emailKhach" placeholder="Nhập email" />
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3 row">
+                                        <label class="col-sm-3 col-form-label">Địa chỉ <span class="text-danger">*</span></label>
+                                        <div class="col-sm-9">
+                                            <input type="text" class="form-control" name="DiaChi" id="diaChiKhach" placeholder="Nhập địa chỉ" />
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3 row">
+                                        <label class="col-sm-3 col-form-label">Mối quan hệ <span class="text-danger">*</span></label>
+                                        <div class="col-sm-9">
+                                            <select class="form-select" name="MoiQuanHe" id="moiQuanHeKhach">
+                                                <option value="">-- Chọn mối quan hệ --</option>
+                                                <option value="Người thân">Người thân</option>
+                                                <option value="Bạn bè">Bạn bè</option>
+                                                <option value="Đồng nghiệp">Đồng nghiệp</option>
+                                                <option value="Khác">Khác</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr />
+                        <div class="d-flex justify-content-end">
+                            <a asp-action="ManageUsers" class="btn btn-secondary me-2">Hủy</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Lưu
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Hướng dẫn</h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info mb-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Vui lòng điền đầy đủ thông tin để tạo tài khoản mới.
+                    </div>
+                    
+                    <h6 class="font-weight-bold">Vai trò người dùng:</h6>
+                    <ul class="mb-3 ps-3">
+                        <li class="mb-2">
+                            <strong>Admin:</strong> Có quyền quản lý toàn bộ hệ thống và người dùng.
+                        </li>
+                        <li class="mb-2">
+                            <strong>Bác sĩ:</strong> Quản lý bệnh nhân và thực hiện điều trị.
+                        </li>
+                        <li class="mb-2">
+                            <strong>Khách thăm bệnh:</strong> Đăng ký lịch thăm bệnh nhân.
+                        </li>
+                    </ul>
+                    
+                    <h6 class="font-weight-bold">Lưu ý:</h6>
+                    <ul class="mb-0 ps-3">
+                        <li class="mb-2">
+                            Bảo mật thông tin tài khoản và không chia sẻ mật khẩu.
+                        </li>
+                        <li class="mb-2">
+                            Các trường có dấu <span class="text-danger">*</span> là bắt buộc.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Hiển thị/ẩn các phần thông tin theo vai trò
+            $('#vaiTroSelect').change(function() {
+                // Ẩn tất cả các phần
+                $('.role-specific-section').hide();
+                
+                var selectedRole = $(this).val();
+                
+                if (selectedRole === 'Bác sĩ') {
+                    $('#bacSiSection').show();
+                    
+                    // Reset và bỏ validate phần khách
+                    resetKhachFields(false);
+                } 
+                else if (selectedRole === 'Khách') {
+                    $('#khachSection').show();
+                    
+                    // Thêm validate cho phần khách
+                    validateKhachFields(true);
+                    
+                    // Log form values for debugging
+                    console.log('Khách thăm bệnh form values:');
+                    console.log('HoTen: ' + $('#hoTenKhach').val());
+                    console.log('SoDienThoai: ' + $('#soDienThoaiKhach').val());
+                    console.log('Email: ' + $('#emailKhach').val());
+                    console.log('DiaChi: ' + $('#diaChiKhach').val());
+                    console.log('MoiQuanHe: ' + $('#moiQuanHeKhach').val());
+                }
+                else {
+                    // Reset và bỏ validate tất cả
+                    resetKhachFields(false);
+                }
+            });
+            
+            // Kiểm tra giá trị ban đầu
+            if ($('#vaiTroSelect').val() === 'Bác sĩ') {
+                $('#bacSiSection').show();
+            }
+            
+            // Hiển thị/ẩn mật khẩu
+            $('#togglePassword').click(function() {
+                var passwordField = $('#password');
+                var fieldType = passwordField.attr('type');
+                var toggleIcon = $('#toggleIcon');
+                
+                if (fieldType === 'password') {
+                    passwordField.attr('type', 'text');
+                    toggleIcon.removeClass('fa-eye').addClass('fa-eye-slash');
+                } else {
+                    passwordField.attr('type', 'password');
+                    toggleIcon.removeClass('fa-eye-slash').addClass('fa-eye');
+                }
+            });
+            
+            // Form validation trước khi submit
+            $('#createUserForm').submit(function(e) {
+                var selectedRole = $('#vaiTroSelect').val();
+                
+                // Log form data before submission
+                console.log('Form submission data:');
+                console.log('TenDangNhap: ' + $('[name="TenDangNhap"]').val());
+                console.log('MatKhau: ' + 'password-hidden');
+                console.log('VaiTro: ' + selectedRole);
+                
+                if (selectedRole === 'Bác sĩ') {
+                    console.log('bacSiId: ' + $('#bacSiSelect').val());
+                    
+                    // Reset khách fields to ensure they aren't validated
+                    $('#hoTenKhach, #soDienThoaiKhach, #emailKhach, #diaChiKhach, #moiQuanHeKhach').val('').prop('required', false);
+                
+                    if ($('#bacSiSelect').val() === '') {
+                        alert('Vui lòng chọn bác sĩ để liên kết với tài khoản');
+                        e.preventDefault();
+                        return false;
+                    }
+                } else if (selectedRole === 'Khách') {
+                    console.log('HoTen: ' + $('#hoTenKhach').val());
+                    console.log('SoDienThoai: ' + $('#soDienThoaiKhach').val());
+                    console.log('Email: ' + $('#emailKhach').val());
+                    console.log('DiaChi: ' + $('#diaChiKhach').val());
+                    console.log('MoiQuanHe: ' + $('#moiQuanHeKhach').val());
+                    
+                    if ($('#hoTenKhach').val() === '') {
+                        alert('Vui lòng nhập họ tên khách thăm bệnh');
+                        $('#hoTenKhach').focus();
+                        e.preventDefault();
+                        return false;
+                    }
+                    
+                    if ($('#soDienThoaiKhach').val() === '') {
+                        alert('Vui lòng nhập số điện thoại khách thăm bệnh');
+                        $('#soDienThoaiKhach').focus();
+                        e.preventDefault();
+                        return false;
+                    }
+                    
+                    if ($('#emailKhach').val() === '') {
+                        alert('Vui lòng nhập email khách thăm bệnh');
+                        $('#emailKhach').focus();
+                        e.preventDefault();
+                        return false;
+                    }
+                    
+                    if ($('#diaChiKhach').val() === '') {
+                        alert('Vui lòng nhập địa chỉ khách thăm bệnh');
+                        $('#diaChiKhach').focus();
+                        e.preventDefault();
+                        return false;
+                    }
+                    
+                    if ($('#moiQuanHeKhach').val() === '') {
+                        alert('Vui lòng chọn mối quan hệ khách thăm bệnh');
+                        $('#moiQuanHeKhach').focus();
+                        e.preventDefault();
+                        return false;
+                    }
+                } else if (selectedRole === 'Admin') {
+                    // Reset fields for other roles
+                    $('#bacSiSelect').val('');
+                    $('#hoTenKhach, #soDienThoaiKhach, #emailKhach, #diaChiKhach, #moiQuanHeKhach').val('').prop('required', false);
+                }
+                
+                return true;
+            });
+            
+            // Hàm validate các trường thông tin của khách
+            function validateKhachFields(required) {
+                if (required) {
+                    // Thêm required attribute
+                    $('#hoTenKhach, #soDienThoaiKhach, #emailKhach, #diaChiKhach, #moiQuanHeKhach').prop('required', true);
+                } else {
+                    // Bỏ required attribute
+                    $('#hoTenKhach, #soDienThoaiKhach, #emailKhach, #diaChiKhach, #moiQuanHeKhach').prop('required', false);
+                }
+            }
+            
+            // Hàm reset các trường thông tin của khách
+            function resetKhachFields(required) {
+                $('#hoTenKhach, #soDienThoaiKhach, #emailKhach, #diaChiKhach, #moiQuanHeKhach').val('').prop('required', required);
+            }
+        });
+    </script>
+    
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} 
+} 

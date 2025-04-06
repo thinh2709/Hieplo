@@ -1,0 +1,178 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Quản lý bệnh viện nội trú</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    @await RenderSectionAsync("Styles", required: false)
+    <style>
+        /* Tùy chỉnh hiệu ứng modal để tránh nhấp nháy */
+        .modal {
+            transition: opacity 0.15s linear;
+        }
+        .modal.fade .modal-dialog {
+            transition: transform 0.2s ease-out;
+            transform: translate(0, -25px);
+        }
+        .modal.show .modal-dialog {
+            transform: translate(0, 0);
+        }
+        .modal-backdrop {
+            opacity: 0.5 !important;
+            transition: opacity 0.15s linear;
+        }
+        /* Các kiểu CSS khác */
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center" href="~/">
+                    <i class="fas fa-hospital-alt text-primary me-2"></i>
+                    <span>Bệnh viện nội trú</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Home" ? "active" : "")"
+                               href="@Url.Action("Index", "Home")">
+                                <i class="fas fa-home me-1"></i> Trang chủ
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "BenhNhan" ? "active" : "")"
+                               href="@Url.Action("Index", "BenhNhan")">
+                                <i class="fas fa-procedures me-1"></i> Bệnh nhân
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "BacSi" ? "active" : "")"
+                               href="@Url.Action("Index", "BacSi")">
+                                <i class="fas fa-user-md me-1"></i> Bác sĩ
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Khoa" ? "active" : "")"
+                               href="@Url.Action("Index", "Khoa")">
+                                <i class="fas fa-clinic-medical me-1"></i> Khoa
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Giuong" ? "active" : "")"
+                               href="@Url.Action("Index", "Giuong")">
+                                <i class="fas fa-bed me-1"></i> Giường bệnh
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Home" && ViewContext.RouteData.Values["action"].ToString() == "Help" ? "active" : "")"
+                               href="@Url.Action("Help", "Home")">
+                                <i class="fas fa-question-circle me-1"></i> Trợ giúp
+                            </a>
+                        </li>
+                    </ul>
+                    <partial name="_LoginPartial" />
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main role="main" class="container py-4">
+        @if (ViewData["Title"] != null)
+        {
+            <div class="page-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="title">@ViewData["Title"]</h1>
+                        @if (ViewData["Subtitle"] != null)
+                        {
+                            <p class="subtitle">@ViewData["Subtitle"]</p>
+                        }
+                    </div>
+                    @await RenderSectionAsync("PageActions", required: false)
+                </div>
+                @if (IsSectionDefined("Breadcrumb"))
+                {
+                    <nav aria-label="breadcrumb" class="mt-2">
+                        <ol class="breadcrumb">
+                            @await RenderSectionAsync("Breadcrumb", required: false)
+                        </ol>
+                    </nav>
+                }
+            </div>
+        }
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        @RenderBody()
+    </main>
+
+    <footer class="footer border-top py-3">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <span class="text-muted">&copy; @DateTime.Now.Year - Quản lý bệnh viện nội trú</span>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <a href="@Url.Action("Help", "Home")" class="text-decoration-none text-muted me-3">
+                        <i class="fas fa-question-circle me-1"></i>
+                        Trợ giúp
+                    </a>
+                    <a href="@Url.Action("Privacy", "Home")" class="text-decoration-none text-muted">
+                        <i class="fas fa-shield-alt me-1"></i>
+                        Chính sách
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        // Initialize all tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+
+        // Initialize all popovers
+        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+        var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+            return new bootstrap.Popover(popoverTriggerEl)
+        });
+
+        // Add fade-in animation to main content
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('main').classList.add('fade-in');
+        });
+    </script>
+</body>
+</html>

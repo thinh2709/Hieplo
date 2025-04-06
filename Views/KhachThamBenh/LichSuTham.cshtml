@@ -1,0 +1,251 @@
+@model IEnumerable<LichThamBenh>
+@{
+    ViewData["Title"] = "Lịch sử thăm bệnh";
+    Layout = "_KhachLayout";
+}
+
+<div class="container">
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
+            <h4 class="mb-0"><i class="fas fa-history me-2"></i>Lịch sử thăm bệnh</h4>
+            <a asp-action="DangKyTham" class="btn btn-light">
+                <i class="fas fa-plus-circle me-1"></i> Đăng ký mới
+            </a>
+        </div>
+        <div class="card-body p-4">
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    @TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            
+            @if (Model == null || !Model.Any())
+            {
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Bạn chưa có lịch sử thăm bệnh nào.
+                </div>
+                <div class="text-center py-4">
+                    <img src="~/images/no-data.svg" alt="Không có dữ liệu" style="max-width: 150px;" class="mb-3">
+                    <h5>Chưa có lịch thăm bệnh</h5>
+                    <p class="text-muted">Bạn có thể đăng ký thăm bệnh bằng cách nhấn vào nút "Đăng ký mới"</p>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Mã lịch</th>
+                                <th>Bệnh nhân</th>
+                                <th>Thời gian thăm</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.MaLich</td>
+                                    <td>
+                                        @if (item.BenhNhan != null)
+                                        {
+                                            <span class="fw-medium">@item.BenhNhan.HoTen</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted fst-italic">Không xác định</span>
+                                        }
+                                    </td>
+                                    <td>@(item.ThoiGianTham.HasValue ? item.ThoiGianTham.Value.ToString("dd/MM/yyyy HH:mm") : "N/A")</td>
+                                    <td>
+                                        @if (item.TrangThai == "Chờ duyệt")
+                                        {
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="fas fa-clock me-1"></i> Chờ duyệt
+                                            </span>
+                                        }
+                                        else if (item.TrangThai == "Đã duyệt")
+                                        {
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check-circle me-1"></i> Đã duyệt
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-times-circle me-1"></i> Từ chối
+                                            </span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (item.TrangThai == "Đã duyệt")
+                                        {
+                                            <button type="button" class="btn btn-primary btn-sm" 
+                                                    onclick="printConfirmation(@item.MaLich, '@(item.BenhNhan?.HoTen ?? "")','@(item.ThoiGianTham.HasValue ? item.ThoiGianTham.Value.ToString("dd/MM/yyyy HH:mm") : "")')">
+                                                <i class="fas fa-print me-1"></i> Phiếu xác nhận
+                                            </button>
+                                        }
+                                        else if (item.TrangThai == "Chờ duyệt")
+                                        {
+                                            <button type="button" class="btn btn-outline-secondary btn-sm" disabled>
+                                                <i class="fas fa-hourglass-half me-1"></i> Đang chờ duyệt
+                                            </button>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+    
+    <div class="d-flex justify-content-between mt-3">
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Quay lại
+        </a>
+    </div>
+</div>
+
+<!-- Phiếu xác nhận modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="confirmationModalLabel">Phiếu xác nhận thăm bệnh</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="confirmationContent" class="p-3">
+                    <div class="text-center mb-4">
+                        <h3 class="mb-1">BỆNH VIỆN NỘI TRÚ</h3>
+                        <p class="mb-1">Địa chỉ: 123 Đường Bệnh Viện, Quận 1, TP.HCM</p>
+                        <p>Hotline: 1900 1234</p>
+                        <h4 class="border-bottom border-top py-2">PHIẾU XÁC NHẬN THĂM BỆNH</h4>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Mã phiếu:</strong> <span id="visitId"></span></p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <p><strong>Ngày in:</strong> <span id="printDate"></span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <p><strong>Bệnh nhân:</strong> <span id="patientName"></span></p>
+                        <p><strong>Thời gian thăm:</strong> <span id="visitTime"></span></p>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Lưu ý:</strong> Vui lòng mang theo phiếu này và giấy tờ tùy thân khi đến thăm bệnh nhân.
+                    </div>
+                    
+                    <div class="row mt-5">
+                        <div class="col-6 text-center">
+                            <p><strong>Người thăm</strong></p>
+                            <p class="mt-5">(Ký và ghi rõ họ tên)</p>
+                        </div>
+                        <div class="col-6 text-center">
+                            <p><strong>Xác nhận của bệnh viện</strong></p>
+                            <p class="mt-5">(Ký tên và đóng dấu)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" onclick="printElement('confirmationContent')">
+                    <i class="fas fa-print me-1"></i> In phiếu
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function printConfirmation(id, patientName, visitTime) {
+            // Cập nhật thông tin cho phiếu xác nhận
+            document.getElementById('visitId').textContent = id;
+            document.getElementById('patientName').textContent = patientName;
+            document.getElementById('visitTime').textContent = visitTime;
+            
+            // Cập nhật ngày in
+            const today = new Date();
+            const formattedDate = today.toLocaleDateString('vi-VN');
+            document.getElementById('printDate').textContent = formattedDate;
+            
+            // Hiển thị modal
+            var modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+            modal.show();
+        }
+        
+        function printElement(elementId) {
+            const content = document.getElementById(elementId);
+            const originalStyles = content.style.cssText;
+            
+            // Tạo một iframe để in
+            const printFrame = document.createElement('iframe');
+            printFrame.style.position = 'absolute';
+            printFrame.style.top = '-9999px';
+            document.body.appendChild(printFrame);
+            
+            const printDocument = printFrame.contentDocument;
+            printDocument.write('<html><head>');
+            
+            // Copy các style sheets
+            const styleSheets = document.styleSheets;
+            for (let i = 0; i < styleSheets.length; i++) {
+                try {
+                    const styleLink = document.createElement('link');
+                    styleLink.rel = 'stylesheet';
+                    styleLink.href = styleSheets[i].href;
+                    if (styleSheets[i].href) {
+                        printDocument.head.appendChild(styleLink);
+                    }
+                } catch (e) {
+                    console.error('Error copying stylesheet', e);
+                }
+            }
+            
+            // Bắt đầu nội dung
+            printDocument.write('</head><body>');
+            printDocument.write('<div class="container p-4">' + content.innerHTML + '</div>');
+            printDocument.write('</body></html>');
+            
+            printDocument.close();
+            
+            printFrame.onload = function() {
+                // Thêm CSS để trang in đẹp hơn
+                const style = printDocument.createElement('style');
+                style.textContent = `
+                    body { font-family: Arial, sans-serif; }
+                    .container { max-width: 800px; margin: 0 auto; }
+                    p { margin-bottom: 8px; }
+                `;
+                printDocument.head.appendChild(style);
+                
+                // In
+                setTimeout(function() {
+                    printFrame.contentWindow.focus();
+                    printFrame.contentWindow.print();
+                    
+                    // Xóa iframe sau khi in
+                    setTimeout(function() {
+                        document.body.removeChild(printFrame);
+                    }, 500);
+                }, 500);
+            };
+        }
+    </script>
+}

@@ -1,0 +1,98 @@
+@model QuanLyBenhVienNoiTru.Models.Giuong
+@{
+    ViewData["Title"] = "Xuất bệnh nhân khỏi giường";
+}
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Xác nhận xuất bệnh nhân khỏi giường</h6>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-warning">
+            <h5>Bạn có chắc chắn muốn xuất bệnh nhân khỏi giường này?</h5>
+            <p>Giường sẽ được chuyển sang trạng thái "Trống" và sẵn sàng cho bệnh nhân khác.</p>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    Thông tin giường bệnh
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TenGiuong</div>
+                                <div class="mt-2">
+                                    <dl class="row">
+                                        <dt class="col-sm-4">Mã giường:</dt>
+                                        <dd class="col-sm-8">@Model.MaGiuong</dd>
+                                        
+                                        <dt class="col-sm-4">Khoa:</dt>
+                                        <dd class="col-sm-8">@Model.Khoa?.TenKhoa</dd>
+                                        
+                                        <dt class="col-sm-4">Giá theo ngày:</dt>
+                                        <dd class="col-sm-8">@Model.GiaTheoNgay.ToString("N0") VND</dd>
+                                        
+                                        <dt class="col-sm-4">Trạng thái:</dt>
+                                        <dd class="col-sm-8">
+                                            <span class="badge bg-warning text-dark">Đã sử dụng</span>
+                                        </dd>
+                                    </dl>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-bed fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                    Thông tin bệnh nhân
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.BenhNhan?.HoTen</div>
+                                <div class="mt-2">
+                                    <dl class="row">
+                                        <dt class="col-sm-4">Mã BN:</dt>
+                                        <dd class="col-sm-8">@Model.BenhNhan?.MaBenhNhan</dd>
+                                        
+                                        <dt class="col-sm-4">Tuổi:</dt>
+                                        <dd class="col-sm-8">
+                                            @{
+                                                var tuoi = Model.BenhNhan?.NgaySinh.HasValue == true 
+                                                    ? DateTime.Now.Year - Model.BenhNhan.NgaySinh.Value.Year 
+                                                    : 0;
+                                            }
+                                            @tuoi
+                                        </dd>
+                                        
+                                        <dt class="col-sm-4">Giới tính:</dt>
+                                        <dd class="col-sm-8">@Model.BenhNhan?.GioiTinh</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-user fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <form asp-action="ReleasePatient" method="post">
+            <input type="hidden" name="id" value="@Model.MaGiuong" />
+            <div class="form-group text-right">
+                <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                <input type="submit" value="Xuất bệnh nhân" class="btn btn-warning" />
+            </div>
+        </form>
+    </div>
+</div> 

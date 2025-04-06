@@ -1,0 +1,110 @@
+@model QuanLyBenhVienNoiTru.Models.Giuong
+@{
+    ViewData["Title"] = "Phân bệnh nhân vào giường";
+    var giuong = ViewBag.Giuong;
+    var selectedKhoa = ViewBag.SelectedKhoa;
+}
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Phân bệnh nhân vào giường</h6>
+    </div>
+    <div class="card-body">
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["ErrorMessage"]
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        }
+        
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    Thông tin giường bệnh
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">@giuong.TenGiuong</div>
+                                <div class="mt-2">
+                                    <dl class="row">
+                                        <dt class="col-sm-4">Mã giường:</dt>
+                                        <dd class="col-sm-8">@giuong.MaGiuong</dd>
+                                        
+                                        <dt class="col-sm-4">Khoa:</dt>
+                                        <dd class="col-sm-8">@giuong.Khoa?.TenKhoa</dd>
+                                        
+                                        <dt class="col-sm-4">Giá theo ngày:</dt>
+                                        <dd class="col-sm-8">@giuong.GiaTheoNgay.ToString("N0") VND</dd>
+                                        
+                                        <dt class="col-sm-4">Trạng thái:</dt>
+                                        <dd class="col-sm-8">
+                                            <span class="badge bg-success">Trống</span>
+                                        </dd>
+                                    </dl>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-bed fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <form asp-action="AssignPatient" method="post">
+            <input type="hidden" name="id" value="@giuong.MaGiuong" />
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="maKhoa" class="control-label">Chọn khoa</label>
+                        <select id="maKhoa" name="maKhoa" class="form-control" asp-items="ViewBag.Khoas">
+                            <option value="">-- Chọn khoa --</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="maBenhNhan" class="control-label">Chọn bệnh nhân</label>
+                        <select id="maBenhNhan" name="maBenhNhan" class="form-control" asp-items="ViewBag.MaBenhNhan" required>
+                            <option value="">-- Chọn bệnh nhân --</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group text-right">
+                <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                <input type="submit" value="Phân bệnh nhân" class="btn btn-success" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function () {
+            // Đặt giá trị mặc định cho dropdown khoa
+            $("#maKhoa").val('@selectedKhoa');
+            
+            // Xử lý sự kiện khi người dùng thay đổi khoa
+            $("#maKhoa").change(function() {
+                var maKhoa = $(this).val();
+                if (maKhoa) {
+                    // Tải lại trang với tham số khoa đã chọn
+                    window.location.href = '@Url.Action("AssignPatient", new { id = giuong.MaGiuong })' + '?maKhoa=' + maKhoa;
+                }
+            });
+        });
+    </script>
+} 

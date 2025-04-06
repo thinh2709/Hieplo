@@ -1,0 +1,226 @@
+@model IEnumerable<QuanLyBenhVienNoiTru.Models.BenhNhan>
+@{
+    ViewData["Title"] = "Danh sách bệnh nhân";
+    ViewData["Subtitle"] = "Danh sách bệnh nhân đang điều trị";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+    <li class="breadcrumb-item active">Danh sách bệnh nhân</li>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+        <i class="fas fa-check-circle me-2"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="row mb-3">
+    <div class="col-lg-3 col-md-6">
+        <div class="card bg-primary bg-gradient text-white mb-2">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-white-50 mb-1">Tổng số bệnh nhân</h6>
+                        <h3 class="mb-0 fw-bold">@ViewBag.TongSoBenhNhan</h3>
+                    </div>
+                    <div class="text-white-50">
+                        <i class="fas fa-hospital-user fa-3x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="card bg-warning bg-gradient text-white mb-2">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-white-50 mb-1">Chưa phân công</h6>
+                        <h3 class="mb-0 fw-bold">@ViewBag.SoBenhNhanChuaPhucVu</h3>
+                    </div>
+                    <div class="text-white-50">
+                        <i class="fas fa-user-md fa-3x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-white py-3">
+        <div class="row align-items-center">
+            <div class="col">
+                <h5 class="mb-0">Danh sách bệnh nhân đang điều trị</h5>
+            </div>
+            <div class="col-auto">
+                <div class="d-flex gap-2">
+                    <a href="@Url.Action("Create", "BenhNhan")" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus me-1"></i> Thêm bệnh nhân mới
+                    </a>
+                    <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#filterModal">
+                        <i class="fas fa-filter me-1"></i> Lọc
+                    </button>
+                    <button type="button" class="btn btn-outline-success btn-sm" id="exportExcel">
+                        <i class="fas fa-file-excel me-1"></i> Xuất Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover" id="dataTable">
+                <thead>
+                    <tr>
+                        <th>Mã BN</th>
+                        <th>Họ tên</th>
+                        <th>Khoa</th>
+                        <th>Ngày nhập viện</th>
+                        <th>Bác sĩ phụ trách</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.MaBenhNhan</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-sm me-2">
+                                        <div class="avatar-title rounded-circle bg-soft-primary text-primary">
+                                            @(item.HoTen?.Length > 0 ? item.HoTen.Substring(0, 1).ToUpper() : "?")
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <a href="@Url.Action("Details", "BenhNhan", new { id = item.MaBenhNhan })" class="text-body fw-semibold">
+                                            @item.HoTen
+                                        </a>
+                                        <div class="small text-muted">
+                                            <span class="me-2">
+                                                <i class="fas fa-phone-alt fa-xs me-1"></i> @(item.SoDienThoai ?? "N/A")
+                                            </span>
+                                            <span>
+                                                <i class="fas fa-calendar-day fa-xs me-1"></i> @(item.NgaySinh?.ToString("dd/MM/yyyy") ?? "N/A")
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>@item.Khoa?.TenKhoa</td>
+                            <td>@item.NgayNhapVien.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                @if (item.BacSi != null)
+                                {
+                                    <span class="text-success">@item.BacSi.HoTen</span>
+                                }
+                                else
+                                {
+                                    <span class="text-warning">Chưa phân công</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-ellipsis-h"></i>
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-end">
+                                        <a class="dropdown-item" href="@Url.Action("Details", "BenhNhan", new { id = item.MaBenhNhan })">
+                                            <i class="fas fa-eye text-primary me-2"></i> Xem chi tiết
+                                        </a>
+                                        <a class="dropdown-item" href="@Url.Action("Create", "DieuTriBenhNhan", new { maBenhNhan = item.MaBenhNhan })">
+                                            <i class="fas fa-notes-medical text-success me-2"></i> Thêm điều trị
+                                        </a>
+                                        <a class="dropdown-item" href="@Url.Action("Edit", "BenhNhan", new { id = item.MaBenhNhan })">
+                                            <i class="fas fa-user-md text-info me-2"></i> Phân công bác sĩ
+                                        </a>
+                                        <a class="dropdown-item" href="@Url.Action("XuatVien", "BacSi", new { id = item.MaBenhNhan })">
+                                            <i class="fas fa-sign-out-alt text-warning me-2"></i> Xuất viện
+                                        </a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Lọc -->
+<div class="modal fade" id="filterModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Lọc danh sách bệnh nhân</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Khoa</label>
+                    <select id="filterKhoa" class="form-select">
+                        <option value="">Tất cả</option>
+                        @foreach (var khoa in ViewBag.DanhSachKhoa ?? new List<string>())
+                        {
+                            <option value="@khoa">@khoa</option>
+                        }
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Bác sĩ phụ trách</label>
+                    <select id="filterBacSi" class="form-select">
+                        <option value="">Tất cả</option>
+                        <option value="Chưa phân công">Chưa phân công</option>
+                        @foreach (var bacSi in ViewBag.DanhSachBacSi ?? new List<string>())
+                        {
+                            <option value="@bacSi">@bacSi</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" id="applyFilter">Áp dụng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // DataTable
+            var table = $('#dataTable').DataTable({
+                language: {
+                    url: '/lib/datatables/Vietnamese.json'
+                },
+                responsive: true,
+                lengthMenu: [10, 25, 50, 100],
+                order: [[0, 'desc']]
+            });
+
+            // Filter function
+            $("#applyFilter").click(function () {
+                var khoa = $("#filterKhoa").val();
+                var bacSi = $("#filterBacSi").val();
+
+                table.columns(2).search(khoa);
+                table.columns(4).search(bacSi);
+                table.draw();
+
+                $('#filterModal').modal('hide');
+            });
+
+            // Export to Excel
+            $("#exportExcel").click(function () {
+                window.location.href = "@Url.Action("ExportBenhNhanExcel", "BenhNhan")";
+            });
+        });
+    </script>
+} 

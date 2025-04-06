@@ -1,0 +1,109 @@
+@model QuanLyBenhVienNoiTru.Models.Giuong
+
+@{
+    ViewData["Title"] = "Thêm mới giường bệnh";
+}
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Thêm mới giường bệnh</h6>
+    </div>
+    <div class="card-body">
+        @if (TempData["ExceptionError"] != null)
+        {
+            <div class="alert alert-danger">
+                <h5>Lỗi khi lưu dữ liệu:</h5>
+                <p>@TempData["ExceptionError"]</p>
+                @if (TempData["InnerExceptionError"] != null)
+                {
+                    <p>Chi tiết: @TempData["InnerExceptionError"]</p>
+                }
+            </div>
+        }
+
+        @foreach (var key in TempData.Keys.Where(k => k.StartsWith("ModelError_")))
+        {
+            <div class="alert alert-warning">
+                <p>Lỗi với trường @key.Replace("ModelError_", ""): @TempData[key]</p>
+            </div>
+        }
+        
+        @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+        {
+            <div class="alert alert-danger">
+                <h5>Có lỗi xảy ra:</h5>
+                <ul>
+                    @foreach (var error in ViewData.ModelState.SelectMany(x => x.Value.Errors))
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
+        }
+        
+        <form asp-action="Create">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="TenGiuong" class="control-label">Tên giường</label>
+                        <input asp-for="TenGiuong" class="form-control" />
+                        <span asp-validation-for="TenGiuong" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="MaKhoa" class="control-label">Khoa</label>
+                        <select asp-for="MaKhoa" asp-items="ViewBag.MaKhoa" class="form-control">
+                            <option value="">-- Chọn khoa --</option>
+                        </select>
+                        <span asp-validation-for="MaKhoa" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="GiaTheoNgay" class="control-label">Giá theo ngày (VND)</label>
+                        <input asp-for="GiaTheoNgay" class="form-control" value="100000" />
+                        <span asp-validation-for="GiaTheoNgay" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="TrangThai" class="control-label">Trạng thái</label>
+                        <select asp-for="TrangThai" asp-items="ViewBag.TrangThaiOptions" class="form-control">
+                            <option value="">-- Chọn trạng thái --</option>
+                        </select>
+                        <span asp-validation-for="TrangThai" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="MoTa" class="control-label">Mô tả</label>
+                <textarea asp-for="MoTa" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="MoTa" class="text-danger"></span>
+            </div>
+            <div class="form-group text-right">
+                <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                <input type="submit" value="Tạo mới" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function() {
+            // Kiểm tra mã lỗi 
+            console.log("Model State Validation: ", @Html.Raw(Json.Serialize(ViewData.ModelState.IsValid)));
+            
+            // In các giá trị mẫu ra console để gỡ lỗi
+            console.log("TenGiuong value: ", $("#TenGiuong").val());
+            console.log("MaKhoa value: ", $("#MaKhoa").val());
+            console.log("GiaTheoNgay value: ", $("#GiaTheoNgay").val());
+            console.log("TrangThai value: ", $("#TrangThai").val());
+        });
+    </script>
+} 

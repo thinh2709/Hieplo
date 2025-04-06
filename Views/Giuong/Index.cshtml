@@ -1,0 +1,244 @@
+@model IEnumerable<QuanLyBenhVienNoiTru.Models.Giuong>
+
+@{
+    ViewData["Title"] = "Quản lý giường bệnh";
+}
+
+<div class="row">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Tổng số giường</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@(ViewBag.TotalCount ?? Model.Count())</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-bed fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Giường trống</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@(ViewBag.EmptyCount ?? Model.Count(g => g.TrangThai == "Trống"))</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Giường đã sử dụng</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@(ViewBag.OccupiedCount ?? Model.Count(g => g.TrangThai == "Đã sử dụng"))</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-procedures fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-danger shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Giường đang sửa chữa</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">@(ViewBag.MaintenanceCount ?? Model.Count(g => g.TrangThai == "Đang sửa chữa"))</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-tools fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">Danh sách giường bệnh</h6>
+        <div class="dropdown no-arrow">
+            <a class="btn btn-primary mr-2" asp-action="BedReport">
+                <i class="fas fa-chart-bar fa-sm text-white-50"></i> Báo cáo giường
+            </a>
+            <a class="btn btn-primary" asp-action="Create">
+                <i class="fas fa-plus fa-sm text-white-50"></i> Thêm giường mới
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["SuccessMessage"]
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["ErrorMessage"]
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        }
+
+        <form asp-action="FilterBeds" method="get" class="mb-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="maKhoa">Khoa</label>
+                        <select class="form-control" id="maKhoa" name="maKhoa">
+                            <option value="">Tất cả</option>
+                            @foreach (var item in (ViewBag.MaKhoa as SelectList))
+                            {
+                                if (ViewBag.MaKhoa?.SelectedValue?.ToString() == item.Value)
+                                {
+                                    <option value="@item.Value" selected="selected">@item.Text</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="trangThai">Trạng thái</label>
+                        <select class="form-control" id="trangThai" name="trangThai">
+                            @foreach (var item in ViewBag.TrangThaiOptions)
+                            {
+                                if (ViewBag.SelectedTrangThai == item.Value)
+                                {
+                                    <option value="@item.Value" selected="selected">@item.Text</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button type="submit" class="btn btn-primary btn-block">Lọc</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Mã giường</th>
+                        <th>Tên giường</th>
+                        <th>Khoa</th>
+                        <th>Giá theo ngày</th>
+                        <th>Trạng thái</th>
+                        <th>Bệnh nhân</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.MaGiuong</td>
+                            <td>@item.TenGiuong</td>
+                            <td>@item.Khoa?.TenKhoa</td>
+                            <td>@item.GiaTheoNgay.ToString("N0") VND</td>
+                            <td>
+                                @if (item.TrangThai == "Trống")
+                                {
+                                    <span class="badge bg-success">Trống</span>
+                                }
+                                else if (item.TrangThai == "Đã sử dụng")
+                                {
+                                    <span class="badge bg-warning text-dark">Đã sử dụng</span>
+                                }
+                                else if (item.TrangThai == "Đang sửa chữa")
+                                {
+                                    <span class="badge bg-danger">Đang sửa chữa</span>
+                                }
+                            </td>
+                            <td>
+                                @if (item.BenhNhan != null)
+                                {
+                                    <a asp-controller="BenhNhan" asp-action="Details" asp-route-id="@item.MaBenhNhan">@item.BenhNhan.HoTen</a>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a asp-action="Edit" asp-route-id="@item.MaGiuong" class="btn btn-sm btn-primary mr-1">
+                                        <i class="fas fa-edit"></i> Sửa
+                                    </a>
+                                    <a asp-action="Details" asp-route-id="@item.MaGiuong" class="btn btn-sm btn-info mr-1">
+                                        <i class="fas fa-info-circle"></i> Chi tiết
+                                    </a>
+                                    @if (item.TrangThai == "Trống")
+                                    {
+                                        <a asp-action="AssignPatient" asp-route-id="@item.MaGiuong" class="btn btn-sm btn-success mr-1">
+                                            <i class="fas fa-user-plus"></i> Phân bệnh nhân
+                                        </a>
+                                    }
+                                    @if (item.TrangThai == "Đã sử dụng" && item.MaBenhNhan != null)
+                                    {
+                                        <a asp-action="ReleasePatient" asp-route-id="@item.MaGiuong" class="btn btn-sm btn-warning mr-1">
+                                            <i class="fas fa-user-minus"></i> Xuất bệnh nhân
+                                        </a>
+                                    }
+                                    @if (item.TrangThai != "Đã sử dụng")
+                                    {
+                                        <a asp-action="Delete" asp-route-id="@item.MaGiuong" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i> Xóa
+                                        </a>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#dataTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Vietnamese.json"
+                }
+            });
+        });
+    </script>
+} 

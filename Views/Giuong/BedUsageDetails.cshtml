@@ -1,0 +1,226 @@
+@model IEnumerable<QuanLyBenhVienNoiTru.Models.Giuong>
+
+@{
+    ViewData["Title"] = "Chi tiết sử dụng giường - " + ViewBag.Khoa.TenKhoa;
+}
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">Chi tiết sử dụng giường - @ViewBag.Khoa.TenKhoa</h6>
+        <div class="dropdown no-arrow">
+            <a class="btn btn-primary" asp-action="BedReport">
+                <i class="fas fa-arrow-left fa-sm text-white-50"></i> Quay lại báo cáo
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Tổng số giường</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Count()</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-bed fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Giường trống</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Count(g => g.TrangThai == "Trống")</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card border-left-warning shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Tỷ lệ sử dụng</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                    @{
+                                        double occupancyRate = Model.Count() > 0 ? 
+                                            (double)Model.Count(g => g.TrangThai == "Đã sử dụng") / Model.Count() * 100 : 0;
+                                    }
+                                    @occupancyRate.ToString("0.00")%
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Mã giường</th>
+                        <th>Tên giường</th>
+                        <th>Giá theo ngày</th>
+                        <th>Trạng thái</th>
+                        <th>Bệnh nhân</th>
+                        <th>Thời gian sử dụng</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.MaGiuong</td>
+                            <td>@item.TenGiuong</td>
+                            <td>@item.GiaTheoNgay.ToString("N0") VND</td>
+                            <td>
+                                @if (item.TrangThai == "Trống")
+                                {
+                                    <span class="badge bg-success">Trống</span>
+                                }
+                                else if (item.TrangThai == "Đã sử dụng")
+                                {
+                                    <span class="badge bg-warning text-dark">Đã sử dụng</span>
+                                }
+                                else if (item.TrangThai == "Đang sửa chữa")
+                                {
+                                    <span class="badge bg-danger">Đang sửa chữa</span>
+                                }
+                            </td>
+                            <td>
+                                @if (item.BenhNhan != null)
+                                {
+                                    <a asp-controller="BenhNhan" asp-action="Details" asp-route-id="@item.MaBenhNhan">@item.BenhNhan.HoTen</a>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+                            <td>
+                                @if (item.BenhNhan != null)
+                                {
+                                    TimeSpan duration = DateTime.Now - item.BenhNhan.NgayNhapVien;
+                                    <span>@duration.Days ngày</span>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a asp-action="Details" asp-route-id="@item.MaGiuong" class="btn btn-sm btn-info">
+                                        <i class="fas fa-info-circle"></i> Chi tiết
+                                    </a>
+                                    @if (item.TrangThai == "Trống")
+                                    {
+                                        <a asp-action="AssignPatient" asp-route-id="@item.MaGiuong" class="btn btn-sm btn-success ml-1">
+                                            <i class="fas fa-user-plus"></i> Phân bệnh nhân
+                                        </a>
+                                    }
+                                    @if (item.TrangThai == "Đã sử dụng" && item.MaBenhNhan != null)
+                                    {
+                                        <a asp-action="ReleasePatient" asp-route-id="@item.MaGiuong" class="btn btn-sm btn-warning ml-1">
+                                            <i class="fas fa-user-minus"></i> Xuất bệnh nhân
+                                        </a>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Biểu đồ trạng thái giường</h6>
+    </div>
+    <div class="card-body">
+        <div class="chart-pie pt-4 pb-2">
+            <canvas id="bedStatusChart"></canvas>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#dataTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Vietnamese.json"
+                }
+            });
+
+            // Pie Chart
+            var ctx = document.getElementById("bedStatusChart");
+            var emptyBeds = @Model.Count(g => g.TrangThai == "Trống");
+            var occupiedBeds = @Model.Count(g => g.TrangThai == "Đã sử dụng");
+            var maintenanceBeds = @Model.Count(g => g.TrangThai == "Đang sửa chữa");
+
+            var myPieChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ["Trống", "Đã sử dụng", "Đang sửa chữa"],
+                    datasets: [{
+                        data: [emptyBeds, occupiedBeds, maintenanceBeds],
+                        backgroundColor: ['#1cc88a', '#f6c23e', '#e74a3b'],
+                        hoverBackgroundColor: ['#17a673', '#f4b619', '#e02d1b'],
+                        hoverBorderColor: "rgba(234, 236, 244, 1)",
+                    }],
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    tooltips: {
+                        backgroundColor: "rgb(255,255,255)",
+                        bodyFontColor: "#858796",
+                        borderColor: '#dddfeb',
+                        borderWidth: 1,
+                        xPadding: 15,
+                        yPadding: 15,
+                        displayColors: false,
+                        caretPadding: 10,
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom'
+                        },
+                        datalabels: {
+                            formatter: (value, ctx) => {
+                                let sum = 0;
+                                let dataArr = ctx.chart.data.datasets[0].data;
+                                dataArr.map(data => {
+                                    sum += data;
+                                });
+                                let percentage = (value * 100 / sum).toFixed(2) + "%";
+                                return percentage;
+                            },
+                            color: '#fff',
+                        }
+                    },
+                    cutout: '70%',
+                },
+            });
+        });
+    </script>
+} 
