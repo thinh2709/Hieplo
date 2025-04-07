@@ -60,6 +60,12 @@
             <a asp-action="Index" class="btn btn-secondary">
                 <i class="fas fa-times me-2"></i> Hủy
             </a>
+            @if (Model.MaBenhNhan.HasValue)
+            {
+                <a href="@Url.Action("Details", "BenhNhan", new { id = Model.MaBenhNhan.Value })" class="btn btn-info">
+                    <i class="fas fa-user-injured me-2"></i> Quay lại chi tiết bệnh nhân
+                </a>
+            }
         </form>
     </div>
 </div>

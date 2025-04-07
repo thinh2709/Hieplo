@@ -379,5 +379,232 @@ namespace QuanLyBenhVienNoiTru.Controllers
         {
             return View();
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Profile()
+        {
+            try
+            {
+                // Lấy thông tin người dùng đăng nhập
+                var userId = User.FindFirst("UserId")?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return RedirectToAction("Login");
+                }
+
+                // Chuyển về số nguyên
+                if (!int.TryParse(userId, out int maTaiKhoan))
+                {
+                    return NotFound("Không tìm thấy thông tin người dùng");
+                }
+
+                // Lấy thông tin tài khoản
+                var taiKhoan = await _context.TaiKhoans
+                    .FirstOrDefaultAsync(t => t.MaTaiKhoan == maTaiKhoan);
+
+                if (taiKhoan == null)
+                {
+                    return NotFound("Không tìm thấy thông tin tài khoản");
+                }
+
+                // Tạo model thông tin profile dựa vào vai trò
+                var profileModel = new ProfileViewModel
+                {
+                    MaTaiKhoan = taiKhoan.MaTaiKhoan,
+                    TenDangNhap = taiKhoan.TenDangNhap,
+                    VaiTro = taiKhoan.VaiTro
+                };
+
+                // Nếu là bác sĩ, lấy thêm thông tin từ bảng BacSi
+                if (taiKhoan.VaiTro == "Bác sĩ")
+                {
+                    var bacSi = await _context.BacSis
+                        .Include(b => b.Khoa)
+                        .FirstOrDefaultAsync(b => b.MaTaiKhoan == maTaiKhoan);
+
+                    if (bacSi != null)
+                    {
+                        profileModel.HoTen = bacSi.HoTen;
+                        profileModel.Email = bacSi.Email;
+                        profileModel.SoDienThoai = bacSi.SoDienThoai;
+                        profileModel.DiaChi = bacSi.DiaChi;
+                        profileModel.GioiTinh = bacSi.GioiTinh;
+                        // Ở đây BacSi không có NgaySinh, nên chúng ta không thể gán giá trị này
+                        profileModel.ChuyenKhoa = bacSi.ChuyenKhoa;
+                        profileModel.MaKhoa = bacSi.MaKhoa;
+                        profileModel.TenKhoa = bacSi.Khoa?.TenKhoa;
+                        profileModel.NgayVaoLam = bacSi.NgayVaoLam;
+                    }
+                }
+                // Nếu là khách, lấy thêm thông tin từ bảng KhachThamBenh
+                else if (taiKhoan.VaiTro == "Khách")
+                {
+                    var khach = await _context.KhachThamBenhs
+                        .FirstOrDefaultAsync(k => k.MaTaiKhoan == maTaiKhoan);
+
+                    if (khach != null)
+                    {
+                        profileModel.HoTen = khach.HoTen;
+                        profileModel.Email = khach.Email;
+                        profileModel.SoDienThoai = khach.SoDienThoai;
+                        profileModel.DiaChi = khach.DiaChi;
+                        profileModel.MoiQuanHe = khach.MoiQuanHe;
+                    }
+                }
+                // Nếu là Admin, tạm thời chỉ hiển thị các thông tin cơ bản
+                else if (taiKhoan.VaiTro == "Admin")
+                {
+                    // Đối với Admin, có thể cần thêm bảng dữ liệu riêng hoặc chỉ hiển thị thông tin cơ bản
+                    profileModel.HoTen = "Admin"; // Giá trị mặc định
+                }
+
+                // Lấy danh sách khoa nếu cần hiển thị trong dropdown
+                ViewBag.DanhSachKhoa = await _context.Khoas
+                    .Where(k => k.TrangThai)
+                    .Select(k => new SelectListItem
+                    {
+                        Value = k.MaKhoa.ToString(),
+                        Text = k.TenKhoa
+                    })
+                    .ToListAsync();
+
+                ViewBag.GioiTinhList = new List<SelectListItem>
+                {
+                    new SelectListItem { Value = "Nam", Text = "Nam" },
+                    new SelectListItem { Value = "Nữ", Text = "Nữ" },
+                    new SelectListItem { Value = "Khác", Text = "Khác" }
+                };
+
+                return View(profileModel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi tải trang hồ sơ cá nhân: {Message}", ex.Message);
+                TempData["ErrorMessage"] = "Không thể tải thông tin hồ sơ cá nhân. Vui lòng thử lại sau.";
+                return RedirectToAction("Index", "Home");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Profile(ProfileViewModel model)
+        {
+            try
+            {
+                // Lấy thông tin người dùng đăng nhập để kiểm tra
+                var userId = User.FindFirst("UserId")?.Value;
+                if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out int maTaiKhoan) || maTaiKhoan != model.MaTaiKhoan)
+                {
+                    return Unauthorized("Bạn không có quyền cập nhật thông tin này");
+                }
+
+                // Lấy thông tin tài khoản hiện tại
+                var taiKhoan = await _context.TaiKhoans
+                    .FirstOrDefaultAsync(t => t.MaTaiKhoan == maTaiKhoan);
+
+                if (taiKhoan == null)
+                {
+                    return NotFound("Không tìm thấy thông tin tài khoản");
+                }
+
+                // Nếu có thay đổi mật khẩu
+                if (!string.IsNullOrEmpty(model.MatKhauMoi) && !string.IsNullOrEmpty(model.XacNhanMatKhau))
+                {
+                    if (model.MatKhauMoi != model.XacNhanMatKhau)
+                    {
+                        ModelState.AddModelError("XacNhanMatKhau", "Mật khẩu xác nhận không khớp với mật khẩu mới");
+                        
+                        // Lấy lại danh sách khoa và giới tính cho view
+                        ViewBag.DanhSachKhoa = await _context.Khoas
+                            .Where(k => k.TrangThai)
+                            .Select(k => new SelectListItem
+                            {
+                                Value = k.MaKhoa.ToString(),
+                                Text = k.TenKhoa
+                            })
+                            .ToListAsync();
+
+                        ViewBag.GioiTinhList = new List<SelectListItem>
+                        {
+                            new SelectListItem { Value = "Nam", Text = "Nam" },
+                            new SelectListItem { Value = "Nữ", Text = "Nữ" },
+                            new SelectListItem { Value = "Khác", Text = "Khác" }
+                        };
+                        
+                        return View(model);
+                    }
+
+                    // Cập nhật mật khẩu mới (trong thực tế nên có mã hóa)
+                    taiKhoan.MatKhau = model.MatKhauMoi;
+                }
+
+                // Cập nhật thông tin theo vai trò
+                if (taiKhoan.VaiTro == "Bác sĩ")
+                {
+                    var bacSi = await _context.BacSis
+                        .FirstOrDefaultAsync(b => b.MaTaiKhoan == maTaiKhoan);
+
+                    if (bacSi != null)
+                    {
+                        // Cập nhật thông tin từ model vào đối tượng BacSi
+                        bacSi.HoTen = model.HoTen;
+                        bacSi.Email = model.Email;
+                        bacSi.SoDienThoai = model.SoDienThoai;
+                        bacSi.DiaChi = model.DiaChi;
+                        bacSi.GioiTinh = model.GioiTinh;
+                        // Không cần cập nhật NgaySinh vì BacSi không có thuộc tính này
+                        
+                        _context.Update(bacSi);
+                    }
+                }
+                else if (taiKhoan.VaiTro == "Khách")
+                {
+                    var khach = await _context.KhachThamBenhs
+                        .FirstOrDefaultAsync(k => k.MaTaiKhoan == maTaiKhoan);
+
+                    if (khach != null)
+                    {
+                        // Cập nhật thông tin từ model vào đối tượng KhachThamBenh
+                        khach.HoTen = model.HoTen;
+                        khach.Email = model.Email;
+                        khach.SoDienThoai = model.SoDienThoai;
+                        khach.DiaChi = model.DiaChi;
+                        khach.MoiQuanHe = model.MoiQuanHe;
+                        
+                        _context.Update(khach);
+                    }
+                }
+
+                _context.Update(taiKhoan);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Cập nhật thông tin cá nhân thành công!";
+                return RedirectToAction("Profile");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi cập nhật hồ sơ cá nhân: {Message}", ex.Message);
+                ModelState.AddModelError("", "Có lỗi xảy ra khi cập nhật thông tin. Vui lòng thử lại sau.");
+                
+                // Lấy lại danh sách khoa và giới tính cho view
+                ViewBag.DanhSachKhoa = await _context.Khoas
+                    .Where(k => k.TrangThai)
+                    .Select(k => new SelectListItem
+                    {
+                        Value = k.MaKhoa.ToString(),
+                        Text = k.TenKhoa
+                    })
+                    .ToListAsync();
+
+                ViewBag.GioiTinhList = new List<SelectListItem>
+                {
+                    new SelectListItem { Value = "Nam", Text = "Nam" },
+                    new SelectListItem { Value = "Nữ", Text = "Nữ" },
+                    new SelectListItem { Value = "Khác", Text = "Khác" }
+                };
+                
+                return View(model);
+            }
+        }
     }
 }

@@ -2,47 +2,63 @@
 
 @{
     ViewData["Title"] = "Thêm mới hình thức điều trị";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="container-fluid">
-    <h2>Thêm mới hình thức điều trị</h2>
-
     <div class="card shadow mb-4">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">Nhập thông tin hình thức điều trị mới</h6>
         </div>
-        <div class="card-body">
-            <form asp-action="Create">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <form asp-action="Create">
+            <div class="card-body">
+                @if (TempData["ValidationErrors"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <h6 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Lỗi nhập liệu:</h6>
+                        <hr>
+                        <p class="mb-0">@Html.Raw(TempData["ValidationErrors"])</p>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                }
+            
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
                 
                 <div class="form-group">
-                    <label asp-for="TenDieuTri" class="control-label">Tên điều trị</label>
+                    <label asp-for="TenDieuTri" class="control-label">Tên điều trị <span class="text-danger">*</span></label>
                     <input asp-for="TenDieuTri" class="form-control" />
                     <span asp-validation-for="TenDieuTri" class="text-danger"></span>
+                    <small class="form-text text-muted">Nhập tên của hình thức điều trị (VD: Xét nghiệm máu, Chụp X-quang...)</small>
                 </div>
                 
                 <div class="form-group">
-                    <label asp-for="MaKhoa" class="control-label">Khoa áp dụng</label>
+                    <label asp-for="MaKhoa" class="control-label">Khoa áp dụng <span class="text-danger">*</span></label>
                     <select asp-for="MaKhoa" class="form-control" asp-items="ViewBag.MaKhoa">
                         <option value="">-- Chọn khoa --</option>
                     </select>
                     <span asp-validation-for="MaKhoa" class="text-danger"></span>
+                    <small class="form-text text-muted">Chọn khoa áp dụng hình thức điều trị này</small>
                 </div>
                 
                 <div class="form-group">
-                    <label asp-for="ChiPhi" class="control-label">Chi phí (VNĐ)</label>
-                    <input asp-for="ChiPhi" class="form-control" type="number" step="0.01" />
+                    <label asp-for="ChiPhi" class="control-label">Chi phí (VNĐ) <span class="text-danger">*</span></label>
+                    <input asp-for="ChiPhi" class="form-control" type="number" min="0" step="1000" />
                     <span asp-validation-for="ChiPhi" class="text-danger"></span>
+                    <small class="form-text text-muted">Nhập chi phí của hình thức điều trị (VD: 150000)</small>
                 </div>
                 
                 <div class="form-group">
-                    <label asp-for="MoTa" class="control-label">Mô tả</label>
+                    <label asp-for="MoTa" class="control-label">Mô tả <span class="text-danger">*</span></label>
                     <textarea asp-for="MoTa" class="form-control" rows="4"></textarea>
                     <span asp-validation-for="MoTa" class="text-danger"></span>
+                    <small class="form-text text-muted">Nhập mô tả chi tiết về hình thức điều trị này</small>
                 </div>
-                
-                <div class="form-group">
+            </div>
+            
+            <div class="card-footer">
+                <div class="form-group mb-0">
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> Lưu
                     </button>
@@ -50,8 +66,8 @@
                         <i class="fas fa-arrow-left"></i> Quay lại danh sách
                     </a>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </div>
 

@@ -2,41 +2,85 @@
 
 @{
     ViewData["Title"] = "Chi tiết hình thức điều trị";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="container-fluid">
-    <h2>Chi tiết hình thức điều trị</h2>
-
     <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Thông tin chi tiết</h6>
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-info-circle"></i> Chi tiết hình thức điều trị
+            </h6>
+            <div>
+                <a asp-action="Edit" asp-route-id="@Model.MaDieuTri" class="btn btn-sm btn-primary">
+                    <i class="fas fa-edit"></i> Chỉnh sửa
+                </a>
+                <a asp-action="Index" class="btn btn-sm btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                </a>
+            </div>
         </div>
         <div class="card-body">
-            <dl class="row">
-                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.MaDieuTri)</dt>
-                <dd class="col-sm-9">@Html.DisplayFor(model => model.MaDieuTri)</dd>
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i> @TempData["SuccessMessage"]
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            }
 
-                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.TenDieuTri)</dt>
-                <dd class="col-sm-9">@Html.DisplayFor(model => model.TenDieuTri)</dd>
-
-                <dt class="col-sm-3">Khoa áp dụng</dt>
-                <dd class="col-sm-9">@(Model.Khoa?.TenKhoa ?? "Không có khoa")</dd>
-
-                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.ChiPhi)</dt>
-                <dd class="col-sm-9">@Html.DisplayFor(model => model.ChiPhi) VNĐ</dd>
-
-                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.MoTa)</dt>
-                <dd class="col-sm-9">@Html.DisplayFor(model => model.MoTa)</dd>
-            </dl>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <tr>
+                        <th class="bg-light" style="width: 30%">Mã điều trị</th>
+                        <td>@Model.MaDieuTri</td>
+                    </tr>
+                    <tr>
+                        <th class="bg-light">Tên điều trị</th>
+                        <td>@Model.TenDieuTri</td>
+                    </tr>
+                    <tr>
+                        <th class="bg-light">Khoa áp dụng</th>
+                        <td>
+                            @if (Model.Khoa != null)
+                            {
+                                <a asp-controller="Khoa" asp-action="Details" asp-route-id="@Model.MaKhoa">
+                                    @Model.Khoa.TenKhoa
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Không có</span>
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="bg-light">Chi phí</th>
+                        <td>@Model.ChiPhi.ToString("N0") VNĐ</td>
+                    </tr>
+                    <tr>
+                        <th class="bg-light">Mô tả</th>
+                        <td>
+                            <pre class="mb-0 bg-white border-0" style="white-space: pre-wrap;">@Model.MoTa</pre>
+                        </td>
+                    </tr>
+                </table>
+            </div>
         </div>
         <div class="card-footer">
-            <div class="form-group">
-                <a asp-action="Edit" asp-route-id="@Model.MaDieuTri" class="btn btn-primary">
-                    <i class="fas fa-edit"></i> Sửa
-                </a>
-                <a asp-action="Index" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i> Quay lại danh sách
+            <div class="d-flex justify-content-between">
+                <div>
+                    <a asp-action="Edit" asp-route-id="@Model.MaDieuTri" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Chỉnh sửa
+                    </a>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                    </a>
+                </div>
+                <a asp-action="Delete" asp-route-id="@Model.MaDieuTri" class="btn btn-danger">
+                    <i class="fas fa-trash-alt"></i> Xóa
                 </a>
             </div>
         </div>

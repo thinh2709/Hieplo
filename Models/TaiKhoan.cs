@@ -25,7 +25,7 @@ namespace QuanLyBenhVienNoiTru.Models
         public string VaiTro { get; set; }
 
         // Navigation properties
-        public virtual BacSi BacSi { get; set; }
-        public virtual KhachThamBenh KhachThamBenh { get; set; }
+        public virtual BacSi? BacSi { get; set; }
+        public virtual KhachThamBenh? KhachThamBenh { get; set; }
     }
 }

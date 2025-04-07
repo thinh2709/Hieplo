@@ -1,7 +1,7 @@
 @model QuanLyBenhVienNoiTru.Models.TaiKhoan
 @{
     ViewData["Title"] = "Thêm người dùng";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="container-fluid">
@@ -22,8 +22,19 @@
                     <h6 class="m-0 font-weight-bold text-primary">Thông tin tài khoản</h6>
                 </div>
                 <div class="card-body">
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <h6 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Lỗi:</h6>
+                            <p class="mb-0">@TempData["Error"]</p>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    }
+                    
                     <form asp-action="CreateUser" method="post" id="createUserForm">
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
 
                         <div class="mb-3 row">
                             <label asp-for="TenDangNhap" class="col-sm-3 col-form-label">Tên đăng nhập <span class="text-danger">*</span></label>

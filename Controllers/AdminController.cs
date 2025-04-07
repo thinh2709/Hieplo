@@ -27,8 +27,8 @@ namespace QuanLyBenhVienNoiTru.Controllers
             // Thống kê tổng quan
             ViewBag.TongBenhNhan = await _context.BenhNhans.CountAsync();
             ViewBag.BenhNhanDangDieuTri = await _context.BenhNhans.Where(b => b.NgayXuatVien == null).CountAsync();
-            ViewBag.TongBacSi = await _context.BacSis.CountAsync();
-            ViewBag.TongKhoa = await _context.Khoas.CountAsync();
+            ViewBag.TongBacSi = await _context.BacSis.Where(b => b.TrangThai).CountAsync();
+            ViewBag.TongKhoa = await _context.Khoas.Where(k => k.TrangThai).CountAsync();
             
             // Thông tin thêm cho dashboard
             ViewBag.BenhNhanMoi = await _context.BenhNhans
@@ -42,7 +42,55 @@ namespace QuanLyBenhVienNoiTru.Controllers
             ViewBag.LuotThamBenh = await _context.LichThamBenhs
                 .Where(l => l.ThoiGianTham != null && l.ThoiGianTham.Value.Date == DateTime.Today)
                 .CountAsync();
+
+            // Thêm thông tin chi phí 
+            ViewBag.TongDoanhThu = await _context.ChiPhiDieuTris
+                .Where(c => c.DaThanhToan)
+                .SumAsync(c => c.TongChiPhi);
                 
+            ViewBag.DoanhThuThangNay = await _context.ChiPhiDieuTris
+                .Where(c => c.DaThanhToan && c.NgayLap != null && 
+                       c.NgayLap.Value.Month == DateTime.Now.Month && 
+                       c.NgayLap.Value.Year == DateTime.Now.Year)
+                .SumAsync(c => c.TongChiPhi);
+
+            // Bệnh nhân mới và sắp ra viện
+            ViewBag.BenhNhanMoiNhat = await _context.BenhNhans
+                .Include(b => b.Khoa)
+                .Include(b => b.BacSi)
+                .OrderByDescending(b => b.NgayNhapVien)
+                .Take(5)
+                .ToListAsync();
+
+            // Bác sĩ có nhiều bệnh nhân nhất
+            var bacSiHangDau = await _context.BacSis
+                .Where(b => b.TrangThai)
+                .Include(b => b.Khoa)
+                .Select(b => new {
+                    BacSi = b,
+                    SoBenhNhan = _context.BenhNhans.Count(bn => bn.MaBacSi == b.MaBacSi && bn.NgayXuatVien == null)
+                })
+                .OrderByDescending(x => x.SoBenhNhan)
+                .Take(5)
+                .ToListAsync();
+                
+            ViewBag.BacSiHangDau = bacSiHangDau;
+
+            // Thống kê theo khoa
+            var thongKeKhoa = await _context.Khoas
+                .Where(k => k.TrangThai)
+                .Select(k => new {
+                    Khoa = k,
+                    SoBenhNhan = _context.BenhNhans.Count(bn => bn.MaKhoa == k.MaKhoa && bn.NgayXuatVien == null),
+                    SoBacSi = _context.BacSis.Count(b => b.MaKhoa == k.MaKhoa && b.TrangThai),
+                    TongSoGiuong = _context.Giuongs.Count(g => g.MaKhoa == k.MaKhoa),
+                    SoGiuongTrong = _context.Giuongs.Count(g => g.MaKhoa == k.MaKhoa && g.TrangThai == "Trống")
+                })
+                .OrderByDescending(x => x.SoBenhNhan)
+                .ToListAsync();
+                
+            ViewBag.ThongKeKhoa = thongKeKhoa;
+
             // Lấy hoạt động gần đây
             var hoatDongGanDay = new List<HoatDongViewModel>();
             
@@ -105,9 +153,37 @@ namespace QuanLyBenhVienNoiTru.Controllers
                     MauSac = "danger"
                 });
             }
+
+            // Thêm thông tin xuất viện gần đây
+            var xuatVienGanDay = await _context.BenhNhans
+                .Where(b => b.NgayXuatVien != null)
+                .OrderByDescending(b => b.NgayXuatVien)
+                .Take(5)
+                .ToListAsync();
+
+            foreach (var bn in xuatVienGanDay)
+            {
+                hoatDongGanDay.Add(new HoatDongViewModel
+                {
+                    Loai = "XuatVien",
+                    ThoiGian = bn.NgayXuatVien ?? DateTime.Now,
+                    NoiDung = $"Bệnh nhân {bn.HoTen} đã xuất viện",
+                    MaDoiTuong = bn.MaBenhNhan,
+                    Icon = "fas fa-hospital-user",
+                    MauSac = "info"
+                });
+            }
             
             // Sắp xếp theo thời gian giảm dần
             ViewBag.HoatDongGanDay = hoatDongGanDay.OrderByDescending(h => h.ThoiGian).Take(10).ToList();
+            
+            // Thêm thông tin báo cáo - số lượng điều trị, chi phí chưa thanh toán
+            ViewBag.TongDieuTri = await _context.DieuTriBenhNhans.CountAsync();
+            ViewBag.DieuTriHomNay = await _context.DieuTriBenhNhans
+                .CountAsync(d => d.NgayThucHien != null && d.NgayThucHien.Value.Date == DateTime.Today);
+            ViewBag.TongChuaThanhToan = await _context.ChiPhiDieuTris
+                .Where(c => !c.DaThanhToan)
+                .SumAsync(c => c.TongChiPhi);
             
             return View();
         }
@@ -154,6 +230,29 @@ namespace QuanLyBenhVienNoiTru.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateUser(TaiKhoan taiKhoan, int? bacSiId, string HoTen = null, string SoDienThoai = null, string Email = null, string DiaChi = null, string MoiQuanHe = null)
         {
+            // Remove validation errors for navigation properties
+            ModelState.Remove("BacSi");
+            ModelState.Remove("KhachThamBenh");
+            
+            // Check if this is a "Khách" (visitor) role creation
+            if (taiKhoan.VaiTro == "Khách")
+            {
+                // Add validation for required visitor fields
+                if (string.IsNullOrEmpty(HoTen))
+                {
+                    ModelState.AddModelError("HoTen", "Vui lòng nhập họ tên khách thăm bệnh");
+                }
+                
+                if (string.IsNullOrEmpty(SoDienThoai))
+                {
+                    ModelState.AddModelError("SoDienThoai", "Vui lòng nhập số điện thoại");
+                }
+                else if (!System.Text.RegularExpressions.Regex.IsMatch(SoDienThoai, @"^[0-9]{10}$"))
+                {
+                    ModelState.AddModelError("SoDienThoai", "Số điện thoại phải có 10 chữ số");
+                }
+            }
+            
             if (!ModelState.IsValid)
             {
                 var errors = ModelState
@@ -277,6 +376,10 @@ namespace QuanLyBenhVienNoiTru.Controllers
             {
                 return NotFound();
             }
+
+            // Remove validation errors for navigation properties
+            ModelState.Remove("BacSi");
+            ModelState.Remove("KhachThamBenh");
 
             if (ModelState.IsValid)
             {

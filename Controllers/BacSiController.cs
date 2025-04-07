@@ -28,9 +28,20 @@ namespace QuanLyBenhVienNoiTru.Controllers
                 // Nếu là Admin, trả về danh sách tất cả bác sĩ
                 var bacSis = await _context.BacSis
                     .Include(b => b.Khoa)
-                    .Include(b => b.BenhNhans)
                     .OrderBy(b => b.HoTen)
                     .ToListAsync();
+
+                // Lấy số lượng bệnh nhân đang điều trị cho mỗi bác sĩ
+                foreach (var bacSi in bacSis)
+                {
+                    bacSi.BenhNhans = await _context.BenhNhans
+                        .Where(b => b.MaBacSi == bacSi.MaBacSi)
+                        .ToListAsync();
+
+                    ViewData[$"SoBenhNhanDangDieuTri_{bacSi.MaBacSi}"] = await _context.BenhNhans
+                        .Where(b => b.MaBacSi == bacSi.MaBacSi && b.NgayXuatVien == null)
+                        .CountAsync();
+                }
 
                 ViewBag.MaKhoa = await _context.Khoas
                     .Where(k => k.TrangThai)
@@ -78,7 +89,6 @@ namespace QuanLyBenhVienNoiTru.Controllers
 
             var bacSi = await _context.BacSis
                 .Include(b => b.Khoa)
-                .Include(b => b.BenhNhans)
                 .Include(b => b.TaiKhoan)
                 .FirstOrDefaultAsync(m => m.MaBacSi == id);
                 
@@ -86,6 +96,12 @@ namespace QuanLyBenhVienNoiTru.Controllers
             {
                 return NotFound();
             }
+
+            // Load danh sách bệnh nhân đang được bác sĩ này phụ trách
+            bacSi.BenhNhans = await _context.BenhNhans
+                .Include(b => b.Khoa)
+                .Where(b => b.MaBacSi == id)
+                .ToListAsync();
 
             // Lấy thông tin điều trị của bác sĩ
             var dieuTri = await _context.DieuTriBenhNhans

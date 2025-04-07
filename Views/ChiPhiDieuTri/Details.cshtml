@@ -5,6 +5,8 @@
     Layout = "_Layout";
     
     var dieuTriList = ViewBag.DieuTriList as List<QuanLyBenhVienNoiTru.Models.DieuTriBenhNhan>;
+    var backToPatient = ViewBag.BackToPatient ?? false;
+    var maBenhNhan = ViewBag.MaBenhNhan;
 }
 
 <div class="container-fluid">
@@ -76,12 +78,22 @@
                 </div>
                 <div class="card-footer">
                     <div class="btn-group">
-                        <a asp-action="Index" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i> Quay lại
-                        </a>
+                        @if (backToPatient && maBenhNhan != null)
+                        {
+                            <a href="@Url.Action("Details", "BenhNhan", new { id = maBenhNhan })" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Quay lại chi tiết bệnh nhân
+                            </a>
+                        }
+                        else
+                        {
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                            </a>
+                        }
+                        
                         @if (!Model.DaThanhToan)
                         {
-                            <a asp-action="ThanhToan" asp-route-id="@Model.MaChiPhi" class="btn btn-success ml-1">
+                            <a asp-action="ThanhToan" asp-route-id="@Model.MaChiPhi" asp-route-backToPatient="@backToPatient" class="btn btn-success ml-1">
                                 <i class="fas fa-money-bill"></i> Thanh toán
                             </a>
                         }

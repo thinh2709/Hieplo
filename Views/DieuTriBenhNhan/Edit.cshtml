@@ -20,7 +20,7 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label asp-for="MaBenhNhan" class="control-label">Bệnh nhân</label>
-                        <select asp-for="MaBenhNhan" class="form-control" asp-items="ViewBag.MaBenhNhan">
+                        <select asp-for="MaBenhNhan" class="form-control" asp-items="ViewBag.MaBenhNhan" id="maBenhNhanSelect">
                             <option value="">-- Chọn bệnh nhân --</option>
                         </select>
                         <span asp-validation-for="MaBenhNhan" class="text-danger"></span>
@@ -64,7 +64,10 @@
             
             <div class="form-group">
                 <input type="submit" value="Lưu" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+                <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+                <a id="btnBackToPatient" href="#" class="btn btn-info">
+                    <i class="fas fa-user-injured mr-1"></i> Quay lại chi tiết bệnh nhân
+                </a>
             </div>
         </form>
     </div>
@@ -79,6 +82,23 @@
                 theme: 'bootstrap4',
                 width: '100%'
             });
+            
+            // Cập nhật liên kết quay lại chi tiết bệnh nhân
+            function updatePatientDetailsLink() {
+                var maBenhNhan = $('#maBenhNhanSelect').val();
+                if (maBenhNhan) {
+                    $('#btnBackToPatient').attr('href', '/BenhNhan/Details/' + maBenhNhan);
+                    $('#btnBackToPatient').show();
+                } else {
+                    $('#btnBackToPatient').hide();
+                }
+            }
+            
+            // Khởi tạo trạng thái ban đầu
+            updatePatientDetailsLink();
+            
+            // Cập nhật liên kết khi thay đổi bệnh nhân
+            $('#maBenhNhanSelect').change(updatePatientDetailsLink);
         });
     </script>
 }

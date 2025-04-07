@@ -14,7 +14,7 @@
     <div class="col-lg-10">
         <div class="card border-0 shadow-sm">
             <div class="card-body p-4">
-                <form asp-action="Create" method="post">
+                <form asp-action="Create" method="post" id="createForm">
                     <div asp-validation-summary="All" class="alert alert-danger mb-4" role="alert">
                         <i class="fas fa-exclamation-circle me-2"></i>
                         <span>Vui lòng kiểm tra lại thông tin.</span>
@@ -126,11 +126,19 @@
 
                                 <div class="col-md-12">
                                     <div class="form-floating">
-                                        <select asp-for="BenhNhan.MaKhoa" class="form-select" asp-items="Model.KhoaSelectList" id="khoaSelect">
+                                        <select asp-for="BenhNhan.MaKhoa" class="form-select" asp-items="Model.KhoaSelectList" id="khoaSelect" disabled="@(ViewBag.KhoaIsLocked != null && ViewBag.KhoaIsLocked)">
                                             <option value="">-- Chọn khoa --</option>
                                         </select>
                                         <label asp-for="BenhNhan.MaKhoa">Khoa điều trị</label>
                                         <span asp-validation-for="BenhNhan.MaKhoa" class="text-danger small"></span>
+                                        @if (ViewBag.KhoaIsLocked != null && ViewBag.KhoaIsLocked)
+                                        {
+                                            <input type="hidden" asp-for="BenhNhan.MaKhoa" />
+                                            <div class="form-text text-info mt-1">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                Khoa đã được tự động chọn theo khoa của bác sĩ đang đăng nhập.
+                                            </div>
+                                        }
                                     </div>
                                 </div>
 
@@ -196,10 +204,18 @@
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <div class="form-floating">
-                                            <select asp-for="MaBacSi" class="form-select" asp-items="Model.BacSiSelectList">
+                                            <select asp-for="MaBacSi" class="form-select" asp-items="Model.BacSiSelectList" disabled="@(ViewBag.BacSiIsLocked != null && ViewBag.BacSiIsLocked)">
                                                 <option value="">-- Chọn bác sĩ phụ trách --</option>
                                             </select>
                                             <label asp-for="MaBacSi">Bác sĩ phụ trách</label>
+                                            @if (ViewBag.BacSiIsLocked != null && ViewBag.BacSiIsLocked)
+                                            {
+                                                <input type="hidden" asp-for="MaBacSi" />
+                                                <div class="form-text text-info mt-1">
+                                                    <i class="fas fa-info-circle me-1"></i>
+                                                    Bác sĩ đang đăng nhập sẽ tự động được chọn làm bác sĩ phụ trách.
+                                                </div>
+                                            }
                                         </div>
                                     </div>
                                     
@@ -211,53 +227,49 @@
                                     </div>
                                 </div>
 
-                                <div class="card">
-                                    <div class="card-header bg-light">
-                                        <h5 class="mb-0">Chọn hình thức điều trị</h5>
+                                <!-- Thông tin hình thức điều trị -->
+                                <div class="card mb-4 shadow-sm">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0"><i class="fas fa-procedures me-2"></i>Hình thức điều trị</h5>
+                                        <div>
+                                            <span class="fw-medium me-2">Tổng chi phí:</span>
+                                            <span id="totalTreatmentCost" class="fw-bold text-primary">0 VND</span>
+                                        </div>
                                     </div>
                                     <div class="card-body">
-                                        <div id="dieuTriList">
-                                            <div class="alert alert-warning" id="emptyKhoaAlert">
-                                                <i class="fas fa-exclamation-circle me-2"></i>
-                                                Vui lòng chọn khoa điều trị trước để xem danh sách hình thức điều trị phù hợp.
+                                        <div id="emptyKhoaAlert" class="alert alert-warning" style="display: none;">
+                                            <i class="fas fa-exclamation-circle me-2"></i>Vui lòng chọn khoa trước để xem các hình thức điều trị.
+                                        </div>
+                                        
+                                        <div id="loadingTreatments" class="d-flex align-items-center mb-3" style="display: none;">
+                                            <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
+                                                <span class="visually-hidden">Đang tải...</span>
                                             </div>
-                                            <div id="hinhThucDieuTriContainer" class="row g-3" style="display: none;">
-                                                <div class="col-12 mb-3">
-                                                    <div class="alert alert-info">
-                                                        <i class="fas fa-info-circle me-2"></i>
-                                                        Bạn đang xem các hình thức điều trị của khoa <strong id="selectedKhoaName">đã chọn</strong>. 
-                                                        Bạn có thể chọn nhiều hình thức điều trị bằng cách tick vào các ô tương ứng.
-                                                    </div>
-                                                </div>
-                                                
-                                                <div class="col-12">
-                                                    <div class="table-responsive" id="treatmentTableContainer">
-                                                        <table class="table table-hover border">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th style="width: 50px;"></th>
-                                                                    <th>Tên điều trị</th>
-                                                                    <th>Mô tả</th>
-                                                                    <th class="text-end">Chi phí</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody id="treatmentTableBody">
-                                                                <!-- Rows will be dynamically generated by JavaScript -->
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                
-                                                <div class="col-12 mt-3">
-                                                    <div class="card bg-light">
-                                                        <div class="card-body">
-                                                            <div class="d-flex justify-content-between align-items-center">
-                                                                <span>Tổng chi phí dự kiến:</span>
-                                                                <span class="fw-bold fs-5" id="totalCost">0 VNĐ</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                            <span>Đang tải dữ liệu hình thức điều trị...</span>
+                                        </div>
+                                        
+                                        <div id="noTreatmentsAlert" class="alert alert-info" style="display: none;">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            <span id="noTreatmentsMessage">Không có hình thức điều trị nào cho khoa này.</span>
+                                            <button id="btnReloadTreatments" class="btn btn-sm btn-outline-primary ms-2">
+                                                <i class="fas fa-sync-alt me-1"></i>Thử lại
+                                            </button>
+                                        </div>
+                                        
+                                        <div id="hinhThucDieuTriContainer" style="display: none;">
+                                            <div class="table-responsive">
+                                                <table id="treatmentTable" class="table table-hover">
+                                                    <thead class="table-light">
+                                                        <tr>
+                                                            <th style="width: 50px;"></th>
+                                                            <th>Tên hình thức điều trị</th>
+                                                            <th>Mô tả</th>
+                                                            <th class="text-end">Chi phí</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="treatmentTableBody">
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
                                     </div>
@@ -277,13 +289,29 @@
                                 <i class="fas fa-times me-2"></i>
                                 Hủy
                             </a>
-                            <button type="button" id="debugBtn" class="btn btn-info">
-                                <i class="fas fa-bug me-2"></i>
-                                Debug Form
-                            </button>
                         </div>
                     </div>
                 </form>
+
+                <div class="mb-4 d-flex justify-content-end">
+                    <button type="button" class="btn btn-primary me-2" id="btnSave">
+                        <i class="fas fa-save me-1"></i> Lưu
+                    </button>
+                    <button type="button" class="btn btn-info" id="btnDebugData">
+                        <i class="fas fa-bug me-1"></i> Kiểm tra dữ liệu
+                    </button>
+                </div>
+
+                <div id="debugOutputContainer" class="mb-4" style="display: none;">
+                    <div class="card border">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Thông tin debug</h5>
+                        </div>
+                        <div class="card-body">
+                            <pre id="debugOutput" class="bg-light p-3 rounded" style="max-height: 300px; overflow: auto;"></pre>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -293,11 +321,182 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     
     <script>
+        // Biến toàn cục
+        var allTreatmentDetails = {};
+        var allTreatmentCosts = {};
+        var treatments = [];
+        var isKhoaLocked = false;
+        var isBacSiLocked = false;
+        
         $(document).ready(function() {
+            // Thêm nút chẩn đoán ở đầu form
+            $('#createTabs').before(`
+                <div class="mb-3">
+                    <button type="button" id="diagnosisBtn" class="btn btn-outline-info btn-sm">
+                        <i class="fas fa-stethoscope me-1"></i> Chẩn đoán API
+                    </button>
+                    <div id="diagnosisResult" class="mt-2" style="display:none;">
+                        <div class="card">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0">Kết quả chẩn đoán</h6>
+                            </div>
+                            <div class="card-body" id="diagnosisContent">
+                                <div class="d-flex justify-content-center">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Đang tải...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `);
+            
+            // Đăng ký sự kiện cho nút chẩn đoán
+            $('#diagnosisBtn').click(function() {
+                runDiagnosis();
+            });
+            
             // Khởi tạo các biến toàn cục
-            var allTreatmentDetails = {};
-            var allTreatmentCosts = {};
             var selectedDepartmentId = null;
+            
+            // Gán giá trị từ ViewBag vào biến toàn cục
+            isKhoaLocked = @((ViewBag.KhoaIsLocked != null && ViewBag.KhoaIsLocked) ? "true" : "false");
+            isBacSiLocked = @((ViewBag.BacSiIsLocked != null && ViewBag.BacSiIsLocked) ? "true" : "false");
+            
+            // Log trạng thái lock
+            console.log("Department selection locked:", isKhoaLocked);
+            console.log("Doctor selection locked:", isBacSiLocked);
+            
+            // Run API diagnostics on page load
+            runApiDiagnostics();
+            
+            // Try to directly fetch all treatments once on page load as a fallback
+            tryFetchAllTreatments();
+            
+            // Function to diagnose API issues
+            function runDiagnosis() {
+                $('#diagnosisResult').show();
+                $('#diagnosisContent').html('<div class="d-flex justify-content-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Đang tải...</span></div></div>');
+                
+                var diagnosticResults = '<div class="text-muted mb-3">Đang chạy chẩn đoán API...</div>';
+                
+                // Kiểm tra API chuẩn đoán
+                $.ajax({
+                    url: '/api/HinhThucDieuTriApi/debug',
+                    type: 'GET',
+                    dataType: 'json',
+                    timeout: 5000,
+                    success: function(data) {
+                        diagnosticResults += `<div class="alert alert-success">✓ API debug thành công</div>`;
+                        diagnosticResults += `<div class="mb-2"><strong>Thông tin bảng dữ liệu:</strong> ${data.schema}.${data.tableName}</div>`;
+                        diagnosticResults += `<div class="mb-2"><strong>Kết nối database:</strong> ${data.databaseConnection ? 'Thành công' : 'Thất bại'}</div>`;
+                        diagnosticResults += `<div class="mb-2"><strong>Tổng số bản ghi:</strong> ${data.totalRecords}</div>`;
+                        
+                        if(data.sampleData && data.sampleData.length > 0) {
+                            diagnosticResults += `<div class="mb-2"><strong>Dữ liệu mẫu:</strong></div>`;
+                            diagnosticResults += `<div class="table-responsive"><table class="table table-sm table-bordered">`;
+                            diagnosticResults += `<thead><tr><th>ID</th><th>Tên</th><th>Khoa</th><th>Chi phí</th></tr></thead><tbody>`;
+                            
+                            data.sampleData.forEach(function(item) {
+                                diagnosticResults += `<tr>
+                                    <td>${item.maDieuTri}</td>
+                                    <td>${item.tenDieuTri}</td>
+                                    <td>${item.maKhoa}</td>
+                                    <td>${new Intl.NumberFormat('vi-VN').format(item.chiPhi)} đ</td>
+                                </tr>`;
+                            });
+                            
+                            diagnosticResults += `</tbody></table></div>`;
+                        } else {
+                            diagnosticResults += `<div class="alert alert-warning">Không tìm thấy dữ liệu mẫu trong bảng.</div>`;
+                        }
+                        
+                        $('#diagnosisContent').html(diagnosticResults);
+                        
+                        // Thử các endpoints của API
+                        testApiEndpoints();
+                    },
+                    error: function(xhr, status, error) {
+                        diagnosticResults += `<div class="alert alert-danger">✗ API debug thất bại: ${error}</div>`;
+                        if(xhr.responseJSON) {
+                            diagnosticResults += `<div class="alert alert-warning">
+                                <strong>Lỗi:</strong> ${xhr.responseJSON.message}<br>
+                                <strong>Stack:</strong> <pre>${xhr.responseJSON.stackTrace}</pre>
+                            </div>`;
+                        } else if(xhr.responseText) {
+                            diagnosticResults += `<div class="alert alert-warning">
+                                <strong>Response:</strong> <pre>${xhr.responseText}</pre>
+                            </div>`;
+                        }
+                        
+                        $('#diagnosisContent').html(diagnosticResults);
+                        
+                        // Vẫn thử các endpoints của API
+                        testApiEndpoints();
+                    }
+                });
+                
+                // Kiểm tra endpoint chính phục vụ dữ liệu điều trị
+                function testApiEndpoints() {
+                    // Lấy MaKhoa hiện tại
+                    var currentKhoaId = $('#khoaSelect').val() || 1;
+                    
+                    // Danh sách các endpoint cần kiểm tra
+                    var endpoints = [
+                        '/api/HinhThucDieuTriApi',
+                        '/api/HinhThucDieuTriApi/ByKhoa/' + currentKhoaId,
+                        '/api/HinhThucDieuTri',
+                        '/api/HinhThucDieuTri/ByKhoa/' + currentKhoaId,
+                        '/api/hinhthucdieutriapi/bykhoa/' + currentKhoaId,
+                        '/HinhThucDieuTriApi/GetByKhoa/' + currentKhoaId,
+                        '/api/HinhThucDieuTriApi/test-treatments/' + currentKhoaId
+                    ];
+                    
+                    $('#diagnosisContent').append('<hr><div class="mb-2"><strong>Kiểm tra các API endpoints:</strong></div>');
+                    var endpointResults = '<div class="d-flex justify-content-center"><div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>Đang kiểm tra các endpoints...</div>';
+                    $('#diagnosisContent').append(endpointResults);
+                    
+                    // Chạy kiểm tra tuần tự các endpoints
+                    testNextEndpoint(0);
+                    
+                    function testNextEndpoint(index) {
+                        if(index >= endpoints.length) {
+                            // Hoàn thành kiểm tra tất cả endpoints
+                            $('#diagnosisContent').find('div:last').remove(); // Xóa thông báo đang kiểm tra
+                            $('#diagnosisContent').append('<div class="alert alert-info mt-2">Hoàn thành kiểm tra các API endpoints.</div>');
+                            return;
+                        }
+                        
+                        var endpoint = endpoints[index];
+                        
+                        $.ajax({
+                            url: endpoint,
+                            type: 'GET',
+                            dataType: 'json',
+                            timeout: 3000,
+                            success: function(data) {
+                                var resultCount = Array.isArray(data) ? data.length : 'Không phải mảng';
+                                var resultHTML = `<div class="mb-1">
+                                    <span class="badge bg-success me-1">✓</span> 
+                                    <code>${endpoint}</code>: Thành công, 
+                                    kết quả: ${resultCount} items
+                                </div>`;
+                                $('#diagnosisContent').append(resultHTML);
+                                testNextEndpoint(index + 1);
+                            },
+                            error: function(xhr, status, error) {
+                                var resultHTML = `<div class="mb-1">
+                                    <span class="badge bg-danger me-1">✗</span> 
+                                    <code>${endpoint}</code>: Lỗi - ${status}, ${error}
+                                </div>`;
+                                $('#diagnosisContent').append(resultHTML);
+                                testNextEndpoint(index + 1);
+                            }
+                        });
+                    }
+                }
+            }
             
             // Kiểm tra trạng thái ban đầu của ThemDieuTri
             var initialThemDieuTriState = $('#themDieuTriSwitch').is(':checked');
@@ -308,6 +507,19 @@
                 setTimeout(function() {
                     $('#treatment-tab').tab('show');
                 }, 500);
+            }
+            
+            // Nếu khoa bị khóa (trường hợp bác sĩ), tự động tải dữ liệu điều trị ngay
+            if (isKhoaLocked) {
+                var maKhoa = $('#khoaSelect').val();
+                if (maKhoa) {
+                    console.log("Auto-loading treatment data for department:", maKhoa);
+                    loadTreatmentDetails(maKhoa);
+                    
+                    // Hiển thị tên khoa được chọn
+                    var khoaText = $("#khoaSelect option:selected").text();
+                    $('#selectedKhoaName').text(khoaText);
+                }
             }
             
             // Hàm để hiển thị hoặc ẩn bảng điều trị dựa trên checkbox thêm điều trị
@@ -374,45 +586,63 @@
             
             // Cập nhật bảng hình thức điều trị với dữ liệu mới
             function updateTreatmentTable(treatments) {
-                var treatmentTableBody = $('#treatmentTableBody');
-                treatmentTableBody.empty();
-
-                if (treatments.length === 0) {
-                    $('#treatmentTableContainer').hide();
-                    $('#emptyKhoaAlert').show();
+                console.log("Cập nhật bảng điều trị với dữ liệu:", treatments);
+                
+                // Xóa dữ liệu cũ
+                $('#treatmentTableBody').empty();
+                
+                if (!treatments || treatments.length === 0) {
+                    console.log("Không có dữ liệu điều trị");
                     $('#hinhThucDieuTriContainer').hide();
+                    $('#noTreatmentsAlert').text('Không có hình thức điều trị nào cho khoa này').show();
                     return;
                 }
-
-                $('#treatmentTableContainer').show();
-                $('#emptyKhoaAlert').hide();
+                
+                $('#noTreatmentsAlert').hide();
                 $('#hinhThucDieuTriContainer').show();
                 
-                treatments.forEach(function(treatment, index) {
+                // Cập nhật dữ liệu cho hình thức điều trị
+                allTreatmentDetails = {};
+                allTreatmentCosts = {};
+                
+                treatments.forEach(function(treatment) {
+                    // Xử lý các trường dữ liệu có thể có tên khác nhau (camelCase vs PascalCase)
+                    var id = treatment.maDieuTri || treatment.MaDieuTri || treatment.id || treatment.Id || 0;
+                    var name = treatment.tenDieuTri || treatment.TenDieuTri || treatment.name || treatment.Name || "Không rõ tên";
+                    var cost = treatment.chiPhi || treatment.ChiPhi || treatment.cost || treatment.Cost || 0;
+                    var desc = treatment.moTa || treatment.MoTa || treatment.description || treatment.Description || "Không có mô tả";
+                    
+                    // Log thông tin dữ liệu từng bản ghi để kiểm tra
+                    console.log("ID: " + id + ", Tên: " + name + ", Giá: " + cost + ", Mô tả: " + desc);
+                    
+                    // Cập nhật bảng dữ liệu
                     var row = $('<tr class="treatment-option">');
-                    row.append('<td><div class="form-check"><input class="form-check-input treatment-checkbox" type="checkbox" data-id="' + treatment.maDieuTri + '" id="dieuTri' + treatment.maDieuTri + '"><label class="form-check-label" for="dieuTri' + treatment.maDieuTri + '"></label></div></td>');
-                    row.append('<td><label for="dieuTri' + treatment.maDieuTri + '" class="cursor-pointer fw-medium">' + treatment.tenDieuTri + '</label></td>');
-                    row.append('<td>' + (treatment.moTa || 'Không có mô tả') + '</td>');
-                    row.append('<td class="text-end">' + formatCurrency(treatment.chiPhi) + '</td>');
-                    treatmentTableBody.append(row);
+                    row.append('<td><div class="form-check"><input class="form-check-input treatment-checkbox" type="checkbox" data-id="' + id + '" id="dieuTri' + id + '"><label class="form-check-label" for="dieuTri' + id + '"></label></div></td>');
+                    row.append('<td><label for="dieuTri' + id + '" class="cursor-pointer fw-medium">' + name + '</label></td>');
+                    row.append('<td>' + desc + '</td>');
+                    row.append('<td class="text-end">' + formatCurrency(cost) + '</td>');
+                    $('#treatmentTableBody').append(row);
+                    
+                    // Lưu thông tin chi tiết
+                    allTreatmentDetails[id] = { 
+                        id: id, 
+                        name: name, 
+                        cost: cost,
+                        desc: desc
+                    };
+                    allTreatmentCosts[id] = cost;
                 });
-
-                // Đăng ký sự kiện cho các checkbox hình thức điều trị
+                
+                // Đăng ký sự kiện cho các checkbox
                 $('.treatment-checkbox').change(function() {
                     updateTotalCost();
                     updateHiddenTreatmentFields();
                 });
                 
-                // Cập nhật tổng chi phí ban đầu
-                updateTotalCost();
-                
-                // Thêm container cho hidden fields nếu chưa có
+                // Tạo container cho hidden fields nếu chưa có
                 if ($('#treatmentIdsContainer').length === 0) {
-                    $('form').append('<div id="treatmentIdsContainer"></div>');
+                    $('#createForm').append('<div id="treatmentIdsContainer" style="display:none;"></div>');
                 }
-                
-                // Cập nhật hidden fields ban đầu
-                updateHiddenTreatmentFields();
             }
             
             // Tính tổng chi phí khi chọn hình thức điều trị
@@ -427,34 +657,13 @@
                 });
                 
                 // Cập nhật hiển thị tổng chi phí
-                $('#totalCost').text(formatCurrency(totalCost));
-            }
-
-            // Tạo dữ liệu chi phí mẫu nếu không tải được từ API
-            function mockTreatmentCosts() {
-                allTreatmentCosts = {
-                    '1': 1500000,
-                    '2': 2000000,
-                    '3': 3000000,
-                    '4': 500000,
-                    '5': 1000000
-                };
-                
-                allTreatmentDetails = {
-                    '1': { maDieuTri: '1', tenDieuTri: 'Siêu âm', chiPhi: 1500000 },
-                    '2': { maDieuTri: '2', tenDieuTri: 'X-quang', chiPhi: 2000000 },
-                    '3': { maDieuTri: '3', tenDieuTri: 'MRI', chiPhi: 3000000 },
-                    '4': { maDieuTri: '4', tenDieuTri: 'Xét nghiệm máu', chiPhi: 500000 },
-                    '5': { maDieuTri: '5', tenDieuTri: 'CT Scan', chiPhi: 1000000 }
-                };
-                
-                var mockTreatments = Object.values(allTreatmentDetails);
-                updateTreatmentTable(mockTreatments);
+                $('#totalTreatmentCost').text(formatCurrency(totalCost));
             }
 
             // Định dạng tiền tệ
             function formatCurrency(amount) {
-                return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+                if (amount === undefined || amount === null) return '0 VND';
+                return new Intl.NumberFormat('vi-VN').format(amount) + ' VND';
             }
 
             // Cập nhật danh sách bác sĩ dựa trên dữ liệu từ API
@@ -475,7 +684,24 @@
             
             // Kiểm tra nếu đã chọn khoa thì hiển thị hình thức điều trị
             if($('#khoaSelect').val()) {
+                var selectedVal = $('#khoaSelect').val();
+                var selectedText = $('#khoaSelect option:selected').text();
+                console.log("Khoa đã được chọn từ đầu:", selectedVal, "-", selectedText);
                 $('#khoaSelect').trigger('change');
+            } else {
+                // Kiểm tra xem dropdown khoa có options không
+                var optionCount = $('#khoaSelect option').length;
+                console.log("Số lượng options trong dropdown khoa:", optionCount);
+                
+                if (optionCount <= 1) {
+                    // Chỉ có option mặc định "-- Chọn khoa --"
+                    console.warn("Dropdown khoa không có dữ liệu. Cần kiểm tra vì sao không tải được danh sách khoa.");
+                }
+                
+                // Hiển thị tất cả các options để debug
+                $('#khoaSelect option').each(function() {
+                    console.log("Khoa option:", $(this).val(), "-", $(this).text());
+                });
             }
             
             // Kiểm tra trước khi submit
@@ -501,7 +727,8 @@
                 // Kiểm tra nếu cần bác sĩ phụ trách
                 if (isThemDieuTri && 
                     $('.treatment-checkbox:checked').length > 0 && 
-                    (!$('#MaBacSi').val() || $('#MaBacSi').val() === '')) {
+                    (!$('#MaBacSi').val() || $('#MaBacSi').val() === '') &&
+                    !isBacSiLocked) { // Không cần kiểm tra bác sĩ khi trường đã bị lock (tự động chọn)
                     
                     e.preventDefault();
                     
@@ -553,133 +780,475 @@
 
             // Hàm để tải thông tin chi tiết về các hình thức điều trị
             function loadTreatmentDetails(maKhoa) {
-                if (!maKhoa) {
-                    $('#emptyKhoaAlert').show();
-                    $('#hinhThucDieuTriContainer').hide();
-                    return;
+                console.log("Bắt đầu tải hình thức điều trị cho khoa: " + maKhoa);
+                $('#loadingTreatments').show();
+                $('#hinhThucDieuTriContainer').hide();
+                $('#emptyKhoaAlert').hide();
+                $('#noTreatmentsAlert').hide();
+                
+                // Mảng các URL API để thử
+                var apiUrls = [
+                    '/api/HinhThucDieuTri/ByKhoa/' + maKhoa,
+                    '/api/HinhThucDieuTriApi/ByKhoa/' + maKhoa
+                ];
+                
+                var apiCallSuccess = false;
+                var apiCallIndex = 0;
+                
+                tryNextApi();
+                
+                function tryNextApi() {
+                    if (apiCallIndex >= apiUrls.length) {
+                        if (!apiCallSuccess) {
+                            console.error("Tất cả các API call đều thất bại");
+                            $('#loadingTreatments').hide();
+                            $('#noTreatmentsAlert').text('Không thể tải dữ liệu điều trị. Vui lòng thử lại sau.').show();
+                            
+                            // Sử dụng dữ liệu mẫu để kiểm tra
+                            useMockData();
+                        }
+                        return;
+                    }
+                    
+                    var currentUrl = apiUrls[apiCallIndex];
+                    console.log("Đang thử API: " + currentUrl);
+                    
+                    $.ajax({
+                        url: currentUrl,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(data) {
+                            console.log("API thành công: " + currentUrl);
+                            console.log("Dữ liệu nhận được:", data);
+                            
+                            apiCallSuccess = true;
+                            
+                            // Xử lý dữ liệu API - kiểm tra xem có bọc trong property 'value' không
+                            var treatments = [];
+                            
+                            if (Array.isArray(data)) {
+                                treatments = data;
+                            } else if (data && typeof data === 'object') {
+                                // Kiểm tra nếu là object với property value (từ OkResult)
+                                if (data.value && Array.isArray(data.value)) {
+                                    treatments = data.value;
+                                } else {
+                                    // Có thể là một object đơn lẻ
+                                    treatments = [data];
+                                }
+                            }
+                            
+                            console.log("Treatments sau khi xử lý:", treatments);
+                            
+                            if (!treatments || treatments.length === 0) {
+                                console.log("Không có dữ liệu điều trị");
+                                $('#loadingTreatments').hide();
+                                $('#noTreatmentsAlert').text('Không có hình thức điều trị nào cho khoa này').show();
+                                return;
+                            }
+                            
+                            // Log ví dụ một phần tử đầu tiên để kiểm tra cấu trúc
+                            if (treatments.length > 0) {
+                                console.log("Mẫu dữ liệu:", treatments[0]);
+                                
+                                // Kiểm tra các thuộc tính có trong item đầu tiên
+                                var firstItem = treatments[0];
+                                console.log("Các thuộc tính có sẵn:", Object.keys(firstItem));
+                            }
+                            
+                            // Lưu vào biến toàn cục
+                            window.treatments = treatments;
+                            updateTreatmentTable(treatments);
+                            $('#loadingTreatments').hide();
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("API lỗi: " + currentUrl, error);
+                            console.log("Status: " + xhr.status);
+                            console.log("Response: " + xhr.responseText);
+                            
+                            apiCallIndex++;
+                            tryNextApi();
+                        }
+                    });
                 }
                 
-                $('#emptyKhoaAlert').hide();
-                
-                // Tải danh sách bác sĩ theo khoa
-                $.ajax({
-                    url: '/api/BacSiApi/ByKhoa/' + maKhoa,
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function(doctors) {
-                        updateDoctorList(doctors);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("Lỗi khi tải danh sách bác sĩ:", error);
+                function useMockData() {
+                    console.log("Sử dụng dữ liệu mẫu để kiểm tra giao diện");
+                    
+                    // Kiểm tra xem có dữ liệu từ API diagnostics không
+                    if (window.cachedAPIData && window.cachedAPIData.length > 0) {
+                        console.log("Sử dụng dữ liệu đã được cache từ API diagnostics:", window.cachedAPIData.length, "records");
+                        $('#noTreatmentsMessage').text('Đang sử dụng dữ liệu cache từ API khác. Có thể không chính xác cho khoa này.');
+                        
+                        var filteredData = window.cachedAPIData;
+                        
+                        // Nếu có mã khoa, lọc dữ liệu cho khoa đó
+                        var maKhoa = $('#khoaSelect').val();
+                        if (maKhoa) {
+                            filteredData = window.cachedAPIData.filter(function(item) {
+                                var itemKhoaId = item.maKhoa || item.MaKhoa;
+                                return itemKhoaId == maKhoa;
+                            });
+                            
+                            if (filteredData.length === 0) {
+                                // Nếu không có dữ liệu cho khoa này, dùng tất cả dữ liệu
+                                filteredData = window.cachedAPIData;
+                            }
+                        }
+                        
+                        updateTreatmentTable(filteredData);
+                        return;
                     }
-                });
+                    
+                    // Nếu không có dữ liệu từ API, dùng dữ liệu mẫu cố định
+                    var mockData = [
+                        { maDieuTri: 1, tenDieuTri: "Khám tổng quát", chiPhi: 150000, moTa: "Khám sức khỏe tổng quát", maKhoa: $('#khoaSelect').val() || 1 },
+                        { maDieuTri: 2, tenDieuTri: "Siêu âm", chiPhi: 200000, moTa: "Siêu âm tổng quát", maKhoa: $('#khoaSelect').val() || 1 },
+                        { maDieuTri: 3, tenDieuTri: "Xét nghiệm máu", chiPhi: 100000, moTa: "Xét nghiệm máu cơ bản", maKhoa: $('#khoaSelect').val() || 1 },
+                        { maDieuTri: 4, tenDieuTri: "Nội soi", chiPhi: 300000, moTa: "Nội soi đường tiêu hóa", maKhoa: $('#khoaSelect').val() || 1 },
+                        { maDieuTri: 5, tenDieuTri: "Chụp X-quang", chiPhi: 180000, moTa: "Chụp X-quang tổng quát", maKhoa: $('#khoaSelect').val() || 1 }
+                    ];
+                    
+                    $('#noTreatmentsMessage').text('Đang sử dụng dữ liệu mẫu. Đây KHÔNG phải dữ liệu thực từ cơ sở dữ liệu.');
+                    updateTreatmentTable(mockData);
+                }
+            }
+            
+            // Function to try fetching all treatments at once and cache them
+            function tryFetchAllTreatments() {
+                // Try different URLs that might contain treatment data
+                var possibleUrls = [
+                    '/api/HinhThucDieuTriApi',
+                    '/api/HinhThucDieuTri',
+                    '/api/HinhThucDieuTriApi/GetAll',
+                    '/api/HinhThucDieuTri/GetAll',
+                    '/HinhThucDieuTri/GetJsonData',
+                    '/HinhThucDieuTri/GetData'
+                ];
                 
-                // Tải hình thức điều trị theo khoa
-                $.ajax({
-                    url: '/api/HinhThucDieuTriApi/ByKhoa/' + maKhoa,
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function(treatments) {
-                        console.log("Đã nhận được các hình thức điều trị:", treatments);
-                        
-                        // Lưu thông tin chi tiết và chi phí của các hình thức điều trị
-                        allTreatmentDetails = {};
-                        allTreatmentCosts = {};
-                        
-                        treatments.forEach(treatment => {
-                            allTreatmentDetails[treatment.maDieuTri] = treatment;
-                            allTreatmentCosts[treatment.maDieuTri] = treatment.chiPhi;
-                        });
-                        
-                        // Cập nhật bảng hình thức điều trị
-                        updateTreatmentTable(treatments);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("Lỗi khi tải hình thức điều trị:", error);
-                        // Sử dụng dữ liệu mẫu nếu API lỗi
-                        mockTreatmentCosts();
+                console.log("Trying to preload all treatments from possible URLs");
+                
+                // Global variable to store all treatments if fetched
+                window.allTreatmentsBackup = null;
+                
+                // Try each URL
+                function tryNextUrl(index) {
+                    if (index >= possibleUrls.length) {
+                        console.log("Could not preload treatments from any URL");
+                        return;
                     }
-                });
+                    
+                    var url = possibleUrls[index];
+                    console.log("Trying to fetch all treatments from:", url);
+                    
+                    $.ajax({
+                        url: url,
+                        type: 'GET',
+                        dataType: 'json',
+                        timeout: 3000,
+                        success: function(data) {
+                            // Check if the data looks like treatments
+                            if (Array.isArray(data) && data.length > 0 && 
+                                (data[0].maDieuTri !== undefined || data[0].MaDieuTri !== undefined)) {
+                                console.log("✓ Successfully preloaded all treatments from:", url);
+                                console.log("Total treatments preloaded:", data.length);
+                                
+                                // Normalize the data (handle different property casings)
+                                var normalizedData = data.map(function(item) {
+                                    return {
+                                        maDieuTri: item.maDieuTri || item.MaDieuTri,
+                                        tenDieuTri: item.tenDieuTri || item.TenDieuTri,
+                                        chiPhi: item.chiPhi || item.ChiPhi,
+                                        moTa: item.moTa || item.MoTa,
+                                        maKhoa: item.maKhoa || item.MaKhoa
+                                    };
+                                });
+                                
+                                // Save to global backup
+                                window.allTreatmentsBackup = normalizedData;
+                            } else {
+                                console.log("✗ URL returned data but it doesn't look like treatments:", url);
+                                tryNextUrl(index + 1);
+                            }
+                        },
+                        error: function() {
+                            console.log("✗ Failed to load from:", url);
+                            tryNextUrl(index + 1);
+                        }
+                    });
+                }
+                
+                // Start trying URLs
+                tryNextUrl(0);
+            }
+            
+            // Function to use the preloaded treatments as a last resort
+            function usePreloadedTreatments(maKhoa) {
+                console.log("Attempting to use preloaded treatments for department:", maKhoa);
+                
+                if (window.allTreatmentsBackup && Array.isArray(window.allTreatmentsBackup)) {
+                    // Filter treatments by the selected department
+                    var departmentTreatments = window.allTreatmentsBackup.filter(function(t) {
+                        return t.maKhoa == maKhoa;
+                    });
+                    
+                    if (departmentTreatments.length > 0) {
+                        console.log("Found", departmentTreatments.length, "preloaded treatments for department", maKhoa);
+                        
+                        // Show a warning that we're using cached data
+                        var warningHtml = '<div class="alert alert-warning alert-dismissible fade show mb-3" role="alert">' +
+                            '<i class="fas fa-exclamation-triangle me-2"></i>' +
+                            'Đang sử dụng dữ liệu đã được tải trước. Một số thông tin có thể không được cập nhật.' +
+                            '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                            '</div>';
+                        
+                        $('#hinhThucDieuTriContainer').prepend(warningHtml);
+                        
+                        // Process the treatments
+                        processReceivedTreatments(departmentTreatments);
+                        return true;
+                    } else {
+                        console.log("No preloaded treatments found for department", maKhoa);
+                    }
+                } else {
+                    console.log("No preloaded treatments available");
+                }
+                
+                return false;
             }
 
             // Cập nhật hidden fields cho hình thức điều trị
             function updateHiddenTreatmentFields() {
-                var container = $('#treatmentIdsContainer');
+                // Xóa các hidden field cũ
+                $('#treatmentIdsContainer').empty();
                 
-                // Xóa hết các hidden fields hiện tại
-                container.empty();
+                // Lấy các ID của các điều trị đã chọn
+                var selectedTreatments = [];
+                $('.treatment-checkbox:checked').each(function() {
+                    var treatmentId = $(this).data('id');
+                    selectedTreatments.push(treatmentId);
+                    
+                    // Thêm hidden input cho mỗi điều trị được chọn
+                    $('#treatmentIdsContainer').append(
+                        $('<input type="hidden" name="HinhThucDieuTriIds" />')
+                            .val(treatmentId)
+                    );
+                });
                 
-                // Lấy danh sách ID các hình thức điều trị được chọn
-                var selectedIds = $('.treatment-checkbox:checked').map(function() { 
-                    return $(this).data('id'); 
-                }).get();
-                
-                // Thêm hidden field cho mỗi hình thức điều trị được chọn
-                for(var i = 0; i < selectedIds.length; i++) {
-                    container.append('<input type="hidden" name="HinhThucDieuTriIds[' + i + ']" value="' + selectedIds[i] + '" />');
+                // Cập nhật các trường static nếu có
+                if ($('#staticSelectedTreatments').length > 0) {
+                    $('#staticSelectedTreatments').val(selectedTreatments.join(','));
                 }
                 
-                // Debug log
-                console.log("Updated treatment hidden fields with values: ", selectedIds);
+                console.log("Đã cập nhật " + selectedTreatments.length + " hidden fields cho điều trị: " + selectedTreatments.join(', '));
             }
 
-            // Add debug button handler
-            $('#debugBtn').click(function() {
-                // Hiển thị hộp thoại debug
-                var formData = {};
-                var serializedForm = $('form').serializeArray();
+            // Thêm xử lý cho nút debug
+            $('#btnDebugData').click(function() {
+                var debugOutput = $('#debugOutput');
+                var debugContainer = $('#debugOutputContainer');
                 
-                serializedForm.forEach(function(item) {
-                    if (formData[item.name]) {
-                        if (!Array.isArray(formData[item.name])) {
-                            formData[item.name] = [formData[item.name]];
-                        }
-                        formData[item.name].push(item.value);
-                    } else {
-                        formData[item.name] = item.value;
-                    }
-                });
-                
-                // Kiểm tra xem trường ThemDieuTri đã được submit chưa
-                var themDieuTriChecked = $('#themDieuTriSwitch').is(':checked');
-                if (formData['ThemDieuTri'] === undefined) {
-                    formData['ThemDieuTri'] = themDieuTriChecked.toString();
+                // Hiển thị container nếu ẩn, ẩn nếu đang hiển thị
+                if (debugContainer.is(':visible')) {
+                    debugContainer.hide();
+                } else {
+                    // Lấy thông tin debug
+                    var debugInfo = {
+                        'Form ID': $('#createForm').attr('id'),
+                        'Selected Department': {
+                            'ID': $('#khoaSelect').val(),
+                            'Name': $('#khoaSelect option:selected').text()
+                        },
+                        'API Data': {
+                            'Treatments Count': window.treatments ? window.treatments.length : 0,
+                            'First Treatment': window.treatments && window.treatments.length > 0 ? window.treatments[0] : null,
+                            'Available Fields': window.treatments && window.treatments.length > 0 ? Object.keys(window.treatments[0]) : []
+                        },
+                        'Selections': {
+                            'Selected Treatment IDs': $('.treatment-checkbox:checked').map(function() { 
+                                return $(this).data('id'); 
+                            }).get(),
+                            'All Treatment Details': allTreatmentDetails,
+                            'Hidden Fields Content': $('#treatmentIdsContainer').html()
+                        },
+                        'Hidden Fields': $('input[type="hidden"]').map(function() {
+                            return {
+                                name: this.name,
+                                value: this.value
+                            };
+                        }).get()
+                    };
+                    
+                    // Cập nhật nội dung debug
+                    debugOutput.text(JSON.stringify(debugInfo, null, 2));
+                    debugContainer.show();
+                }
+            });
+
+            // Xử lý sự kiện cho nút Save
+            $('#btnSave').click(function() {
+                // Kiểm tra xem đã chọn khoa chưa
+                if (!$('#khoaSelect').val()) {
+                    alert('Vui lòng chọn khoa trước khi lưu!');
+                    return;
                 }
                 
-                // Đảm bảo giá trị chính xác của ThemDieuTri
-                $('#themDieuTriSwitch').val(themDieuTriChecked);
+                // Kiểm tra xem đã chọn giường chưa
+                if (!$('#MaGiuong').val()) {
+                    alert('Vui lòng chọn giường trước khi lưu!');
+                    return;
+                }
                 
-                // Format dữ liệu
-                var debugText = '<pre>' + JSON.stringify(formData, null, 2) + '</pre>';
-                
-                // Tạo và hiển thị modal
-                $('body').append(`
-                    <div class="modal fade" id="debugModal" tabindex="-1">
-                        <div class="modal-dialog modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Form Data Debug</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    ${debugText}
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `);
-                
-                var debugModal = new bootstrap.Modal(document.getElementById('debugModal'));
-                debugModal.show();
-                
-                // Xóa modal khi ẩn
-                $('#debugModal').on('hidden.bs.modal', function() {
-                    $(this).remove();
-                });
+                // Submit form
+                $('#createForm').submit();
             });
+
+            // Sự kiện reload treatments
+            $('#btnReloadTreatments').click(function(e) {
+                e.preventDefault();
+                
+                var maKhoa = $('#khoaSelect').val();
+                if (!maKhoa) {
+                    alert("Vui lòng chọn khoa trước khi tải dữ liệu điều trị.");
+                    return;
+                }
+                
+                // Hiển thị thông báo đang tải
+                $('#noTreatmentsAlert').hide();
+                $('#loadingTreatments').show();
+                
+                console.log("Đang thử tải lại dữ liệu điều trị cho khoa:", maKhoa);
+                
+                // Thử tải lại từ cả hai API endpoint
+                loadTreatmentDetails(maKhoa);
+            });
+
+            // Run API diagnostics on page load
+            runApiDiagnostics();
         });
+
+        // Function to run auto diagnosis when page loads
+        function runApiDiagnostics() {
+            console.log("Auto-running API diagnostics...");
+            
+            // Danh sách tất cả endpoints có thể chứa dữ liệu hình thức điều trị
+            var allPossibleEndpoints = [
+                '/api/HinhThucDieuTri',
+                '/api/HinhThucDieuTriApi',
+                '/api/HinhThucDieuTri/GetAll',
+                '/api/HinhThucDieuTriApi/GetAll'
+            ];
+            
+            // Thêm endpoints với department ID
+            var testKhoaId = 1; // Sử dụng ID 1 để test
+            var departmentEndpoints = [
+                '/api/HinhThucDieuTri/ByKhoa/' + testKhoaId,
+                '/api/HinhThucDieuTriApi/ByKhoa/' + testKhoaId
+            ];
+            
+            // Kết hợp tất cả endpoints cần kiểm tra
+            var allEndpoints = allPossibleEndpoints.concat(departmentEndpoints);
+            
+            // Biến lưu trữ kết quả
+            var results = {};
+            var successCount = 0;
+            
+            // Hàm kiểm tra từng endpoint
+            function testEndpoint(index) {
+                if (index >= allEndpoints.length) {
+                    // Đã kiểm tra xong tất cả
+                    console.log("API Diagnostic complete. Results:", results);
+                    console.log(`${successCount}/${allEndpoints.length} endpoints returned data.`);
+                    
+                    // Lưu lại data thành công từ bất kỳ endpoint nào (ưu tiên endpoint đầy đủ hơn)
+                    var successfulEndpoints = Object.keys(results).filter(function(endpoint) {
+                        return results[endpoint].status === 'success' && 
+                               results[endpoint].dataLength !== 'not array' && 
+                               results[endpoint].dataLength > 0;
+                    });
+                    
+                    if (successfulEndpoints.length > 0) {
+                        // Sắp xếp các endpoint thành công theo độ lớn của data
+                        successfulEndpoints.sort(function(a, b) {
+                            return results[b].dataLength - results[a].dataLength;
+                        });
+                        
+                        // Lấy endpoint có nhiều data nhất
+                        var bestEndpoint = successfulEndpoints[0];
+                        console.log("Best endpoint for caching:", bestEndpoint, "with", results[bestEndpoint].dataLength, "records");
+                        
+                        // Tải data từ endpoint tốt nhất để cache
+                        $.ajax({
+                            url: bestEndpoint,
+                            type: 'GET',
+                            dataType: 'json',
+                            success: function(data) {
+                                // Lưu data vào biến toàn cục cho sử dụng sau này
+                                if (Array.isArray(data)) {
+                                    window.cachedAPIData = data;
+                                } else if (data && data.value && Array.isArray(data.value)) {
+                                    window.cachedAPIData = data.value;
+                                } else {
+                                    console.log("Failed to cache API data - unexpected format");
+                                }
+                                
+                                if (window.cachedAPIData) {
+                                    console.log("Cached", window.cachedAPIData.length, "records from", bestEndpoint);
+                                }
+                            },
+                            error: function() {
+                                console.log("Failed to cache data from:", bestEndpoint);
+                            }
+                        });
+                    }
+                    
+                    // Kiểm tra nếu không có endpoint nào hoạt động, hiển thị thông báo
+                    if (successCount === 0) {
+                        console.error("WARNING: All API endpoints failed. The form may not work correctly.");
+                    }
+                    
+                    return;
+                }
+                
+                var endpoint = allEndpoints[index];
+                console.log(`Testing endpoint (${index+1}/${allEndpoints.length}): ${endpoint}`);
+                
+                $.ajax({
+                    url: endpoint,
+                    type: 'GET',
+                    dataType: 'json',
+                    timeout: 3000,
+                    success: function(data) {
+                        var dataLength = Array.isArray(data) ? data.length : 
+                                        (data && data.value && Array.isArray(data.value)) ? data.value.length : 'not array';
+                        
+                        console.log(`✅ ${endpoint}: Success, data length: ${dataLength}`);
+                        results[endpoint] = {
+                            status: 'success',
+                            dataLength: dataLength
+                        };
+                        
+                        successCount++;
+                        
+                        // Tiếp tục với endpoint tiếp theo
+                        testEndpoint(index + 1);
+                    },
+                    error: function(xhr, status, error) {
+                        console.log(`❌ ${endpoint}: ${status}, ${error}`);
+                        results[endpoint] = {
+                            status: 'error',
+                            errorMsg: error,
+                            statusCode: xhr.status
+                        };
+                        
+                        // Tiếp tục với endpoint tiếp theo
+                        testEndpoint(index + 1);
+                    }
+                });
+            }
+            
+            // Bắt đầu kiểm tra
+            testEndpoint(0);
+        }
     </script>
 }

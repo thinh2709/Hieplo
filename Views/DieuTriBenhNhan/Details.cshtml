@@ -19,7 +19,15 @@
                     <dd class="col-sm-8">@Model.MaDieuTriBenhNhan</dd>
 
                     <dt class="col-sm-4">Bệnh nhân:</dt>
-                    <dd class="col-sm-8">@Model.BenhNhan.HoTen</dd>
+                    <dd class="col-sm-8">
+                        @Model.BenhNhan.HoTen
+                        @if (Model.MaBenhNhan.HasValue)
+                        {
+                            <a href="@Url.Action("Details", "BenhNhan", new {id = Model.MaBenhNhan.Value})" class="ml-2 btn btn-sm btn-outline-primary">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        }
+                    </dd>
 
                     <dt class="col-sm-4">Hình thức điều trị:</dt>
                     <dd class="col-sm-8">@Model.HinhThucDieuTri.TenDieuTri</dd>
@@ -53,5 +61,11 @@
     <div class="card-footer">
         <a asp-action="Edit" asp-route-id="@Model.MaDieuTriBenhNhan" class="btn btn-warning">Sửa</a>
         <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+        @if (Model.MaBenhNhan.HasValue)
+        {
+            <a href="@Url.Action("Details", "BenhNhan", new {id = Model.MaBenhNhan.Value})" class="btn btn-info">
+                <i class="fas fa-user-injured me-2"></i> Xem chi tiết bệnh nhân
+            </a>
+        }
     </div>
 </div>

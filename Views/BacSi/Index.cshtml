@@ -87,7 +87,13 @@
                             <td>@item.Khoa?.TenKhoa</td>
                             <td>@item.SoDienThoai</td>
                             <td>@item.Email</td>
-                            <td>@(item.BenhNhans?.Count() ?? 0)</td>
+                            <td>
+                                <span class="badge bg-primary">Tổng: @(item.BenhNhans?.Count() ?? 0)</span>
+                                @if (ViewData[$"SoBenhNhanDangDieuTri_{item.MaBacSi}"] != null)
+                                {
+                                    <span class="badge bg-success ms-1">Đang điều trị: @ViewData[$"SoBenhNhanDangDieuTri_{item.MaBacSi}"]</span>
+                                }
+                            </td>
                             <td>
                                 @if (item.TrangThai)
                                 {

@@ -1,0 +1,247 @@
+@{
+    ViewData["Title"] = "Sửa lỗi cơ sở dữ liệu";
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Công cụ sửa lỗi cơ sở dữ liệu</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <p><strong>Lỗi hiện tại:</strong> Invalid object name 'hinhthuctrilieus'</p>
+                        <p>Công cụ này sẽ giúp bạn tạo bảng cần thiết và thêm dữ liệu mẫu để ứng dụng hoạt động đúng.</p>
+                    </div>
+                    
+                    <div class="d-flex gap-2 mb-4">
+                        <button id="btnCheckTables" class="btn btn-primary">
+                            <i class="fas fa-database me-2"></i>Kiểm tra bảng dữ liệu
+                        </button>
+                        <button id="btnCreateTable" class="btn btn-success" disabled>
+                            <i class="fas fa-table me-2"></i>Tạo bảng HinhThucDieuTris
+                        </button>
+                        <button id="btnAddSampleData" class="btn btn-info" disabled>
+                            <i class="fas fa-file-import me-2"></i>Thêm dữ liệu mẫu
+                        </button>
+                    </div>
+                    
+                    <div id="statusContainer" class="mb-3" style="display: none;">
+                        <div class="alert" id="statusMessage"></div>
+                    </div>
+                    
+                    <div id="tableListContainer" style="display: none;">
+                        <h5>Danh sách bảng trong cơ sở dữ liệu:</h5>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Tên đầy đủ</th>
+                                        <th>Số cột</th>
+                                        <th>Trạng thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableList"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Hướng dẫn sửa lỗi</h5>
+                </div>
+                <div class="card-body">
+                    <ol>
+                        <li>Click <strong>Kiểm tra bảng dữ liệu</strong> để xem danh sách bảng hiện có</li>
+                        <li>Nếu không có bảng <code>HinhThucDieuTris</code>, click <strong>Tạo bảng HinhThucDieuTris</strong></li>
+                        <li>Sau khi tạo bảng thành công, click <strong>Thêm dữ liệu mẫu</strong> để thêm dữ liệu mẫu vào bảng</li>
+                        <li>Sau khi hoàn thành, bạn có thể quay lại trang bệnh nhân để kiểm tra xem lỗi đã được khắc phục chưa</li>
+                    </ol>
+                    
+                    <div class="alert alert-warning mt-3">
+                        <h6>Thông tin kỹ thuật:</h6>
+                        <p>Lỗi này xảy ra do cấu hình trong code đang cố gắng sử dụng bảng <code>hinhthuctrilieus</code> nhưng bảng này không tồn tại trong cơ sở dữ liệu. Chúng tôi đã thay đổi cấu hình để sử dụng tên bảng chuẩn <code>HinhThucDieuTris</code>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Biến để theo dõi trạng thái
+            let hasTable = false;
+            
+            // Handler khi click nút kiểm tra bảng
+            $('#btnCheckTables').click(function() {
+                checkTables();
+            });
+            
+            // Handler khi click nút tạo bảng
+            $('#btnCreateTable').click(function() {
+                createTable();
+            });
+            
+            // Handler khi click nút thêm dữ liệu mẫu
+            $('#btnAddSampleData').click(function() {
+                addSampleData();
+            });
+            
+            // Hàm kiểm tra bảng
+            function checkTables() {
+                showStatus('info', 'Đang kiểm tra bảng dữ liệu...', true);
+                
+                $.ajax({
+                    url: '/api/tables',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.error) {
+                            showStatus('danger', 'Lỗi: ' + data.error);
+                            return;
+                        }
+                        
+                        // Hiển thị danh sách bảng
+                        $('#tableListContainer').show();
+                        $('#tableList').empty();
+                        
+                        if (data.tables && data.tables.length > 0) {
+                            $.each(data.tables, function(i, table) {
+                                let statusClass = '';
+                                let statusText = '';
+                                
+                                // Check if this is the table we need
+                                if (table.name.toLowerCase() === 'hinhthucdieutris') {
+                                    hasTable = true;
+                                    statusClass = 'success';
+                                    statusText = 'Bảng cần thiết';
+                                }
+                                // Check for tables with similar names
+                                else if (table.name.toLowerCase().includes('hinhthuc') || 
+                                         table.name.toLowerCase().includes('dieutri') ||
+                                         table.name.toLowerCase().includes('trilieu')) {
+                                    statusClass = 'warning';
+                                    statusText = 'Tên bảng tương tự';
+                                }
+                                
+                                $('#tableList').append(`
+                                    <tr>
+                                        <td>${table.fullName}</td>
+                                        <td>${table.columnCount}</td>
+                                        <td>${statusText ? '<span class="badge bg-' + statusClass + '">' + statusText + '</span>' : ''}</td>
+                                    </tr>
+                                `);
+                            });
+                        } else {
+                            $('#tableList').append('<tr><td colspan="3" class="text-center">Không tìm thấy bảng nào</td></tr>');
+                        }
+                        
+                        // Cập nhật trạng thái
+                        hasTable = data.hasHinhThucDieuTrisTable;
+                        
+                        if (hasTable) {
+                            showStatus('success', 'Bảng HinhThucDieuTris đã tồn tại!');
+                            $('#btnCreateTable').prop('disabled', true);
+                            $('#btnAddSampleData').prop('disabled', false);
+                        } else {
+                            showStatus('warning', 'Không tìm thấy bảng HinhThucDieuTris! Bạn cần tạo bảng này.');
+                            $('#btnCreateTable').prop('disabled', false);
+                            $('#btnAddSampleData').prop('disabled', true);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        showStatus('danger', 'Lỗi khi kiểm tra bảng: ' + error);
+                    }
+                });
+            }
+            
+            // Hàm tạo bảng
+            function createTable() {
+                showStatus('info', 'Đang tạo bảng HinhThucDieuTris...', true);
+                
+                $.ajax({
+                    url: '/api/create-table',
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.error) {
+                            showStatus('danger', 'Lỗi khi tạo bảng: ' + data.error);
+                            return;
+                        }
+                        
+                        showStatus('success', data.message);
+                        $('#btnCreateTable').prop('disabled', true);
+                        $('#btnAddSampleData').prop('disabled', false);
+                        
+                        // Kiểm tra lại danh sách bảng
+                        setTimeout(checkTables, 1000);
+                    },
+                    error: function(xhr, status, error) {
+                        showStatus('danger', 'Lỗi khi tạo bảng: ' + error);
+                    }
+                });
+            }
+            
+            // Hàm thêm dữ liệu mẫu
+            function addSampleData() {
+                showStatus('info', 'Đang thêm dữ liệu mẫu...', true);
+                
+                $.ajax({
+                    url: '/api/add-sample-data',
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.error) {
+                            showStatus('danger', 'Lỗi khi thêm dữ liệu mẫu: ' + data.error);
+                            return;
+                        }
+                        
+                        showStatus('success', data.message);
+                        
+                        // Thêm link để quay lại trang bệnh nhân
+                        $('#statusMessage').append(`
+                            <div class="mt-2">
+                                <a href="/BenhNhan/Create" class="btn btn-primary">
+                                    <i class="fas fa-user-plus me-2"></i>Tạo bệnh nhân mới
+                                </a>
+                            </div>
+                        `);
+                    },
+                    error: function(xhr, status, error) {
+                        showStatus('danger', 'Lỗi khi thêm dữ liệu mẫu: ' + error);
+                    }
+                });
+            }
+            
+            // Hàm hiển thị thông báo trạng thái
+            function showStatus(type, message, isLoading) {
+                $('#statusContainer').show();
+                $('#statusMessage')
+                    .removeClass('alert-info alert-success alert-warning alert-danger')
+                    .addClass('alert-' + type);
+                
+                let content = message;
+                if (isLoading) {
+                    content = `<div class="d-flex align-items-center">
+                        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                        <span>${message}</span>
+                    </div>`;
+                }
+                
+                $('#statusMessage').html(content);
+            }
+            
+            // Tự động kiểm tra bảng khi tải trang
+            checkTables();
+        });
+    </script>
+} 

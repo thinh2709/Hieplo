@@ -36,6 +36,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/thinh/Downloads/Hieplo-main/Hieplo-main/Hieplo/QuanLyBenhVienNoiTru/Views/Account/Profile.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxQcm9maWxlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/thinh/Downloads/Hieplo-main/Hieplo-main/Hieplo/QuanLyBenhVienNoiTru/Views/Account/Register.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -132,6 +136,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2hpUGhpRGlldVRyaVxUaGFuaFRvYW4uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/thinh/Downloads/Hieplo-main/Hieplo-main/Hieplo/QuanLyBenhVienNoiTru/Views/DatabaseFix/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGF0YWJhc2VGaXhcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/thinh/Downloads/Hieplo-main/Hieplo-main/Hieplo/QuanLyBenhVienNoiTru/Views/DieuTriBenhNhan/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGlldVRyaUJlbmhOaGFuXENyZWF0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -198,6 +206,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/thinh/Downloads/Hieplo-main/Hieplo-main/Hieplo/QuanLyBenhVienNoiTru/Views/HinhThucDieuTri/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSGluaFRodWNEaWV1VHJpXERldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/thinh/Downloads/Hieplo-main/Hieplo-main/Hieplo/QuanLyBenhVienNoiTru/Views/HinhThucDieuTri/Diagnostic.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSGluaFRodWNEaWV1VHJpXERpYWdub3N0aWMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/thinh/Downloads/Hieplo-main/Hieplo-main/Hieplo/QuanLyBenhVienNoiTru/Views/HinhThucDieuTri/Edit.cshtml]

@@ -90,8 +90,8 @@
                         </div>
                     </div>
                     <div class="d-flex align-items-center">
-                        <i class="fas fa-clock text-muted me-1"></i>
-                        <small class="text-muted">Cập nhật lúc @DateTime.Now.ToString("HH:mm")</small>
+                        <i class="fas fa-calendar-day text-muted me-1"></i>
+                        <small class="text-muted">@ViewBag.DieuTriHomNay điều trị hôm nay</small>
                     </div>
                 </div>
             </div>
@@ -115,6 +115,79 @@
                             <i class="fas fa-check-circle"></i>
                         </span>
                         <small class="text-muted">@ViewBag.LuotThamBenh lượt thăm bệnh hôm nay</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Row - Thông tin doanh thu -->
+    <div class="row">
+        <!-- Tổng doanh thu Card -->
+        <div class="col-xl-6 col-md-12 mb-4">
+            <div class="card border-0 shadow-sm stats-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-danger-soft me-3 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-file-invoice-dollar fa-lg text-danger"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h3 class="stats-number mb-0">@string.Format("{0:N0}", ViewBag.TongDoanhThu) đ</h3>
+                            <p class="stats-label mb-0">Tổng doanh thu</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-success-soft text-success me-2">
+                                    <i class="fas fa-arrow-up me-1"></i>
+                                </span>
+                                <small class="text-muted">@string.Format("{0:N0}", ViewBag.DoanhThuThangNay) đ (tháng này)</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-danger-soft text-danger me-2">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                </span>
+                                <small class="text-muted">@string.Format("{0:N0}", ViewBag.TongChuaThanhToan) đ (chưa thanh toán)</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thống kê điều trị Card -->
+        <div class="col-xl-6 col-md-12 mb-4">
+            <div class="card border-0 shadow-sm stats-card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-info-soft me-3 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-stethoscope fa-lg text-info"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h3 class="stats-number mb-0">@ViewBag.TongDieuTri</h3>
+                            <p class="stats-label mb-0">Tổng số lượt điều trị</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-info-soft text-info me-2">
+                                    <i class="fas fa-calendar-day me-1"></i>
+                                </span>
+                                <small class="text-muted">@ViewBag.DieuTriHomNay điều trị hôm nay</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-primary-soft text-primary me-2">
+                                    <i class="fas fa-chart-line me-1"></i>
+                                </span>
+                                <small class="text-muted">Trung bình: @(ViewBag.TongBenhNhan > 0 ? (ViewBag.TongDieuTri / ViewBag.TongBenhNhan).ToString("0.0") : "0") lượt/BN</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -234,32 +307,210 @@
         </div>
     </div>
 
-    <!-- Content Row - Hoạt động gần đây -->
+    <!-- Content Row - Thống kê khoa và Bác sĩ tiêu biểu -->
     <div class="row">
-        <div class="col-12 mb-4">
+        <!-- Thống kê theo khoa -->
+        <div class="col-lg-6 mb-4">
             <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent">
+                    <h6 class="mb-0 fw-bold">Thống kê theo khoa</h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Khoa</th>
+                                    <th>BN hiện tại</th>
+                                    <th>Bác sĩ</th>
+                                    <th>Giường trống</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (ViewBag.ThongKeKhoa != null)
+                                {
+                                    foreach (var khoa in ViewBag.ThongKeKhoa)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-xs me-2">
+                                                        <span class="avatar-title rounded-circle bg-primary-soft text-primary">
+                                                            @khoa.Khoa.TenKhoa.Substring(0, 1)
+                                                        </span>
+                                                    </div>
+                                                    <span>@khoa.Khoa.TenKhoa</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <span class="me-2">@khoa.SoBenhNhan</span>
+                                                    @if (khoa.TongSoGiuong > 0)
+                                                    {
+                                                        var congSuat = (double)khoa.SoBenhNhan / khoa.TongSoGiuong * 100;
+                                                        <div class="progress flex-grow-1" style="height: 5px;">
+                                                            <div class="progress-bar @(congSuat > 80 ? "bg-danger" : congSuat > 60 ? "bg-warning" : "bg-success")" 
+                                                                 role="progressbar" style="width: @congSuat%"></div>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </td>
+                                            <td>@khoa.SoBacSi</td>
+                                            <td>
+                                                <span class="badge @(khoa.SoGiuongTrong > 5 ? "bg-success" : khoa.SoGiuongTrong > 2 ? "bg-warning" : "bg-danger")">
+                                                    @khoa.SoGiuongTrong/@khoa.TongSoGiuong
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bác sĩ tiêu biểu -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent">
+                    <h6 class="mb-0 fw-bold">Bác sĩ có nhiều bệnh nhân nhất</h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Bác sĩ</th>
+                                    <th>Khoa</th>
+                                    <th>Bệnh nhân</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (ViewBag.BacSiHangDau != null)
+                                {
+                                    foreach (var item in ViewBag.BacSiHangDau)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-xs me-2">
+                                                        <span class="avatar-title rounded-circle bg-info-soft text-info">
+                                                            @item.BacSi.HoTen.Substring(0, 1)
+                                                        </span>
+                                                    </div>
+                                                    <a href="@Url.Action("Details", "BacSi", new { id = item.BacSi.MaBacSi })" class="text-decoration-none text-dark">
+                                                        @item.BacSi.HoTen
+                                                    </a>
+                                                </div>
+                                            </td>
+                                            <td>@item.BacSi.Khoa?.TenKhoa</td>
+                                            <td>
+                                                <span class="badge bg-primary">@item.SoBenhNhan</span>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Row - Bệnh nhân mới nhất -->
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent">
+                    <h6 class="mb-0 fw-bold">Bệnh nhân mới nhập viện</h6>
+                </div>
+                <div class="card-body p-0">
+                    @if (ViewBag.BenhNhanMoiNhat != null && ViewBag.BenhNhanMoiNhat.Count > 0)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th>Bệnh nhân</th>
+                                        <th>Khoa</th>
+                                        <th>Bác sĩ</th>
+                                        <th>Ngày nhập viện</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var bn in ViewBag.BenhNhanMoiNhat)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-xs me-2">
+                                                        <span class="avatar-title rounded-circle bg-warning-soft text-warning">
+                                                            @bn.HoTen.Substring(0, 1)
+                                                        </span>
+                                                    </div>
+                                                    <a href="@Url.Action("Details", "BenhNhan", new { id = bn.MaBenhNhan })" class="text-decoration-none text-dark">
+                                                        @bn.HoTen
+                                                    </a>
+                                                </div>
+                                            </td>
+                                            <td>@bn.Khoa?.TenKhoa</td>
+                                            <td>
+                                                @if (bn.BacSi != null)
+                                                {
+                                                    <a href="@Url.Action("Details", "BacSi", new { id = bn.BacSi.MaBacSi })" class="text-decoration-none">
+                                                        @bn.BacSi.HoTen
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Chưa phân công</span>
+                                                }
+                                            </td>
+                                            <td>@bn.NgayNhapVien.ToString("dd/MM/yyyy")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <img src="~/images/no-data.svg" alt="Không có dữ liệu" width="120" class="mb-3">
+                            <p class="text-muted mb-0">Không có bệnh nhân mới nhập viện</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Row - Hoạt động gần đây -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
                 <div class="card-header bg-transparent">
                     <h6 class="mb-0 fw-bold">Hoạt động gần đây</h6>
                 </div>
                 <div class="card-body p-0">
-                    <div class="timeline">
+                    <div class="timeline px-3 py-2">
                         @if (ViewBag.HoatDongGanDay != null && ViewBag.HoatDongGanDay.Count > 0)
                         {
                             @foreach (var hoatDong in ViewBag.HoatDongGanDay)
                             {
-                                <div class="timeline-item">
-                                    <div class="time">@hoatDong.ThoiGianHienThi</div>
-                                    <div class="content">
-                                        <div class="d-flex align-items-center mb-2">
-                                            <div class="icon-circle-sm bg-@hoatDong.MauSac-soft me-3 d-flex align-items-center justify-content-center">
-                                                <i class="@hoatDong.Icon text-@hoatDong.MauSac"></i>
-                                            </div>
-                                            <h6 class="mb-0">@hoatDong.NoiDung</h6>
+                                <div class="timeline-item py-2">
+                                    <div class="d-flex">
+                                        <div class="timeline-icon me-3">
+                                            <span class="avatar-title rounded-circle bg-@hoatDong.MauSac-soft text-@hoatDong.MauSac">
+                                                <i class="@hoatDong.Icon"></i>
+                                            </span>
                                         </div>
-                                        <div class="timeline-actions">
-                                            <a href="@hoatDong.UrlChiTiet" class="btn btn-sm btn-light">
-                                                <i class="fas fa-eye me-1"></i>Xem chi tiết
-                                            </a>
+                                        <div class="timeline-content">
+                                            <p class="mb-1">@hoatDong.NoiDung</p>
+                                            <small class="text-muted">
+                                                @hoatDong.ThoiGian.ToString("HH:mm, dd/MM/yyyy")
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
@@ -267,10 +518,8 @@
                         }
                         else
                         {
-                            <div class="text-center py-5">
-                                <img src="~/images/no-activity.svg" alt="Không có hoạt động" class="mb-3" height="120">
-                                <h6 class="text-muted">Không có hoạt động gần đây</h6>
-                                <p class="text-muted small mb-0">Các hoạt động sẽ được hiển thị khi có dữ liệu mới</p>
+                            <div class="text-center py-4">
+                                <p class="text-muted mb-0">Không có hoạt động nào gần đây</p>
                             </div>
                         }
                     </div>

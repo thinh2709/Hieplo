@@ -69,7 +69,7 @@ namespace QuanLyBenhVienNoiTru.Controllers
             return View(chiPhiList);
         }
 
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? id, bool? backToPatient = false)
         {
             if (id == null)
             {
@@ -85,6 +85,10 @@ namespace QuanLyBenhVienNoiTru.Controllers
             {
                 return NotFound();
             }
+
+            // Lưu mã bệnh nhân để sử dụng cho nút quay lại
+            ViewBag.MaBenhNhan = chiPhi.MaBenhNhan;
+            ViewBag.BackToPatient = backToPatient ?? false;
 
             // Lấy danh sách các điều trị của bệnh nhân
             var dieuTriList = await _context.DieuTriBenhNhans
@@ -127,7 +131,7 @@ namespace QuanLyBenhVienNoiTru.Controllers
             return RedirectToAction("Index", "DieuTriBenhNhan");
         }
 
-        public async Task<IActionResult> ThanhToan(int? id)
+        public async Task<IActionResult> ThanhToan(int? id, bool? backToPatient = false)
         {
             if (id == null)
             {
@@ -143,10 +147,14 @@ namespace QuanLyBenhVienNoiTru.Controllers
                 return NotFound();
             }
 
+            // Lưu mã bệnh nhân để sử dụng cho nút quay lại
+            ViewBag.MaBenhNhan = chiPhi.MaBenhNhan;
+            ViewBag.BackToPatient = backToPatient ?? false;
+
             if (chiPhi.DaThanhToan)
             {
                 TempData["Message"] = "Chi phí này đã được thanh toán trước đó.";
-                return RedirectToAction(nameof(Details), new { id });
+                return RedirectToAction(nameof(Details), new { id, backToPatient });
             }
             
             // Tính toán chi phí nếu bệnh nhân có bảo hiểm y tế (giảm 80%)
@@ -171,9 +179,11 @@ namespace QuanLyBenhVienNoiTru.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ThanhToanConfirmed(int id)
+        public async Task<IActionResult> ThanhToanConfirmed(int id, bool backToPatient = false)
         {
-            var chiPhi = await _context.ChiPhiDieuTris.FindAsync(id);
+            var chiPhi = await _context.ChiPhiDieuTris
+                .Include(c => c.BenhNhan)
+                .FirstOrDefaultAsync(c => c.MaChiPhi == id);
             
             if (chiPhi == null)
             {
@@ -184,7 +194,15 @@ namespace QuanLyBenhVienNoiTru.Controllers
             _context.Update(chiPhi);
             await _context.SaveChangesAsync();
             
-            TempData["Success"] = "Thanh toán thành công!";
+            TempData["SuccessMessage"] = "Thanh toán thành công!";
+            
+            // Sau khi thanh toán, nếu yêu cầu quay lại trang chi tiết bệnh nhân thì chuyển hướng
+            if (backToPatient && chiPhi.MaBenhNhan.HasValue)
+            {
+                return RedirectToAction("Details", "BenhNhan", new { id = chiPhi.MaBenhNhan.Value });
+            }
+            
+            // Ngược lại quay về trang danh sách chi phí
             return RedirectToAction(nameof(Index));
         }
     }

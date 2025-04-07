@@ -36,7 +36,12 @@ namespace QuanLyBenhVienNoiTru.Data
             modelBuilder.Entity<LichThamBenh>().HasKey(l => l.MaLich);
             modelBuilder.Entity<TaiKhoan>().HasKey(t => t.MaTaiKhoan);
             modelBuilder.Entity<Giuong>().HasKey(g => g.MaGiuong);
-
+            
+            // Fix cho vấn đề tên bảng HinhThucDieuTris vs hinhthuctrilieus
+            // Map bảng 'HinhThucDieuTri' to 'HinhThucDieuTris' (tên mặc định của Entity Framework)
+            // Do không tìm thấy bảng hinhthuctrilieus, nên chúng ta quay lại sử dụng tên bảng mặc định
+            modelBuilder.Entity<HinhThucDieuTri>().ToTable("HinhThucDieuTris");
+            
             // Quan hệ giữa BacSi và TaiKhoan
             modelBuilder.Entity<BacSi>()
                 .HasOne(b => b.TaiKhoan)

@@ -1,0 +1,160 @@
+@{
+    ViewData["Title"] = "Chẩn đoán hình thức điều trị";
+    Layout = "_Layout";
+    var data = ViewBag.DiagnosticData as Dictionary<string, object>;
+}
+
+<div class="container my-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Chẩn đoán kết nối cơ sở dữ liệu</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h5>Thông tin cấu hình</h5>
+                        <p><strong>Kết nối đến cơ sở dữ liệu:</strong> 
+                            @if (data["DatabaseConnection"] is bool canConnect && canConnect)
+                            {
+                                <span class="badge bg-success">Thành công</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Thất bại</span>
+                            }
+                        </p>
+                        <p><strong>Tên bảng điều trị trong code:</strong> @data["Schema"].@data["TableName"]</p>
+                        <p><strong>Số lượng bản ghi:</strong> @data["RecordCount"]</p>
+                    </div>
+
+                    @if (data["AllTables"] is List<string> tables && tables.Any())
+                    {
+                        <div class="card mt-3">
+                            <div class="card-header">Danh sách bảng trong cơ sở dữ liệu</div>
+                            <div class="card-body">
+                                <div class="alert alert-warning">
+                                    <strong>Lưu ý:</strong> Kiểm tra xem trong danh sách có tên bảng <code>dbo.HinhThucDieuTris</code> hoặc tương tự như <code>dbo.hinhthuctrilieus</code> không?
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Tên bảng</th>
+                                                <th>Trạng thái</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var tableName in tables)
+                                            {
+                                                <tr>
+                                                    <td>@tableName</td>
+                                                    <td>
+                                                        @if (tableName.ToLowerInvariant().Contains("hinhthuc") || 
+                                                            tableName.ToLowerInvariant().Contains("dieutri") ||
+                                                            tableName.ToLowerInvariant().Contains("trilieu"))
+                                                        {
+                                                            <span class="badge bg-warning">Có thể liên quan</span>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (data["SampleRecords"] is IEnumerable<dynamic> treatments && treatments.Any())
+                    {
+                        <div class="card mt-3">
+                            <div class="card-header">Dữ liệu mẫu</div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Tên điều trị</th>
+                                                <th>Khoa</th>
+                                                <th>Chi phí</th>
+                                                <th>Mô tả</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var item in treatments)
+                                            {
+                                                <tr>
+                                                    <td>@item.MaDieuTri</td>
+                                                    <td>@item.TenDieuTri</td>
+                                                    <td>@item.KhoaTen (@item.MaKhoa)</td>
+                                                    <td>@string.Format("{0:N0} đ", item.ChiPhi)</td>
+                                                    <td>@(item.MoTa?.ToString().Length > 50 ? item.MoTa.ToString().Substring(0, 47) + "..." : item.MoTa)</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-danger mt-3">
+                            <strong>Không tìm thấy dữ liệu!</strong> Không thể tìm thấy bản ghi nào trong bảng.
+                        </div>
+                    }
+
+                    <div class="card mt-3">
+                        <div class="card-header">Kiểm tra SQL trực tiếp</div>
+                        <div class="card-body">
+                            @if (data.ContainsKey("RawQueryRecordCount"))
+                            {
+                                <div class="alert alert-success">
+                                    <strong>Truy vấn SQL thành công!</strong> Tìm thấy @data["RawQueryRecordCount"] bản ghi.
+                                </div>
+                            }
+                            else if (data.ContainsKey("RawQueryError"))
+                            {
+                                <div class="alert alert-danger">
+                                    <strong>Lỗi khi thực hiện truy vấn SQL:</strong>
+                                    <pre>@data["RawQueryError"]</pre>
+                                </div>
+                            }
+
+                            <h5 class="mt-3">Gợi ý giải quyết vấn đề:</h5>
+                            <ol>
+                                <li>Kiểm tra tên bảng trong cơ sở dữ liệu. Nếu tên bảng là <code>hinhthuctrilieus</code> thay vì <code>HinhThucDieuTris</code>, bạn cần thực hiện một trong các cách sau:
+                                    <ul>
+                                        <li>Đổi tên bảng trong SQL Server để khớp với tên trong code</li>
+                                        <li>Sửa mã trong tập tin <code>ApplicationDbContext.cs</code> để ánh xạ đúng tên bảng</li>
+                                    </ul>
+                                </li>
+                                <li>Nếu không tồn tại bảng trong cơ sở dữ liệu, bạn cần tạo migration và cập nhật cơ sở dữ liệu</li>
+                                <li>Kiểm tra kết nối cơ sở dữ liệu trong <code>appsettings.json</code> để đảm bảo nó trỏ tới đúng database</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="card-header">Tùy chọn giải quyết</div>
+                        <div class="card-body">
+                            <div class="d-flex flex-wrap gap-2">
+                                <a href="/api/HinhThucDieuTriApi/debug" target="_blank" class="btn btn-secondary">
+                                    <i class="fas fa-bug me-1"></i> Debug API
+                                </a>
+                                <a href="/HinhThucDieuTri" class="btn btn-primary">
+                                    <i class="fas fa-list me-1"></i> Quay lại danh sách
+                                </a>
+                                <a href="/" class="btn btn-light">
+                                    <i class="fas fa-home me-1"></i> Trang chủ
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

@@ -48,50 +48,76 @@ namespace QuanLyBenhVienNoiTru.Controllers
                 return NotFound();
             }
 
+            // Lưu ID bệnh nhân vào ViewBag để view có thể xử lý redirect nếu cần
+            if (dieuTri.MaBenhNhan.HasValue)
+            {
+                ViewBag.MaBenhNhan = dieuTri.MaBenhNhan.Value;
+            }
+
             return View(dieuTri);
         }
 
-        public async Task<IActionResult> Create(int? maBenhNhan = null)
+        public IActionResult Create(int? maBenhNhan)
         {
-            // Chuẩn bị dữ liệu cho view
-            await PrepareCreateViewData(maBenhNhan);
+            ViewBag.MaBenhNhan = new SelectList(_context.BenhNhans.Where(b => b.TrangThai == true), "MaBenhNhan", "HoTen");
+            ViewBag.Khoas = new SelectList(_context.Khoas.Where(k => k.TrangThai), "MaKhoa", "TenKhoa");
             
-            // Nếu có mã bệnh nhân được truyền vào, tạo model với thông tin mặc định
+            var model = new DieuTriBenhNhan
+            {
+                NgayThucHien = DateTime.Now
+            };
+            
+            // Check if maBenhNhan is provided in the URL
             if (maBenhNhan.HasValue)
             {
-                var benhNhan = await _context.BenhNhans
+                var benhNhan = _context.BenhNhans
                     .Include(b => b.Khoa)
-                    .FirstOrDefaultAsync(b => b.MaBenhNhan == maBenhNhan.Value);
+                    .Include(b => b.BacSi)
+                    .FirstOrDefault(b => b.MaBenhNhan == maBenhNhan.Value);
                     
                 if (benhNhan != null)
                 {
-                    // Thêm thông tin để View biết rằng bệnh nhân đã được chọn sẵn
+                    // Set the patient ID in the model
+                    model.MaBenhNhan = benhNhan.MaBenhNhan;
+                    
+                    // Set flag to show the patient is fixed
                     ViewBag.FixedPatient = true;
-                    ViewBag.BenhNhanInfo = $"{benhNhan.HoTen} (Mã: {benhNhan.MaBenhNhan} - Khoa: {benhNhan.Khoa.TenKhoa})";
-                    ViewBag.ReturnToBenhNhanDetail = true;
+                    ViewBag.BenhNhanInfo = $"{benhNhan.HoTen} - {benhNhan.Khoa?.TenKhoa ?? "Chưa có khoa"}";
                     
-                    var model = new DieuTriBenhNhan
-                    {
-                        MaBenhNhan = maBenhNhan.Value,
-                        NgayThucHien = DateTime.Now
-                    };
+                    // Store the department ID to be pre-selected in the dropdown
+                    ViewBag.BenhNhanKhoaId = benhNhan.MaKhoa;
                     
-                    // Tự động chọn bác sĩ nếu người dùng là bác sĩ
-                    var currentUser = await _context.TaiKhoans
-                        .Include(t => t.BacSi)
-                        .FirstOrDefaultAsync(t => t.TenDangNhap == User.Identity.Name);
-                        
-                    if (User.IsInRole("Bác sĩ") && currentUser?.BacSi != null)
+                    // Lock department selection since it's based on patient's current department
+                    ViewBag.KhoaIsLocked = true;
+                    
+                    // Pre-select doctor if assigned to patient
+                    if (benhNhan.MaBacSi > 0)
                     {
-                        model.MaBacSi = currentUser.BacSi.MaBacSi;
+                        model.MaBacSi = benhNhan.MaBacSi;
+                        ViewBag.BacSiIsLocked = true;
                     }
                     
-                    return View(model);
+                    // Flag to return to patient details page after saving
+                    ViewBag.ReturnToBenhNhanDetail = true;
+                    
+                    // Get treatment options for the patient's department
+                    if (benhNhan.MaKhoa > 0)
+                    {
+                        var treatments = _context.HinhThucDieuTris
+                            .Where(h => h.MaKhoa == benhNhan.MaKhoa)
+                            .Select(h => new SelectListItem
+                            {
+                                Value = h.MaDieuTri.ToString(),
+                                Text = $"{h.TenDieuTri} - {h.ChiPhi:N0} VND"
+                            })
+                            .ToList();
+                            
+                        ViewBag.MaDieuTri = new SelectList(treatments, "Value", "Text");
+                    }
                 }
             }
             
-            // Mặc định trả về view trống
-            return View();
+            return View(model);
         }
 
         [HttpPost]
@@ -197,43 +223,48 @@ namespace QuanLyBenhVienNoiTru.Controllers
                     .ToListAsync(),
                 "MaKhoa", "TenKhoa");
             
-            // Nếu có mã bệnh nhân, lấy khoa của bệnh nhân đó để thiết lập giá trị mặc định
+            // Nếu có mã bệnh nhân, lấy thông tin bệnh nhân và khoa
             if (maBenhNhan.HasValue)
             {
                 var benhNhan = await _context.BenhNhans
                     .Include(b => b.Khoa)
                     .FirstOrDefaultAsync(b => b.MaBenhNhan == maBenhNhan.Value);
-                    
-                if (benhNhan?.Khoa != null)
+
+                if (benhNhan != null)
                 {
-                    ViewBag.SelectedKhoa = benhNhan.MaKhoa;
-                }
-            }
-            // Nếu là bác sĩ, thiết lập khoa mặc định là khoa của bác sĩ
-            else if (isDoctor && currentUser?.BacSi?.MaKhoa != null)
-            {
-                ViewBag.SelectedKhoa = currentUser.BacSi.MaKhoa;
-            }
-            
-            // Chuẩn bị dữ liệu cho view
-            if (isAdmin)
-            {
-                ViewBag.MaBenhNhan = new SelectList(
-                    await _context.BenhNhans
-                        .Where(b => b.TrangThai)
-                        .Select(b => new
+                    ViewBag.FixedPatient = true;
+                    ViewBag.BenhNhanInfo = $"{benhNhan.HoTen} - {benhNhan.MaBenhNhan}";
+                    ViewBag.BenhNhanKhoaId = benhNhan.MaKhoa;
+                    ViewBag.KhoaIsLocked = true;
+
+                    // Lấy danh sách bác sĩ theo khoa của bệnh nhân
+                    var bacSiList = await _context.BacSis
+                        .Where(b => b.MaKhoa == benhNhan.MaKhoa)
+                        .Select(b => new SelectListItem
                         {
-                            MaBenhNhan = b.MaBenhNhan,
-                            ThongTinHienThi = $"{b.HoTen} (Mã: {b.MaBenhNhan} - Khoa: {b.Khoa.TenKhoa})"
+                            Value = b.MaBacSi.ToString(),
+                            Text = b.HoTen
                         })
-                        .ToListAsync(),
-                    "MaBenhNhan", "ThongTinHienThi", maBenhNhan);
-                
-                // Danh sách bác sĩ
-                ViewBag.MaBacSi = new SelectList(await _context.BacSis.ToListAsync(), "MaBacSi", "HoTen");
-                
-                // Ban đầu, hiển thị tất cả hình thức điều trị
-                ViewBag.MaDieuTri = new SelectList(await _context.HinhThucDieuTris.ToListAsync(), "MaDieuTri", "TenDieuTri");
+                        .ToListAsync();
+                    ViewBag.MaBacSi = new SelectList(bacSiList, "Value", "Text");
+
+                    // Nếu bệnh nhân đã có bác sĩ phụ trách, cố định bác sĩ đó
+                    if (benhNhan.MaBacSi > 0)
+                    {
+                        ViewBag.BacSiIsLocked = true;
+                    }
+
+                    // Lấy danh sách hình thức điều trị theo khoa của bệnh nhân
+                    var dieuTriList = await _context.HinhThucDieuTris
+                        .Where(h => h.MaKhoa == benhNhan.MaKhoa)
+                        .Select(h => new SelectListItem
+                        {
+                            Value = h.MaDieuTri.ToString(),
+                            Text = $"{h.TenDieuTri} - {h.ChiPhi:N0} VND"
+                        })
+                        .ToListAsync();
+                    ViewBag.MaDieuTri = new SelectList(dieuTriList, "Value", "Text");
+                }
             }
             else if (isDoctor && currentUser?.BacSi != null)
             {
@@ -264,6 +295,11 @@ namespace QuanLyBenhVienNoiTru.Controllers
                 ViewBag.MaDieuTri = new SelectList(
                     await _context.HinhThucDieuTris
                         .Where(h => h.MaKhoa == maKhoa)
+                        .Select(h => new
+                        {
+                            MaDieuTri = h.MaDieuTri,
+                            TenDieuTri = $"{h.TenDieuTri} - {h.ChiPhi:N0} VND"
+                        })
                         .ToListAsync(), 
                     "MaDieuTri", 
                     "TenDieuTri");
@@ -271,9 +307,19 @@ namespace QuanLyBenhVienNoiTru.Controllers
             else
             {
                 // Trường hợp không xác định được vai trò/thông tin
-                ViewBag.MaBenhNhan = new SelectList(await _context.BenhNhans.Where(b => b.TrangThai).ToListAsync(), "MaBenhNhan", "HoTen", maBenhNhan);
-                ViewBag.MaDieuTri = new SelectList(await _context.HinhThucDieuTris.ToListAsync(), "MaDieuTri", "TenDieuTri");
-                ViewBag.MaBacSi = new SelectList(await _context.BacSis.ToListAsync(), "MaBacSi", "HoTen");
+                ViewBag.MaBenhNhan = new SelectList(
+                    await _context.BenhNhans
+                        .Where(b => b.TrangThai)
+                        .Select(b => new
+                        {
+                            MaBenhNhan = b.MaBenhNhan,
+                            ThongTinHienThi = $"{b.HoTen} (Mã: {b.MaBenhNhan})"
+                        })
+                        .ToListAsync(),
+                    "MaBenhNhan", "ThongTinHienThi", maBenhNhan);
+                    
+                ViewBag.MaDieuTri = new SelectList(Enumerable.Empty<SelectListItem>(), "MaDieuTri", "TenDieuTri");
+                ViewBag.MaBacSi = new SelectList(await _context.BacSis.Where(b => b.TrangThai).ToListAsync(), "MaBacSi", "HoTen");
             }
         }
 
@@ -310,8 +356,47 @@ namespace QuanLyBenhVienNoiTru.Controllers
             {
                 try
                 {
+                    // Lưu thông tin điều trị trước khi cập nhật chi phí
+                    var originalDieuTri = await _context.DieuTriBenhNhans
+                        .Include(d => d.HinhThucDieuTri)
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(d => d.MaDieuTriBenhNhan == id);
+
+                    // Kiểm tra nếu hình thức điều trị đã bị thay đổi, cập nhật chi phí tương ứng
+                    if (originalDieuTri != null && originalDieuTri.MaDieuTri != dieuTriBenhNhan.MaDieuTri)
+                    {
+                        // Lấy thông tin hình thức điều trị cũ và mới
+                        var oldHinhThucDieuTri = await _context.HinhThucDieuTris.FindAsync(originalDieuTri.MaDieuTri);
+                        var newHinhThucDieuTri = await _context.HinhThucDieuTris.FindAsync(dieuTriBenhNhan.MaDieuTri);
+
+                        if (oldHinhThucDieuTri != null && newHinhThucDieuTri != null)
+                        {
+                            // Cập nhật chi phí trong bảng ChiPhiDieuTri nếu chưa thanh toán
+                            var chiPhi = await _context.ChiPhiDieuTris
+                                .FirstOrDefaultAsync(c => c.MaBenhNhan == dieuTriBenhNhan.MaBenhNhan && !c.DaThanhToan);
+
+                            if (chiPhi != null)
+                            {
+                                // Trừ chi phí cũ và cộng chi phí mới
+                                chiPhi.TongChiPhi = chiPhi.TongChiPhi - oldHinhThucDieuTri.ChiPhi + newHinhThucDieuTri.ChiPhi;
+                                _context.Update(chiPhi);
+                            }
+                        }
+                    }
+
                     _context.Update(dieuTriBenhNhan);
                     await _context.SaveChangesAsync();
+                    
+                    // Thêm thông báo thành công
+                    TempData["SuccessMessage"] = "Cập nhật thông tin điều trị thành công!";
+                    
+                    // Chuyển hướng về trang chi tiết bệnh nhân
+                    if (dieuTriBenhNhan.MaBenhNhan.HasValue)
+                    {
+                        return RedirectToAction("Details", "BenhNhan", new { id = dieuTriBenhNhan.MaBenhNhan.Value });
+                    }
+                    
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -324,7 +409,6 @@ namespace QuanLyBenhVienNoiTru.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
             
             ViewBag.MaBenhNhan = new SelectList(await _context.BenhNhans.ToListAsync(), "MaBenhNhan", "HoTen", dieuTriBenhNhan.MaBenhNhan);
@@ -360,9 +444,102 @@ namespace QuanLyBenhVienNoiTru.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var dieuTri = await _context.DieuTriBenhNhans.FindAsync(id);
-            _context.DieuTriBenhNhans.Remove(dieuTri);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            
+            if (dieuTri == null)
+            {
+                return NotFound();
+            }
+            
+            // Lưu MaBenhNhan trước khi xóa để có thể chuyển hướng về trang chi tiết bệnh nhân
+            int? maBenhNhan = dieuTri.MaBenhNhan;
+            
+            try
+            {
+                // Lấy thông tin về chi phí điều trị để cập nhật
+                if (dieuTri.MaDieuTri.HasValue && dieuTri.MaBenhNhan.HasValue)
+                {
+                    var hinhThucDieuTri = await _context.HinhThucDieuTris.FindAsync(dieuTri.MaDieuTri.Value);
+                    
+                    if (hinhThucDieuTri != null)
+                    {
+                        // Cập nhật chi phí trong bảng ChiPhiDieuTri nếu chưa thanh toán
+                        var chiPhi = await _context.ChiPhiDieuTris
+                            .FirstOrDefaultAsync(c => c.MaBenhNhan == dieuTri.MaBenhNhan.Value && !c.DaThanhToan);
+
+                        if (chiPhi != null)
+                        {
+                            // Trừ chi phí của hình thức điều trị bị xóa
+                            chiPhi.TongChiPhi -= hinhThucDieuTri.ChiPhi;
+                            if (chiPhi.TongChiPhi < 0) chiPhi.TongChiPhi = 0; // Đảm bảo chi phí không âm
+                            _context.Update(chiPhi);
+                        }
+                    }
+                }
+                
+                // Xóa điều trị
+                _context.DieuTriBenhNhans.Remove(dieuTri);
+                await _context.SaveChangesAsync();
+                
+                TempData["SuccessMessage"] = "Xóa thông tin điều trị thành công!";
+                
+                // Chuyển hướng về trang chi tiết bệnh nhân nếu có
+                if (maBenhNhan.HasValue)
+                {
+                    return RedirectToAction("Details", "BenhNhan", new { id = maBenhNhan.Value });
+                }
+                
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Lỗi khi xóa điều trị: {ex.Message}";
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        // Phương thức hỗ trợ để lấy danh sách bác sĩ theo khoa
+        [HttpGet]
+        public async Task<JsonResult> GetBacSiByKhoa(int khoaId)
+        {
+            try
+            {
+                var bacSiList = await _context.BacSis
+                    .Where(b => b.MaKhoa == khoaId && b.TrangThai)
+                    .Select(b => new { 
+                        b.MaBacSi, 
+                        b.HoTen 
+                    })
+                    .ToListAsync();
+                
+                return Json(bacSiList);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message });
+            }
+        }
+        
+        // Phương thức hỗ trợ để lấy danh sách điều trị theo khoa
+        [HttpGet]
+        public async Task<JsonResult> GetDieuTriByKhoa(int khoaId)
+        {
+            try
+            {
+                var dieuTriList = await _context.HinhThucDieuTris
+                    .Where(h => h.MaKhoa == khoaId)
+                    .Select(h => new { 
+                        h.MaDieuTri, 
+                        h.TenDieuTri,
+                        h.ChiPhi
+                    })
+                    .ToListAsync();
+                
+                return Json(dieuTriList);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message });
+            }
         }
     }
 }

@@ -85,18 +85,87 @@ namespace QuanLyBenhVienNoiTru.Controllers
                     NgayNhapVien = DateTime.Now, 
                     TrangThai = true
                 },
-                KhoaSelectList = new SelectList(_context.Khoas, "MaKhoa", "TenKhoa"),
                 GioiTinhOptions = new List<SelectListItem>
                 {
                     new SelectListItem { Value = "Nam", Text = "Nam" },
                     new SelectListItem { Value = "Nữ", Text = "Nữ" }
                 },
-                HinhThucDieuTriSelectList = new SelectList(_context.HinhThucDieuTris, "MaDieuTri", "TenDieuTri"),
-                BacSiSelectList = new SelectList(_context.BacSis, "MaBacSi", "HoTen")
+                HinhThucDieuTriSelectList = new SelectList(new List<SelectListItem>()),
+                BacSiSelectList = new SelectList(new List<SelectListItem>())
             };
             
             // Khởi tạo danh sách giường trống
             viewModel.GiuongSelectList = new SelectList(new List<SelectListItem>());
+            
+            // Nếu người dùng là bác sĩ, lấy thông tin bác sĩ và khoa
+            if (User.IsInRole("Bác sĩ"))
+            {
+                var userId = User.FindFirst("UserId")?.Value;
+                if (!string.IsNullOrEmpty(userId) && int.TryParse(userId, out int maTaiKhoan))
+                {
+                    var bacSi = _context.BacSis
+                        .Include(b => b.Khoa)
+                        .FirstOrDefault(b => b.MaTaiKhoan == maTaiKhoan);
+                        
+                    if (bacSi != null)
+                    {
+                        // Tự động gán bác sĩ phụ trách - bác sĩ đăng nhập là người phụ trách
+                        viewModel.BenhNhan.MaBacSi = bacSi.MaBacSi;
+                        viewModel.MaBacSi = bacSi.MaBacSi;
+                        
+                        // Tự động gán khoa
+                        viewModel.BenhNhan.MaKhoa = bacSi.MaKhoa;
+                        
+                        // Tạo danh sách khoa với 1 phần tử và đã được chọn
+                        viewModel.KhoaSelectList = new SelectList(
+                            new List<SelectListItem> { 
+                                new SelectListItem { Value = bacSi.MaKhoa.ToString(), Text = bacSi.Khoa.TenKhoa }
+                            }, "Value", "Text");
+                        
+                        // Tạo danh sách bác sĩ với 1 phần tử và đã được chọn
+                        viewModel.BacSiSelectList = new SelectList(
+                            new List<SelectListItem> { 
+                                new SelectListItem { Value = bacSi.MaBacSi.ToString(), Text = bacSi.HoTen }
+                            }, "Value", "Text");
+
+                        // Thêm thông tin trạng thái khóa cho view
+                        ViewBag.KhoaIsLocked = true;
+                        ViewBag.BacSiIsLocked = true;
+                        
+                        // Tải danh sách hình thức điều trị của khoa
+                        viewModel.HinhThucDieuTriSelectList = new SelectList(
+                            _context.HinhThucDieuTris
+                                .Where(h => h.MaKhoa == bacSi.MaKhoa)
+                                .Select(h => new
+                                {
+                                    MaDieuTri = h.MaDieuTri,
+                                    TenHienThi = $"{h.TenDieuTri} - {h.ChiPhi:N0} VND"
+                                })
+                                .ToList(),
+                            "MaDieuTri", "TenHienThi");
+                        
+                        // Tải danh sách giường trống của khoa
+                        var availableBeds = _context.Giuongs
+                            .Where(g => g.MaKhoa == bacSi.MaKhoa && g.TrangThai == "Trống")
+                            .Select(g => new
+                            {
+                                MaGiuong = g.MaGiuong,
+                                TenGiuong = $"{g.TenGiuong} - {g.GiaTheoNgay:N0} VND/ngày"
+                            })
+                            .ToList();
+                            
+                        viewModel.GiuongSelectList = new SelectList(availableBeds, "MaGiuong", "TenGiuong");
+                    }
+                }
+            }
+            else
+            {
+                // Nếu là Admin, hiển thị tất cả khoa
+                viewModel.KhoaSelectList = new SelectList(_context.Khoas.Where(k => k.TrangThai), "MaKhoa", "TenKhoa");
+                viewModel.BacSiSelectList = new SelectList(_context.BacSis.Where(b => b.TrangThai), "MaBacSi", "HoTen");
+                ViewBag.KhoaIsLocked = false;
+                ViewBag.BacSiIsLocked = false;
+            }
             
             return View(viewModel);
         }
@@ -113,8 +182,18 @@ namespace QuanLyBenhVienNoiTru.Controllers
                     $"MaKhoa={viewModel.BenhNhan?.MaKhoa}, " +
                     $"GioiTinh={viewModel.BenhNhan?.GioiTinh}, " +
                     $"ThemDieuTri={viewModel.ThemDieuTri}, " +
-                    $"MaBacSi={viewModel.MaBacSi}, " +
-                    $"Selected treatments={string.Join(",", viewModel.HinhThucDieuTriIds?.Select(i => i.ToString()) ?? Enumerable.Empty<string>())}");
+                    $"MaBacSi={viewModel.MaBacSi}");
+                
+                // Log more details about treatment IDs
+                if (viewModel.HinhThucDieuTriIds != null)
+                {
+                    _logger.LogInformation($"HinhThucDieuTriIds count: {viewModel.HinhThucDieuTriIds.Count}, " +
+                        $"Values: {string.Join(", ", viewModel.HinhThucDieuTriIds)}");
+                }
+                else
+                {
+                    _logger.LogWarning("HinhThucDieuTriIds is null");
+                }
 
                 // Loại bỏ validation errors cho các navigation properties
                 foreach (var key in ModelState.Keys.Where(k => k.StartsWith("BenhNhan.Khoa") || 
@@ -128,6 +207,46 @@ namespace QuanLyBenhVienNoiTru.Controllers
                                                            k.StartsWith("BenhNhan.HinhThucDieuTris")).ToList())
                 {
                     ModelState.Remove(key);
+                }
+                
+                // Nếu là bác sĩ, tự động gán giá trị
+                if (User.IsInRole("Bác sĩ"))
+                {
+                    var userId = User.FindFirst("UserId")?.Value;
+                    if (!string.IsNullOrEmpty(userId) && int.TryParse(userId, out int maTaiKhoan))
+                    {
+                        var bacSi = await _context.BacSis
+                            .Include(b => b.Khoa)
+                            .FirstOrDefaultAsync(b => b.MaTaiKhoan == maTaiKhoan);
+                            
+                        if (bacSi != null)
+                        {
+                            _logger.LogInformation($"Doctor creating patient: {bacSi.HoTen} (ID: {bacSi.MaBacSi})");
+                            
+                            // Đảm bảo bác sĩ phụ trách và khoa được gán đúng - bác sĩ đang đăng nhập sẽ là người phụ trách
+                            viewModel.BenhNhan.MaBacSi = bacSi.MaBacSi;
+                            viewModel.BenhNhan.MaKhoa = bacSi.MaKhoa;
+                            
+                            // Gán bác sĩ điều trị nếu thêm điều trị
+                            if (viewModel.ThemDieuTri)
+                            {
+                                viewModel.MaBacSi = bacSi.MaBacSi;
+                            }
+                            
+                            // Xóa các validation errors liên quan
+                            ModelState.Remove("BenhNhan.MaBacSi");
+                            ModelState.Remove("BenhNhan.MaKhoa");
+                            ModelState.Remove("MaBacSi");
+                            
+                            ViewBag.KhoaIsLocked = true;
+                            ViewBag.BacSiIsLocked = true;
+                        }
+                    }
+                }
+                else
+                {
+                    ViewBag.KhoaIsLocked = false;
+                    ViewBag.BacSiIsLocked = false;
                 }
 
                 if (!ModelState.IsValid)
@@ -288,6 +407,14 @@ namespace QuanLyBenhVienNoiTru.Controllers
                         {
                             _logger.LogInformation($"Processing treatment ID: {dieuTriId}");
                             
+                            // Kiểm tra hình thức điều trị có tồn tại
+                            var hinhThucDieuTri = await _context.HinhThucDieuTris.FindAsync(dieuTriId);
+                            if (hinhThucDieuTri == null)
+                            {
+                                _logger.LogWarning($"Treatment ID {dieuTriId} not found in database. Skipping.");
+                                continue;
+                            }
+                            
                             var dieuTri = new DieuTriBenhNhan
                             {
                                 MaBenhNhan = newBenhNhan.MaBenhNhan,
@@ -296,33 +423,37 @@ namespace QuanLyBenhVienNoiTru.Controllers
                                 NgayThucHien = viewModel.NgayThucHien ?? DateTime.Now
                             };
                             
-                            if (dieuTri.MaBacSi == null || dieuTri.MaBacSi == 0)
+                            // Log doctor assignment
+                            _logger.LogInformation($"Assigning doctor ID: {dieuTri.MaBacSi} for treatment ID: {dieuTriId}");
+                            
+                            // If no doctor is selected but should be auto-assigned
+                            if ((dieuTri.MaBacSi == null || dieuTri.MaBacSi == 0) && User.IsInRole("Bác sĩ"))
                             {
-                                _logger.LogWarning($"Bác sĩ không được chọn cho điều trị ID: {dieuTriId}");
-                                if (User.IsInRole("Bác sĩ"))
+                                // Tự động lấy bác sĩ hiện tại nếu người dùng là bác sĩ
+                                var userId = User.FindFirst("UserId")?.Value;
+                                if (!string.IsNullOrEmpty(userId) && int.TryParse(userId, out int maTaiKhoan))
                                 {
-                                    // Tự động lấy bác sĩ hiện tại nếu người dùng là bác sĩ
-                                    var currentUser = await _context.TaiKhoans
-                                        .Include(t => t.BacSi)
-                                        .FirstOrDefaultAsync(t => t.TenDangNhap == User.Identity.Name);
+                                    var bacSi = await _context.BacSis
+                                        .FirstOrDefaultAsync(b => b.MaTaiKhoan == maTaiKhoan);
                                         
-                                    if (currentUser?.BacSi != null)
+                                    if (bacSi != null)
                                     {
-                                        dieuTri.MaBacSi = currentUser.BacSi.MaBacSi;
-                                        _logger.LogInformation($"Tự động chọn bác sĩ hiện tại ID: {dieuTri.MaBacSi}");
+                                        dieuTri.MaBacSi = bacSi.MaBacSi;
+                                        _logger.LogInformation($"Auto-assigned current doctor ID: {dieuTri.MaBacSi}");
                                     }
                                 }
                             }
                             
                             _context.DieuTriBenhNhans.Add(dieuTri);
                             await _context.SaveChangesAsync(); // Lưu điều trị trước khi cập nhật chi phí
+                            _logger.LogInformation($"Added treatment {dieuTriId} to patient {newBenhNhan.MaBenhNhan}");
                             
                             // Cập nhật chi phí
-                            var hinhThucDieuTri = await _context.HinhThucDieuTris.FindAsync(dieuTriId);
+                            var hinhThucDieuTriInfo = await _context.HinhThucDieuTris.FindAsync(dieuTriId);
                             
-                            if (hinhThucDieuTri != null)
+                            if (hinhThucDieuTriInfo != null)
                             {
-                                _logger.LogInformation($"Found treatment: {hinhThucDieuTri.TenDieuTri} with cost: {hinhThucDieuTri.ChiPhi}");
+                                _logger.LogInformation($"Found treatment: {hinhThucDieuTriInfo.TenDieuTri} with cost: {hinhThucDieuTriInfo.ChiPhi}");
                                 
                                 var chiPhiHienTai = await _context.ChiPhiDieuTris
                                     .FirstOrDefaultAsync(c => c.MaBenhNhan == newBenhNhan.MaBenhNhan && !c.DaThanhToan);
@@ -332,16 +463,16 @@ namespace QuanLyBenhVienNoiTru.Controllers
                                     chiPhiHienTai = new ChiPhiDieuTri
                                     {
                                         MaBenhNhan = newBenhNhan.MaBenhNhan,
-                                        TongChiPhi = hinhThucDieuTri.ChiPhi,
+                                        TongChiPhi = hinhThucDieuTriInfo.ChiPhi,
                                         DaThanhToan = false,
                                         NgayLap = DateTime.Now
                                     };
                                     _context.ChiPhiDieuTris.Add(chiPhiHienTai);
-                                    _logger.LogInformation($"Created new cost entry with initial cost: {hinhThucDieuTri.ChiPhi}");
+                                    _logger.LogInformation($"Created new cost entry with initial cost: {hinhThucDieuTriInfo.ChiPhi}");
                                 }
                                 else
                                 {
-                                    chiPhiHienTai.TongChiPhi += hinhThucDieuTri.ChiPhi;
+                                    chiPhiHienTai.TongChiPhi += hinhThucDieuTriInfo.ChiPhi;
                                     _logger.LogInformation($"Updated existing cost entry, new total: {chiPhiHienTai.TongChiPhi}");
                                 }
                                 
@@ -349,7 +480,7 @@ namespace QuanLyBenhVienNoiTru.Controllers
                             }
                             else
                             {
-                                _logger.LogWarning($"Treatment with ID {dieuTriId} not found");
+                                _logger.LogWarning($"Treatment with ID {dieuTriId} not found when updating costs");
                             }
                         }
                         
@@ -831,6 +962,27 @@ namespace QuanLyBenhVienNoiTru.Controllers
                 ModelState.AddModelError("", "Đã xảy ra lỗi khi xuất viện. Vui lòng thử lại.");
                 return View(viewModel);
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetKhoaByBenhNhan(int maBenhNhan)
+        {
+            var benhNhan = await _context.BenhNhans
+                .Include(b => b.Khoa)
+                .FirstOrDefaultAsync(b => b.MaBenhNhan == maBenhNhan);
+
+            if (benhNhan == null)
+            {
+                return Json(new { success = false });
+            }
+
+            return Json(new { 
+                success = true,
+                maBenhNhan = benhNhan.MaBenhNhan,
+                maKhoa = benhNhan.MaKhoa,
+                tenKhoa = benhNhan.Khoa?.TenKhoa,
+                maBacSi = benhNhan.MaBacSi
+            });
         }
 
         private bool BenhNhanExists(int id)

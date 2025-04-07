@@ -5,6 +5,14 @@ namespace QuanLyBenhVienNoiTru.Models
 {
     public class BacSi
     {
+        public BacSi()
+        {
+            // Initialize collections to prevent null reference exceptions
+            DieuTriBenhNhans = new HashSet<DieuTriBenhNhan>();
+            BenhNhans = new HashSet<BenhNhan>();
+            HinhThucDieuTris = new HashSet<HinhThucDieuTri>();
+        }
+        
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int MaBacSi { get; set; }
@@ -60,10 +68,10 @@ namespace QuanLyBenhVienNoiTru.Models
 
         // Navigation properties
         [ForeignKey("MaTaiKhoan")]
-        public virtual TaiKhoan TaiKhoan { get; set; }
+        public virtual TaiKhoan? TaiKhoan { get; set; }
 
         [ForeignKey("MaKhoa")]
-        public virtual Khoa Khoa { get; set; }
+        public virtual Khoa? Khoa { get; set; }
 
         public virtual ICollection<DieuTriBenhNhan> DieuTriBenhNhans { get; set; }
         public virtual ICollection<BenhNhan> BenhNhans { get; set; }

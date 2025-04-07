@@ -1,0 +1,233 @@
+@model QuanLyBenhVienNoiTru.Models.ViewModels.ProfileViewModel
+
+@{
+    ViewData["Title"] = "Thông tin cá nhân";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+    <li class="breadcrumb-item active">Thông tin cá nhân</li>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+        <i class="fas fa-check-circle me-2"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i> @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body text-center">
+                <div class="avatar-profile rounded-circle mx-auto mb-3">
+                    @{
+                        var firstLetter = Model.HoTen?.Length > 0 ? Model.HoTen.Substring(0, 1).ToUpper() : "?";
+                        var bgColor = Model.VaiTro switch
+                        {
+                            "Admin" => "bg-gradient-primary text-white",
+                            "Bác sĩ" => "bg-gradient-success text-white",
+                            "Khách" => "bg-gradient-info text-white",
+                            _ => "bg-gradient-secondary text-white"
+                        };
+                    }
+                    <div class="avatar-content @bgColor">
+                        @firstLetter
+                    </div>
+                </div>
+                <h4 class="fw-bold mb-1">@Model.HoTen</h4>
+                <p class="text-muted mb-2">@Model.VaiTro</p>
+                
+                @if (Model.VaiTro == "Bác sĩ")
+                {
+                    <div class="d-flex justify-content-center">
+                        <span class="badge bg-light text-dark me-2">
+                            <i class="fas fa-stethoscope me-1"></i> @Model.ChuyenKhoa
+                        </span>
+                        <span class="badge bg-light text-dark">
+                            <i class="fas fa-hospital me-1"></i> @Model.TenKhoa
+                        </span>
+                    </div>
+                }
+                
+                <hr>
+                
+                <div class="text-start">
+                    <div class="mb-2">
+                        <i class="fas fa-user text-muted me-2"></i> @Model.TenDangNhap
+                    </div>
+                    <div class="mb-2">
+                        <i class="fas fa-envelope text-muted me-2"></i> @Model.Email
+                    </div>
+                    <div class="mb-2">
+                        <i class="fas fa-phone text-muted me-2"></i> @Model.SoDienThoai
+                    </div>
+                    
+                    @if (!string.IsNullOrEmpty(Model.DiaChi))
+                    {
+                        <div class="mb-2">
+                            <i class="fas fa-map-marker-alt text-muted me-2"></i> @Model.DiaChi
+                        </div>
+                    }
+                    
+                    @if (Model.VaiTro == "Bác sĩ" && Model.NgayVaoLam.HasValue)
+                    {
+                        <div class="mb-2">
+                            <i class="fas fa-calendar-check text-muted me-2"></i> Vào làm: @Model.NgayVaoLam.Value.ToString("dd/MM/yyyy")
+                        </div>
+                    }
+                    
+                    @if (Model.VaiTro == "Khách" && !string.IsNullOrEmpty(Model.MoiQuanHe))
+                    {
+                        <div class="mb-2">
+                            <i class="fas fa-heart text-muted me-2"></i> @Model.MoiQuanHe
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header py-3">
+                <h5 class="mb-0">Cập nhật thông tin cá nhân</h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Profile" method="post">
+                    <input type="hidden" asp-for="MaTaiKhoan" />
+                    <input type="hidden" asp-for="TenDangNhap" />
+                    <input type="hidden" asp-for="VaiTro" />
+                    
+                    @if (Model.VaiTro == "Bác sĩ")
+                    {
+                        <input type="hidden" asp-for="ChuyenKhoa" />
+                        <input type="hidden" asp-for="MaKhoa" />
+                        <input type="hidden" asp-for="TenKhoa" />
+                        <input type="hidden" asp-for="NgayVaoLam" />
+                    }
+                    
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                    
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="HoTen" class="form-control" />
+                                <label asp-for="HoTen"></label>
+                                <span asp-validation-for="HoTen" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        @if (Model.VaiTro == "Bác sĩ")
+                        {
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select asp-for="GioiTinh" class="form-select" asp-items="ViewBag.GioiTinhList">
+                                        <option value="">-- Chọn giới tính --</option>
+                                    </select>
+                                    <label asp-for="GioiTinh"></label>
+                                    <span asp-validation-for="GioiTinh" class="text-danger"></span>
+                                </div>
+                            </div>
+                        }
+                        
+                        <div class="@(Model.VaiTro == "Bác sĩ" ? "col-md-6" : "col-md-12")">
+                            <div class="form-floating">
+                                <input asp-for="Email" class="form-control" />
+                                <label asp-for="Email"></label>
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="SoDienThoai" class="form-control" />
+                                <label asp-for="SoDienThoai"></label>
+                                <span asp-validation-for="SoDienThoai" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="@(Model.VaiTro == "Khách" && !string.IsNullOrEmpty(Model.MoiQuanHe) ? "col-md-6" : "col-md-12")">
+                            <div class="form-floating">
+                                <input asp-for="DiaChi" class="form-control" />
+                                <label asp-for="DiaChi"></label>
+                                <span asp-validation-for="DiaChi" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        @if (Model.VaiTro == "Khách" && !string.IsNullOrEmpty(Model.MoiQuanHe))
+                        {
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="MoiQuanHe" class="form-control" />
+                                    <label asp-for="MoiQuanHe"></label>
+                                    <span asp-validation-for="MoiQuanHe" class="text-danger"></span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    
+                    <hr>
+                    
+                    <h6 class="mb-3">Đổi mật khẩu</h6>
+                    
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="MatKhauMoi" class="form-control" />
+                                <label asp-for="MatKhauMoi"></label>
+                                <span asp-validation-for="MatKhauMoi" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="XacNhanMatKhau" class="form-control" />
+                                <label asp-for="XacNhanMatKhau"></label>
+                                <span asp-validation-for="XacNhanMatKhau" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i> Lưu thay đổi
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-profile {
+        width: 100px;
+        height: 100px;
+        overflow: hidden;
+    }
+    
+    .avatar-content {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        font-weight: bold;
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+} 
