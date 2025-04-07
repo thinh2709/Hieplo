@@ -61,6 +61,23 @@ namespace QuanLyBenhVienNoiTru.Controllers
             var giuong = await _context.Giuongs
                 .FirstOrDefaultAsync(g => g.MaBenhNhan == id);
 
+            // Tính tiền giường từ ngày nhập viện đến ngày xuất viện hoặc hiện tại
+            decimal tienGiuong = 0;
+            bool daThanhToanTienGiuong = false;
+
+            if (giuong != null)
+            {
+                var ngayKetThuc = benhNhan.NgayXuatVien ?? DateTime.Now;
+                var soNgay = (int)Math.Ceiling((ngayKetThuc - benhNhan.NgayNhapVien).TotalDays);
+                tienGiuong = soNgay * giuong.GiaTheoNgay;
+
+                // Kiểm tra xem đã có chi phí giường được thanh toán chưa
+                daThanhToanTienGiuong = await _context.ChiPhiDieuTris
+                    .AnyAsync(c => c.MaBenhNhan == id && 
+                                  c.MoTa == "Tiền giường bệnh" && 
+                                  c.DaThanhToan);
+            }
+
             // Tạo view model cho chi tiết bệnh nhân
             var viewModel = new BenhNhanDetailsViewModel
             {
@@ -70,7 +87,8 @@ namespace QuanLyBenhVienNoiTru.Controllers
                 LichThamBenhs = benhNhan.LichThamBenhs?.ToList() ?? new List<LichThamBenh>(),
                 TongChiPhiChuaThanhToan = benhNhan.ChiPhiDieuTris?.Where(c => !c.DaThanhToan).Sum(c => c.TongChiPhi) ?? 0,
                 TongChiPhiDaThanhToan = benhNhan.ChiPhiDieuTris?.Where(c => c.DaThanhToan).Sum(c => c.TongChiPhi) ?? 0,
-                Giuong = giuong
+                Giuong = giuong,
+                TienGiuong = daThanhToanTienGiuong ? 0 : tienGiuong
             };
 
             return View(viewModel);
@@ -359,15 +377,17 @@ namespace QuanLyBenhVienNoiTru.Controllers
                 };
 
                 // Thêm bệnh nhân vào database
-                _context.BenhNhans.Add(newBenhNhan);
-                await _context.SaveChangesAsync();
-                
-                _logger.LogInformation($"Đã thêm bệnh nhân thành công: {newBenhNhan.MaBenhNhan}");
-                
-                // Nếu đã chọn giường, cập nhật thông tin giường
-                if (viewModel.MaGiuong.HasValue && viewModel.MaGiuong.Value > 0)
+                using var transaction = await _context.Database.BeginTransactionAsync();
+                try
                 {
-                    try {
+                    _context.BenhNhans.Add(newBenhNhan);
+                    await _context.SaveChangesAsync();
+                    
+                    _logger.LogInformation($"Đã thêm bệnh nhân thành công: {newBenhNhan.MaBenhNhan}");
+                    
+                    // Nếu đã chọn giường, cập nhật thông tin giường
+                    if (viewModel.MaGiuong.HasValue && viewModel.MaGiuong.Value > 0)
+                    {
                         var giuong = await _context.Giuongs.FindAsync(viewModel.MaGiuong.Value);
                         if (giuong != null && giuong.TrangThai == "Trống")
                         {
@@ -382,26 +402,14 @@ namespace QuanLyBenhVienNoiTru.Controllers
                             
                             _logger.LogInformation($"Đã phân bệnh nhân {newBenhNhan.MaBenhNhan} vào giường {giuong.MaGiuong}");
                         }
-                    } catch (Exception ex) {
-                        _logger.LogError($"Lỗi khi cập nhật giường: {ex.Message}");
                     }
-                }
-                
-                // Nếu người dùng chọn thêm hình thức điều trị
-                if (viewModel.ThemDieuTri && viewModel.HinhThucDieuTriIds?.Count > 0)
-                {
-                    _logger.LogInformation($"Adding treatments: {string.Join(", ", viewModel.HinhThucDieuTriIds)}");
-                    _logger.LogInformation($"Bác sĩ phụ trách ID: {viewModel.MaBacSi}");
                     
-                    try
+                    // Nếu người dùng chọn thêm hình thức điều trị
+                    if (viewModel.ThemDieuTri && viewModel.HinhThucDieuTriIds?.Count > 0)
                     {
-                        // Ensure the list is not null
-                        if (viewModel.HinhThucDieuTriIds == null)
-                        {
-                            viewModel.HinhThucDieuTriIds = new List<int>();
-                            _logger.LogWarning("HinhThucDieuTriIds was null, initialized to empty list");
-                        }
-                        
+                        _logger.LogInformation($"Adding treatments: {string.Join(", ", viewModel.HinhThucDieuTriIds)}");
+                        _logger.LogInformation($"Bác sĩ phụ trách ID: {viewModel.MaBacSi}");
+
                         // Thêm các hình thức điều trị được chọn
                         foreach (var dieuTriId in viewModel.HinhThucDieuTriIds)
                         {
@@ -415,103 +423,87 @@ namespace QuanLyBenhVienNoiTru.Controllers
                                 continue;
                             }
                             
+                            // Ensure we have a valid doctor ID
+                            int? doctorId = viewModel.MaBacSi;
+                            if (doctorId == null || doctorId == 0)
+                            {
+                                // Try to get the current doctor if user is a doctor
+                                if (User.IsInRole("Bác sĩ"))
+                                {
+                                    var userId = User.FindFirst("UserId")?.Value;
+                                    if (!string.IsNullOrEmpty(userId) && int.TryParse(userId, out int maTaiKhoan))
+                                    {
+                                        var bacSi = await _context.BacSis
+                                            .FirstOrDefaultAsync(b => b.MaTaiKhoan == maTaiKhoan);
+                                            
+                                        if (bacSi != null)
+                                        {
+                                            doctorId = bacSi.MaBacSi;
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Create and add the treatment
                             var dieuTri = new DieuTriBenhNhan
                             {
                                 MaBenhNhan = newBenhNhan.MaBenhNhan,
                                 MaDieuTri = dieuTriId,
-                                MaBacSi = viewModel.MaBacSi,
+                                MaBacSi = doctorId,
                                 NgayThucHien = viewModel.NgayThucHien ?? DateTime.Now
                             };
                             
-                            // Log doctor assignment
-                            _logger.LogInformation($"Assigning doctor ID: {dieuTri.MaBacSi} for treatment ID: {dieuTriId}");
-                            
-                            // If no doctor is selected but should be auto-assigned
-                            if ((dieuTri.MaBacSi == null || dieuTri.MaBacSi == 0) && User.IsInRole("Bác sĩ"))
-                            {
-                                // Tự động lấy bác sĩ hiện tại nếu người dùng là bác sĩ
-                                var userId = User.FindFirst("UserId")?.Value;
-                                if (!string.IsNullOrEmpty(userId) && int.TryParse(userId, out int maTaiKhoan))
-                                {
-                                    var bacSi = await _context.BacSis
-                                        .FirstOrDefaultAsync(b => b.MaTaiKhoan == maTaiKhoan);
-                                        
-                                    if (bacSi != null)
-                                    {
-                                        dieuTri.MaBacSi = bacSi.MaBacSi;
-                                        _logger.LogInformation($"Auto-assigned current doctor ID: {dieuTri.MaBacSi}");
-                                    }
-                                }
-                            }
-                            
                             _context.DieuTriBenhNhans.Add(dieuTri);
-                            await _context.SaveChangesAsync(); // Lưu điều trị trước khi cập nhật chi phí
+                            await _context.SaveChangesAsync();
+                            
                             _logger.LogInformation($"Added treatment {dieuTriId} to patient {newBenhNhan.MaBenhNhan}");
                             
-                            // Cập nhật chi phí
-                            var hinhThucDieuTriInfo = await _context.HinhThucDieuTris.FindAsync(dieuTriId);
-                            
-                            if (hinhThucDieuTriInfo != null)
+                            // Add treatment cost
+                            var chiPhiHienTai = await _context.ChiPhiDieuTris
+                                .FirstOrDefaultAsync(c => c.MaBenhNhan == newBenhNhan.MaBenhNhan && !c.DaThanhToan);
+                                
+                            if (chiPhiHienTai == null)
                             {
-                                _logger.LogInformation($"Found treatment: {hinhThucDieuTriInfo.TenDieuTri} with cost: {hinhThucDieuTriInfo.ChiPhi}");
-                                
-                                var chiPhiHienTai = await _context.ChiPhiDieuTris
-                                    .FirstOrDefaultAsync(c => c.MaBenhNhan == newBenhNhan.MaBenhNhan && !c.DaThanhToan);
-                                    
-                                if (chiPhiHienTai == null)
+                                chiPhiHienTai = new ChiPhiDieuTri
                                 {
-                                    chiPhiHienTai = new ChiPhiDieuTri
-                                    {
-                                        MaBenhNhan = newBenhNhan.MaBenhNhan,
-                                        TongChiPhi = hinhThucDieuTriInfo.ChiPhi,
-                                        DaThanhToan = false,
-                                        NgayLap = DateTime.Now
-                                    };
-                                    _context.ChiPhiDieuTris.Add(chiPhiHienTai);
-                                    _logger.LogInformation($"Created new cost entry with initial cost: {hinhThucDieuTriInfo.ChiPhi}");
-                                }
-                                else
-                                {
-                                    chiPhiHienTai.TongChiPhi += hinhThucDieuTriInfo.ChiPhi;
-                                    _logger.LogInformation($"Updated existing cost entry, new total: {chiPhiHienTai.TongChiPhi}");
-                                }
-                                
-                                await _context.SaveChangesAsync();
+                                    MaBenhNhan = newBenhNhan.MaBenhNhan,
+                                    TongChiPhi = hinhThucDieuTri.ChiPhi,
+                                    DaThanhToan = false,
+                                    NgayLap = DateTime.Now,
+                                    MoTa = $"Chi phí điều trị: {hinhThucDieuTri.TenDieuTri}"
+                                };
+                                _context.ChiPhiDieuTris.Add(chiPhiHienTai);
                             }
                             else
                             {
-                                _logger.LogWarning($"Treatment with ID {dieuTriId} not found when updating costs");
+                                chiPhiHienTai.TongChiPhi += hinhThucDieuTri.ChiPhi;
+                                chiPhiHienTai.MoTa = string.IsNullOrEmpty(chiPhiHienTai.MoTa) 
+                                    ? $"Chi phí điều trị: {hinhThucDieuTri.TenDieuTri}"
+                                    : $"{chiPhiHienTai.MoTa}, {hinhThucDieuTri.TenDieuTri}";
                             }
+                            
+                            await _context.SaveChangesAsync();
                         }
                         
                         // Cập nhật bác sĩ phụ trách cho bệnh nhân nếu chưa có
-                        if (viewModel.MaBacSi.HasValue && viewModel.MaBacSi.Value > 0 && (!newBenhNhan.MaBacSi.HasValue || newBenhNhan.MaBacSi.Value == 0))
+                        if (viewModel.MaBacSi.HasValue && viewModel.MaBacSi.Value > 0 && 
+                            (!newBenhNhan.MaBacSi.HasValue || newBenhNhan.MaBacSi.Value == 0))
                         {
                             newBenhNhan.MaBacSi = viewModel.MaBacSi;
                             _context.Update(newBenhNhan);
                             await _context.SaveChangesAsync();
-                            _logger.LogInformation($"Đã cập nhật bác sĩ phụ trách {viewModel.MaBacSi} cho bệnh nhân {newBenhNhan.MaBenhNhan}");
-                        }
-                        
-                        _logger.LogInformation($"Đã thêm {viewModel.HinhThucDieuTriIds.Count} hình thức điều trị cho bệnh nhân {newBenhNhan.MaBenhNhan}");
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError($"Lỗi khi thêm điều trị: {ex.Message}");
-                        if (ex.InnerException != null)
-                        {
-                            _logger.LogError($"Inner exception: {ex.InnerException.Message}");
                         }
                     }
+
+                    await transaction.CommitAsync();
+                    TempData["Success"] = $"Thêm bệnh nhân {newBenhNhan.HoTen} thành công!";
+                    return RedirectToAction(nameof(Details), new { id = newBenhNhan.MaBenhNhan });
                 }
-                else
+                catch (Exception ex)
                 {
-                    _logger.LogInformation("No treatments added. ThemDieuTri = " + viewModel.ThemDieuTri + 
-                        ", HinhThucDieuTriIds count = " + (viewModel.HinhThucDieuTriIds?.Count.ToString() ?? "null"));
+                    await transaction.RollbackAsync();
+                    throw; // Re-throw to be caught by outer catch block
                 }
-                
-                TempData["Success"] = $"Thêm bệnh nhân {newBenhNhan.HoTen} thành công!";
-                return RedirectToAction(nameof(Details), new { id = newBenhNhan.MaBenhNhan });
             }
             catch (Exception ex)
             {

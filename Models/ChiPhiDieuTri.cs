@@ -7,6 +7,7 @@ namespace QuanLyBenhVienNoiTru.Models
         public decimal TongChiPhi { get; set; }
         public bool DaThanhToan { get; set; }
         public DateTime? NgayLap { get; set; }
+        public string MoTa { get; set; }
 
         // Navigation properties
         public virtual BenhNhan BenhNhan { get; set; }

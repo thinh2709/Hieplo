@@ -79,9 +79,6 @@ namespace QuanLyBenhVienNoiTru.Models.ViewModels
         [Display(Name = "Phương thức thanh toán")]
         public string PhuongThucThanhToan { get; set; }
         
-        [Display(Name = "Ghi chú")]
-        public string GhiChu { get; set; }
-        
         public List<SelectListItem> PhuongThucThanhToanOptions { get; set; } = new List<SelectListItem>
         {
             new SelectListItem { Value = "Tiền mặt", Text = "Tiền mặt" },

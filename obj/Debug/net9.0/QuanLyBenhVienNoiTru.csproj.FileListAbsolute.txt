@@ -855,7 +855,6 @@ C:\Users\thinh\Downloads\Hieplo-main\Hieplo-main\Hieplo\QuanLyBenhVienNoiTru\obj
 C:\Users\thinh\Downloads\Hieplo-main\Hieplo-main\Hieplo\QuanLyBenhVienNoiTru\obj\Debug\net9.0\compressed\nsm5sna2kx-61n19gt1b8.gz
 C:\Users\thinh\Downloads\Hieplo-main\Hieplo-main\Hieplo\QuanLyBenhVienNoiTru\obj\Debug\net9.0\compressed\it2hx678kl-4utea7a4lo.gz
 C:\Users\thinh\Downloads\Hieplo-main\Hieplo-main\Hieplo\QuanLyBenhVienNoiTru\obj\Debug\net9.0\compressed\6ecjeqd61p-1nun3iyfmq.gz
-C:\Users\thinh\Downloads\Hieplo-main\Hieplo-main\Hieplo\QuanLyBenhVienNoiTru\obj\Debug\net9.0\compressed\f3as0icyxv-zf0uqym939.gz
 C:\Users\thinh\Downloads\Hieplo-main\Hieplo-main\Hieplo\QuanLyBenhVienNoiTru\obj\Debug\net9.0\compressed\d54vzl7euo-bqjiyaj88i.gz
 C:\Users\thinh\Downloads\Hieplo-main\Hieplo-main\Hieplo\QuanLyBenhVienNoiTru\obj\Debug\net9.0\compressed\e4mq42wufh-c2jlpeoesf.gz
 C:\Users\thinh\Downloads\Hieplo-main\Hieplo-main\Hieplo\QuanLyBenhVienNoiTru\obj\Debug\net9.0\compressed\qfj8dh2lk6-erw9l3u2r3.gz
@@ -935,3 +934,4 @@ C:\Users\thinh\Downloads\Hieplo-main\Hieplo-main\Hieplo\QuanLyBenhVienNoiTru\bin
 C:\Users\thinh\Downloads\Hieplo-main\Hieplo-main\Hieplo\QuanLyBenhVienNoiTru\bin\Debug\net9.0\QuanLyBenhVienNoiTru.pdb
 C:\Users\thinh\Downloads\Hieplo-main\Hieplo-main\Hieplo\QuanLyBenhVienNoiTru\obj\Debug\net9.0\QuanLyBenhVienNoiTru.genruntimeconfig.cache
 C:\Users\thinh\Downloads\Hieplo-main\Hieplo-main\Hieplo\QuanLyBenhVienNoiTru\obj\Debug\net9.0\ref\QuanLyBenhVienNoiTru.dll
+C:\Users\thinh\Downloads\Hieplo-main\Hieplo-main\Hieplo\QuanLyBenhVienNoiTru\obj\Debug\net9.0\compressed\f3as0icyxv-zf0uqym939.gz

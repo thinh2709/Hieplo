@@ -106,36 +106,10 @@
                                     </a>
                                     <button type="button" 
                                             class="btn btn-sm btn-light text-danger" 
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#deleteModal@(item.MaBenhNhan)"
+                                            onclick="confirmDelete('@item.MaBenhNhan', '@item.HoTen')"
                                             title="Xóa">
                                         <i class="fas fa-trash"></i>
                                     </button>
-                                </div>
-
-                                <!-- Delete Modal -->
-                                <div class="modal fade" id="deleteModal@(item.MaBenhNhan)" tabindex="-1" aria-labelledby="deleteModalLabel@(item.MaBenhNhan)" aria-hidden="true" data-bs-backdrop="static">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="deleteModalLabel@(item.MaBenhNhan)">Xác nhận xóa</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <div class="alert alert-danger mb-0">
-                                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                                    <span>Bạn có chắc chắn muốn xóa bệnh nhân <strong>@item.HoTen</strong>?</span>
-                                                    <div class="mt-2 mb-0">Hành động này không thể hoàn tác.</div>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
-                                                <form asp-action="Delete" asp-route-id="@item.MaBenhNhan" method="post" class="d-inline">
-                                                    <button type="submit" class="btn btn-danger">Xác nhận xóa</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </td>
                         </tr>
@@ -210,6 +184,30 @@
         function applyFilter() {
             // Implement filter logic here
             $('#filterModal').modal('hide');
+        }
+
+        function confirmDelete(id, name) {
+            if (confirm(`Bạn có chắc chắn muốn xóa bệnh nhân ${name}? Hành động này không thể hoàn tác.`)) {
+                const form = document.createElement('form');
+                form.method = 'post';
+                form.action = '@Url.Action("Delete")';
+                
+                const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = '__RequestVerificationToken';
+                csrfInput.value = csrfToken;
+                form.appendChild(csrfInput);
+                
+                const idInput = document.createElement('input');
+                idInput.type = 'hidden';
+                idInput.name = 'id';
+                idInput.value = id;
+                form.appendChild(idInput);
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
         }
 
         $(document).ready(function() {

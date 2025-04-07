@@ -205,5 +205,77 @@ namespace QuanLyBenhVienNoiTru.Controllers
             // Ngược lại quay về trang danh sách chi phí
             return RedirectToAction(nameof(Index));
         }
+
+        // GET: ChiPhiDieuTri/ThanhToanTatCa/5
+        public async Task<IActionResult> ThanhToanTatCa(int? maBenhNhan)
+        {
+            if (maBenhNhan == null)
+            {
+                return NotFound();
+            }
+
+            // Tạo chi phí mới cho tiền giường
+            var benhNhan = await _context.BenhNhans
+                .Include(b => b.ChiPhiDieuTris)
+                .FirstOrDefaultAsync(b => b.MaBenhNhan == maBenhNhan);
+
+            if (benhNhan == null)
+            {
+                return NotFound();
+            }
+
+            // Lấy thông tin giường bệnh
+            var giuong = await _context.Giuongs
+                .FirstOrDefaultAsync(g => g.MaBenhNhan == maBenhNhan);
+
+            // Tính tiền giường và tạo chi phí mới
+            if (giuong != null)
+            {
+                var ngayKetThuc = benhNhan.NgayXuatVien ?? DateTime.Now;
+                var soNgay = (int)Math.Ceiling((ngayKetThuc - benhNhan.NgayNhapVien).TotalDays);
+                var tienGiuong = soNgay * giuong.GiaTheoNgay;
+
+                // Kiểm tra xem đã có chi phí giường chưa thanh toán không
+                var chiPhiGiuongCu = await _context.ChiPhiDieuTris
+                    .FirstOrDefaultAsync(c => c.MaBenhNhan == maBenhNhan && 
+                                            c.MoTa == "Tiền giường bệnh" && 
+                                            !c.DaThanhToan);
+
+                if (chiPhiGiuongCu != null)
+                {
+                    // Nếu có, cập nhật trạng thái thanh toán
+                    chiPhiGiuongCu.DaThanhToan = true;
+                    _context.Update(chiPhiGiuongCu);
+                }
+                else
+                {
+                    // Nếu chưa có, tạo mới chi phí giường
+                    var chiPhiGiuong = new ChiPhiDieuTri
+                    {
+                        MaBenhNhan = benhNhan.MaBenhNhan,
+                        NgayLap = DateTime.Now,
+                        TongChiPhi = tienGiuong,
+                        DaThanhToan = true,
+                        MoTa = "Tiền giường bệnh"
+                    };
+                    _context.ChiPhiDieuTris.Add(chiPhiGiuong);
+                }
+            }
+
+            // Cập nhật trạng thái thanh toán cho tất cả chi phí chưa thanh toán
+            var chiPhiChuaThanhToan = await _context.ChiPhiDieuTris
+                .Where(c => c.MaBenhNhan == maBenhNhan && !c.DaThanhToan)
+                .ToListAsync();
+
+            foreach (var chiPhi in chiPhiChuaThanhToan)
+            {
+                chiPhi.DaThanhToan = true;
+            }
+
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Đã thanh toán tất cả chi phí thành công!";
+            return RedirectToAction("Details", "BenhNhan", new { id = maBenhNhan });
+        }
     }
 }

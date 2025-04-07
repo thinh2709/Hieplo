@@ -147,6 +147,7 @@ namespace QuanLyBenhVienNoiTru.Models.ViewModels
         public decimal TongChiPhiChuaThanhToan { get; set; }
         public decimal TongChiPhiDaThanhToan { get; set; }
         public Giuong Giuong { get; set; }
+        public decimal TienGiuong { get; set; }
     }
 
     public class BenhNhanXuatVienViewModel
